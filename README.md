@@ -1,8 +1,5 @@
 # Hybrid Long Read Deconvolution (HyLoRD) 
 
-A Hybrid Approach for Cell Type Deconvolution in Long-Read (ONT) Methylation
-Data
-
 ## Abstract
 
 Cell type deconvolution is a critical tool in epigenome-wide association
