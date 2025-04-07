@@ -38,7 +38,7 @@ class TSVFileReader {
 
    // Reading
    struct ChunkResult {
-      int chunk_index{};
+      std::size_t chunk_index{};
       std::vector<RecordType> records{};
    };
    std::vector<std::string> splitTSVLine(const std::string& line) const;
