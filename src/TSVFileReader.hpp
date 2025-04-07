@@ -206,13 +206,13 @@ TSVFileReader<RecordType>::processFile(const char* file_start,
 
    // Parallel processing of chunks
    std::vector<std::future<ChunkResult>> futures;
-   auto processChunkTask{[this](size_t i, const auto& ranges) -> ChunkResult {
-      auto records = processChunk(ranges[i].first, ranges[i].second);
-      return ChunkResult{i, std::move(records)};
-   }};
-   for (std::size_t i{0}; i < chunk_ranges.size(); ++i) {
-      futures.push_back(std::async(
-          std::launch::async, processChunkTask, i, std::cref(chunk_ranges)));
+   for (size_t i = 0; i < chunk_ranges.size(); ++i) {
+      futures.push_back(
+          std::async(std::launch::async, [this, i, &chunk_ranges]() {
+             auto records =
+                 processChunk(chunk_ranges[i].first, chunk_ranges[i].second);
+             return ChunkResult{i, std::move(records)};
+          }));
    }
 
    std::vector<ChunkResult> chunk_results(chunk_ranges.size());
