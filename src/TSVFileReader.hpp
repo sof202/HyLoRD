@@ -21,6 +21,24 @@
 
 template <typename RecordType>
 class TSVFileReader {
+  public:
+   TSVFileReader(const std::string_view file_path,
+                 const std::vector<int>& columns_to_include = {},
+                 std::function<bool(const std::vector<std::string>&)>
+                     rowFilter = nullptr,
+                 int threads = std::thread::hardware_concurrency()) :
+       m_file_path{file_path},
+       m_columns_to_include{columns_to_include},
+       m_rowFilter{rowFilter},
+       m_num_threads{threads} {
+      setupMemoryMap();
+   }
+
+   void load();
+   const std::vector<RecordType>& getRecords() const { return m_records; }
+
+   ~TSVFileReader() { cleanupMemoryMap(); }
+
   private:
    std::string m_file_path{};
    std::vector<RecordType> m_records{};
@@ -47,24 +65,6 @@ class TSVFileReader {
                                         const char* end) const;
    std::vector<ChunkResult> processFile(const char* file_start,
                                         const char* file_end);
-
-  public:
-   TSVFileReader(const std::string_view file_path,
-                 const std::vector<int>& columns_to_include = {},
-                 std::function<bool(const std::vector<std::string>&)>
-                     rowFilter = nullptr,
-                 int threads = std::thread::hardware_concurrency()) :
-       m_file_path{file_path},
-       m_columns_to_include{columns_to_include},
-       m_rowFilter{rowFilter},
-       m_num_threads{threads} {
-      setupMemoryMap();
-   }
-
-   void load();
-   const std::vector<RecordType>& getRecords() const { return m_records; }
-
-   ~TSVFileReader() { cleanupMemoryMap(); }
 };
 
 template <typename RecordType>
