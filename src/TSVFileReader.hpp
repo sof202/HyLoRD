@@ -19,13 +19,15 @@
 #include <utility>
 #include <vector>
 
+using Fields = std::vector<std::string>;
+using RowFilterFunction = std::function<bool(const std::vector<std::string>&)>;
+
 template <typename RecordType>
 class TSVFileReader {
   public:
    TSVFileReader(const std::string_view file_path,
                  const std::vector<int>& columns_to_include = {},
-                 std::function<bool(const std::vector<std::string>&)>
-                     rowFilter = nullptr,
+                 RowFilterFunction rowFilter = nullptr,
                  int threads = std::thread::hardware_concurrency()) :
        m_file_path{file_path},
        m_columns_to_include{columns_to_include},
@@ -43,7 +45,7 @@ class TSVFileReader {
    std::string m_file_path{};
    std::vector<RecordType> m_records{};
    std::vector<int> m_columns_to_include{};
-   std::function<bool(const std::vector<std::string>&)> m_rowFilter{};
+   RowFilterFunction m_rowFilter{};
    int m_num_threads{};
 
    // Memory mapping
@@ -59,7 +61,7 @@ class TSVFileReader {
       std::size_t chunk_index{};
       std::vector<RecordType> records{};
    };
-   std::vector<std::string> splitTSVLine(const std::string& line) const;
+   Fields splitTSVLine(const std::string& line) const;
    const char* findChunkEnd(const char* start, std::size_t size) const;
    std::vector<RecordType> processChunk(const char* start,
                                         const char* end) const;
@@ -120,9 +122,9 @@ inline void TSVFileReader<RecordType>::cleanupMemoryMap() {
 }
 
 template <typename RecordType>
-inline std::vector<std::string> TSVFileReader<RecordType>::splitTSVLine(
+inline Fields TSVFileReader<RecordType>::splitTSVLine(
     const std::string& line) const {
-   std::vector<std::string> fields;
+   Fields fields;
    std::size_t start{0};
    std::size_t end{line.find('\t')};
 
@@ -163,9 +165,9 @@ inline std::vector<RecordType> TSVFileReader<RecordType>::processChunk(
       if (!line_end) line_end = end;
 
       std::string line(line_start, line_end - line_start);
-      std::vector<std::string> fields{splitTSVLine(line)};
+      Fields fields{splitTSVLine(line)};
 
-      std::vector<std::string> filtered_fields{};
+      Fields filtered_fields{};
       filtered_fields.reserve(fields.size());
       for (auto i : m_columns_to_include) {
          if (i < fields.size()) {
