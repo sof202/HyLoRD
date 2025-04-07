@@ -165,7 +165,8 @@ inline std::vector<RecordType> TSVFileReader<RecordType>::processChunk(
       std::string line(line_start, line_end - line_start);
       std::vector<std::string> fields{splitTSVLine(line)};
 
-      std::vector<std::string> filtered_fields(m_columns_to_include.size());
+      std::vector<std::string> filtered_fields{};
+      filtered_fields.reserve(fields.size());
       for (auto i : m_columns_to_include) {
          if (i < fields.size()) {
             filtered_fields.push_back(fields[i]);
@@ -181,10 +182,8 @@ inline std::vector<RecordType> TSVFileReader<RecordType>::processChunk(
             std::cerr << "Record conversion error: " << e.what() << '\n';
          }
       }
-
       line_start = line_end + 1;
    }
-
    return chunk_records;
 }
 
