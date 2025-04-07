@@ -36,8 +36,8 @@ class TSVFileReader {
       int chunk_index{};
       std::vector<RecordType> records{};
    };
-   const char* findChunkEnd(const char* start, int size) const;
    std::vector<std::string> splitTSVLine(const std::string& line) const;
+   const char* findChunkEnd(const char* start, int size) const;
    std::vector<RecordType> processChunk(const char* start,
                                         const char* end) const;
    std::vector<ChunkResult> processChunksOrdered(const char* file_start,
@@ -112,6 +112,24 @@ inline void TSVFileReader<RecordType>::cleanupMemoryMap() {
       close(m_file_descriptor);
       m_file_descriptor = -1;
    }
+}
+
+template <typename RecordType>
+inline std::vector<std::string> TSVFileReader<RecordType>::splitTSVLine(
+    const std::string& line) const {
+   std::vector<std::string> fields;
+   std::size_t start{0};
+   std::size_t end{line.find('\t')};
+
+   while (end != std::string::npos) {
+      fields.push_back(line.substr(start, end - start));
+      start = end + 1;
+      end = line.find('\t', start);
+   }
+   // Final field
+   fields.push_back(line.substr(start));
+
+   return fields;
 }
 
 #endif
