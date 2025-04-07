@@ -1,0 +1,14 @@
+﻿---
+BasedOnStyle: Google
+ColumnLimit: '79'
+Language: Cpp
+PointerAlignment: Left
+TabWidth: '3'
+IndentWidth: '3'
+BinPackArguments: false
+BinPackParameters: false
+AllowAllConstructorInitializersOnNextLine: false
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+BreakConstructorInitializers: AfterColon
+
+...
