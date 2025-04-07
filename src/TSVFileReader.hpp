@@ -9,11 +9,13 @@
 #include <cerrno>
 #include <cstring>
 #include <functional>
+#include <future>
 #include <iostream>
 #include <stdexcept>
 #include <string>
 #include <system_error>
 #include <thread>
+#include <utility>
 #include <vector>
 
 template <typename RecordType>
@@ -39,11 +41,11 @@ class TSVFileReader {
       std::vector<RecordType> records{};
    };
    std::vector<std::string> splitTSVLine(const std::string& line) const;
-   const char* findChunkEnd(const char* start, int size) const;
+   const char* findChunkEnd(const char* start, std::size_t size) const;
    std::vector<RecordType> processChunk(const char* start,
                                         const char* end) const;
-   std::vector<ChunkResult> processChunksOrdered(const char* file_start,
-                                                 const char* file_end);
+   std::vector<ChunkResult> processFile(const char* file_start,
+                                        const char* file_end);
 
   public:
    TSVFileReader(const std::string_view file_path,
@@ -135,6 +137,20 @@ inline std::vector<std::string> TSVFileReader<RecordType>::splitTSVLine(
 }
 
 template <typename RecordType>
+inline const char* TSVFileReader<RecordType>::findChunkEnd(
+    const char* start, std::size_t size) const {
+   const char* approximate_end{start + size};
+   const char* file_end{m_mapped_data + m_file_size};
+
+   if (approximate_end >= file_end) return file_end;
+
+   const char* end{static_cast<const char*>(
+       memchr(approximate_end, '\n', (file_end)-approximate_end))};
+
+   return end ? end : file_end;
+}
+
+template <typename RecordType>
 inline std::vector<RecordType> TSVFileReader<RecordType>::processChunk(
     const char* start, const char* end) const {
    std::vector<RecordType> chunk_records;
@@ -167,6 +183,47 @@ inline std::vector<RecordType> TSVFileReader<RecordType>::processChunk(
 
       line_start = line_end + 1;
    }
+}
+
+template <typename RecordType>
+inline std::vector<typename TSVFileReader<RecordType>::ChunkResult>
+TSVFileReader<RecordType>::processFile(const char* file_start,
+                                       const char* file_end) {
+   std::vector<std::pair<const char*, const char*>> chunk_ranges{};
+   std::size_t chunk_size = m_file_size / m_num_threads;
+   const char* chunk_start = file_start;
+
+   for (std::size_t i{0}; i < m_num_threads; ++i) {
+      const char* chunk_end{(i == m_num_threads - 1)
+                                ? file_end
+                                : findChunkEnd(chunk_start, chunk_size)};
+      chunk_ranges.emplace_back(chunk_start, chunk_end);
+      chunk_start = chunk_end + 1;
+   }
+
+   // Parallel processing of chunks
+   std::vector<std::future<ChunkResult>> futures;
+   auto processChunkTask{[this](size_t i, const auto& ranges) -> ChunkResult {
+      auto records = processChunk(ranges[i].first, ranges[i].second);
+      return ChunkResult{i, std::move(records)};
+   }};
+   for (std::size_t i{0}; i < chunk_ranges.size(); ++i) {
+      futures.push_back(std::async(
+          std::launch::async, processChunkTask, i, std::cref(chunk_ranges)));
+   }
+
+   std::vector<ChunkResult> chunk_results(chunk_ranges.size());
+   for (const auto& future : futures) {
+      try {
+         auto result = future.get();
+         chunk_results[result.chunk_index] = std::move(result);
+      } catch (const std::exception& e) {
+         std::cerr << "Some chunk could not be processed: " << e.what()
+                   << '\n';
+      }
+   }
+
+   return chunk_results;
 }
 
 #endif
