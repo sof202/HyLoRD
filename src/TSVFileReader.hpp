@@ -7,7 +7,9 @@
 #include <unistd.h>
 
 #include <cerrno>
+#include <cstring>
 #include <functional>
+#include <iostream>
 #include <stdexcept>
 #include <string>
 #include <system_error>
@@ -130,6 +132,41 @@ inline std::vector<std::string> TSVFileReader<RecordType>::splitTSVLine(
    fields.push_back(line.substr(start));
 
    return fields;
+}
+
+template <typename RecordType>
+inline std::vector<RecordType> TSVFileReader<RecordType>::processChunk(
+    const char* start, const char* end) const {
+   std::vector<RecordType> chunk_records;
+   const char* line_start{start};
+
+   while (line_start < end) {
+      const char* line_end{static_cast<const char*>(
+          memchr(line_start, '\n', end - line_start))};
+      if (!line_end) line_end = end;
+
+      std::string line(line_start, line_end - line_start);
+      std::vector<std::string> fields{splitTSVLine(line)};
+
+      std::vector<std::string> filtered_fields(m_columns_to_include.size());
+      for (auto i : m_columns_to_include) {
+         if (i < fields.size()) {
+            filtered_fields.push_back(fields[i]);
+         } else {
+            filtered_fields.emplace_back();
+         }
+      }
+
+      if (!m_rowFilter || m_rowFilter(filtered_fields)) {
+         try {
+            chunk_records.push_back(RecordType::fromFields(filtered_fields));
+         } catch (const std::exception& e) {
+            std::cerr << "Record conversion error: " << e.what() << '\n';
+         }
+      }
+
+      line_start = line_end + 1;
+   }
 }
 
 #endif
