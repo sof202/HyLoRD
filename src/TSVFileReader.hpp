@@ -11,6 +11,7 @@
 #include <functional>
 #include <future>
 #include <iostream>
+#include <iterator>
 #include <stdexcept>
 #include <string>
 #include <system_error>
@@ -224,6 +225,23 @@ TSVFileReader<RecordType>::processFile(const char* file_start,
    }
 
    return chunk_results;
+}
+
+template <typename RecordType>
+void TSVFileReader<RecordType>::load() {
+   const char* file_start{m_mapped_data};
+   const char* file_end{m_mapped_data + m_file_size};
+
+   auto chunk_results{processFile(file_start, file_end)};
+
+   m_records.reserve(m_file_size / 100);
+
+   // Insert chunks in the correct order
+   for (auto& result : chunk_results) {
+      m_records.insert(m_records.end(),
+                       std::make_move_iterator(result.records.begin()),
+                       std::make_move_iterator(result.records.end()));
+   }
 }
 
 #endif
