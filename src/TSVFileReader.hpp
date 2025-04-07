@@ -184,6 +184,8 @@ inline std::vector<RecordType> TSVFileReader<RecordType>::processChunk(
 
       line_start = line_end + 1;
    }
+
+   return chunk_records;
 }
 
 template <typename RecordType>
