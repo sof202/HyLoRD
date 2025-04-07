@@ -216,7 +216,7 @@ TSVFileReader<RecordType>::processFile(const char* file_start,
    }
 
    std::vector<ChunkResult> chunk_results(chunk_ranges.size());
-   for (const auto& future : futures) {
+   for (auto& future : futures) {
       try {
          auto result = future.get();
          chunk_results[result.chunk_index] = std::move(result);
