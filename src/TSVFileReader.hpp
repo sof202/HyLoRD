@@ -45,7 +45,41 @@ class TSVFileReader {
       setupMemoryMap();
    }
 
+   TSVFileReader(const TSVFileReader&) = delete;
+   TSVFileReader& operator=(const TSVFileReader&) = delete;
+
+   TSVFileReader(TSVFileReader&& other) noexcept :
+       m_file_path{std::move(other.m_file_path)},
+       m_records{std::move(other.m_records)},
+       m_columns_to_include{std::move(other.m_columns_to_include)},
+       m_rowFilter{std::move(other.m_rowFilter)},
+       m_num_threads{other.m_num_threads},
+       m_file_info{other.m_file_info},
+       m_file_size{other.m_file_size},
+       m_file_descriptor{std::exchange(other.m_file_descriptor, -1)},
+       m_mapped_data{std::exchange(other.m_mapped_data, nullptr)} {}
+
+   TSVFileReader& operator=(TSVFileReader&& other) noexcept {
+      if (this != &other) {
+         cleanupMemoryMap();
+
+         m_file_path = std::move(other.m_file_path);
+         m_records = std::move(other.m_records);
+         m_columns_to_include = std::move(other.m_columns_to_include);
+         m_rowFilter = std::move(other.m_rowFilter);
+         m_num_threads = other.m_num_threads;
+         m_file_info = other.m_file_info;
+         m_file_size = other.m_file_size;
+         m_file_descriptor = std::exchange(other.m_file_descriptor, -1);
+         m_mapped_data = std::exchange(other.m_mapped_data, nullptr);
+      }
+      return *this;
+   }
+
    void load();
+   bool isValid() const noexcept {
+      return m_file_descriptor != -1 && m_mapped_data != nullptr;
+   }
    const std::vector<RecordType>& getRecords() const { return m_records; }
 
    ~TSVFileReader() { cleanupMemoryMap(); }
@@ -244,6 +278,10 @@ TSVFileReader<RecordType>::processFile(const char* file_start,
 
 template <TSVRecord RecordType>
 void TSVFileReader<RecordType>::load() {
+   if (!isValid()) {
+      throw std::runtime_error(
+          "Reader is invalid state (Probably due to move).");
+   }
    const char* file_start{m_mapped_data};
    const char* file_end{m_mapped_data + m_file_size};
 
