@@ -7,6 +7,7 @@
 #include <unistd.h>
 
 #include <cerrno>
+#include <cstddef>
 #include <cstring>
 #include <functional>
 #include <future>
@@ -34,9 +35,9 @@ template <TSVRecord RecordType>
 class TSVFileReader {
   public:
    TSVFileReader(const std::string_view file_path,
-                 const std::vector<int>& columns_to_include = {},
+                 const std::vector<std::size_t>& columns_to_include = {},
                  RowFilterFunction rowFilter = nullptr,
-                 int threads = std::thread::hardware_concurrency()) :
+                 std::size_t threads = std::thread::hardware_concurrency()) :
        m_file_path{file_path},
        m_columns_to_include{columns_to_include},
        m_rowFilter{rowFilter},
@@ -52,9 +53,9 @@ class TSVFileReader {
   private:
    std::string m_file_path{};
    std::vector<RecordType> m_records{};
-   std::vector<int> m_columns_to_include{};
+   std::vector<std::size_t> m_columns_to_include{};
    RowFilterFunction m_rowFilter{};
-   int m_num_threads{};
+   std::size_t m_num_threads{};
 
    // Memory mapping
    struct stat m_file_info{};
@@ -156,7 +157,9 @@ inline const char* TSVFileReader<RecordType>::findChunkEnd(
    if (approximate_end >= file_end) return file_end;
 
    const char* end{static_cast<const char*>(
-       memchr(approximate_end, '\n', (file_end)-approximate_end))};
+       memchr(approximate_end,
+              '\n',
+              static_cast<std::size_t>(file_end - approximate_end)))};
 
    return end ? end : file_end;
 }
@@ -168,11 +171,12 @@ inline std::vector<RecordType> TSVFileReader<RecordType>::processChunk(
    const char* line_start{start};
 
    while (line_start < end) {
-      const char* line_end{static_cast<const char*>(
-          memchr(line_start, '\n', end - line_start))};
+      const char* line_end{static_cast<const char*>(memchr(
+          line_start, '\n', static_cast<std::size_t>(end - line_start)))};
       if (!line_end) line_end = end;
 
-      std::string line(line_start, line_end - line_start);
+      std::string line(line_start,
+                       static_cast<std::size_t>(line_end - line_start));
       Fields fields{splitTSVLine(line)};
 
       Fields filtered_fields{};
@@ -215,7 +219,7 @@ TSVFileReader<RecordType>::processFile(const char* file_start,
 
    // Parallel processing of chunks
    std::vector<std::future<ChunkResult>> futures;
-   for (size_t i = 0; i < chunk_ranges.size(); ++i) {
+   for (std::size_t i = 0; i < chunk_ranges.size(); ++i) {
       futures.push_back(
           std::async(std::launch::async, [this, i, &chunk_ranges]() {
              auto records =
