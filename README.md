@@ -1,6 +1,8 @@
 # Hybrid Long Read Deconvolution (HyLoRD) 
 
-## Abstract
+## Description
+
+### Abstract
 
 Cell type deconvolution is a critical tool in epigenome-wide association
 studies (EWAS), enabling the estimation of cellular heterogeneity in bulk
@@ -25,7 +27,7 @@ supports multi-signature deconvolution, incorporating both 5mC and 5hmC
 modifications, which may enhance resolution in cell types with distinct
 hydroxymethylation patterns (*e.g.*, neuronal populations).
 
-## Introduction
+### Introduction
 
 Epigenetic cell type deconvolution is widely used to dissect cellular
 heterogeneity in bulk tissue samples, with applications in EWAS and biomarker
@@ -43,7 +45,7 @@ long-read methylation data. HyLoRD fills this gap by combining reference-based
 and reference-free approaches, enabling robust proportion estimation even for
 cell types absent in the user provided reference methylation matrix.
 
-## Methodological Approach
+### Methodological Approach
 
 HyLoRD formulates deconvolution as a quadratic programming problem (QPP),
 optimizing cell proportions under biological constraints (e.g., non-negativity,
@@ -61,7 +63,7 @@ sum-to-one). Key features include:
   - Optional integration of 5hmC signals, improving resolution in cell types
   with differential hydroxymethylation
 
-## Advantages Over Existing Methods
+### Advantages Over Existing Methods
 
 Accuracy: Leverages long-read methylation calls, which are less susceptible to
 PCR bias and coverage dropouts.
@@ -72,7 +74,7 @@ limited availability of cell-sorted ONT data.
 Interpretability: Quadratic programming provides transparent, deterministic
 solutions.
 
-## Applications
+### Applications
 
 HyLoRD is particularly suited for:
 
@@ -82,7 +84,7 @@ power.
 - Analyzing archival or low-input samples where long-read sequencing is
 advantageous.
 
-## Future Directions
+### Future Directions
 As ONT basecallers (e.g., Dorado) improve in accuracy, HyLoRD’s performance
 will further benefit from higher-fidelity 5mC/5hmC calls. We also anticipate
 extending HyLoRD to other long-read epigenetic modifications (e.g., 6mA) as
