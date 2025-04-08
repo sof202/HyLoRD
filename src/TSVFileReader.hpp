@@ -77,7 +77,7 @@ class TSVFileReader {
                                         const char* file_end);
 };
 
-template <typename RecordType>
+template <TSVRecord RecordType>
 inline void TSVFileReader<RecordType>::setupMemoryMap() {
    m_file_descriptor = open(m_file_path.c_str(), O_RDONLY);
    if (m_file_descriptor == -1) {
@@ -117,7 +117,7 @@ inline void TSVFileReader<RecordType>::setupMemoryMap() {
    madvise(m_mapped_data, m_file_size, MADV_SEQUENTIAL | MADV_WILLNEED);
 }
 
-template <typename RecordType>
+template <TSVRecord RecordType>
 inline void TSVFileReader<RecordType>::cleanupMemoryMap() {
    if (m_mapped_data) {
       munmap(m_mapped_data, m_file_size);
@@ -129,7 +129,7 @@ inline void TSVFileReader<RecordType>::cleanupMemoryMap() {
    }
 }
 
-template <typename RecordType>
+template <TSVRecord RecordType>
 inline Fields TSVFileReader<RecordType>::splitTSVLine(
     const std::string& line) const {
    Fields fields;
@@ -147,7 +147,7 @@ inline Fields TSVFileReader<RecordType>::splitTSVLine(
    return fields;
 }
 
-template <typename RecordType>
+template <TSVRecord RecordType>
 inline const char* TSVFileReader<RecordType>::findChunkEnd(
     const char* start, std::size_t size) const {
    const char* approximate_end{start + size};
@@ -161,7 +161,7 @@ inline const char* TSVFileReader<RecordType>::findChunkEnd(
    return end ? end : file_end;
 }
 
-template <typename RecordType>
+template <TSVRecord RecordType>
 inline std::vector<RecordType> TSVFileReader<RecordType>::processChunk(
     const char* start, const char* end) const {
    std::vector<RecordType> chunk_records;
@@ -197,7 +197,7 @@ inline std::vector<RecordType> TSVFileReader<RecordType>::processChunk(
    return chunk_records;
 }
 
-template <typename RecordType>
+template <TSVRecord RecordType>
 inline std::vector<typename TSVFileReader<RecordType>::ChunkResult>
 TSVFileReader<RecordType>::processFile(const char* file_start,
                                        const char* file_end) {
@@ -238,7 +238,7 @@ TSVFileReader<RecordType>::processFile(const char* file_start,
    return chunk_results;
 }
 
-template <typename RecordType>
+template <TSVRecord RecordType>
 void TSVFileReader<RecordType>::load() {
    const char* file_start{m_mapped_data};
    const char* file_end{m_mapped_data + m_file_size};
