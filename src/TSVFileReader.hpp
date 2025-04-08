@@ -81,7 +81,7 @@ class TSVFileReader {
 
    using Records = std::vector<RecordType>;
    const Records& getRecords() const {
-      if (!m_loaded) throw std::runtime_error("No data loaded.");
+      if (!isLoaded()) throw std::runtime_error("No data loaded.");
       return m_records;
    }
 
