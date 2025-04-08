@@ -280,7 +280,7 @@ template <TSVRecord RecordType>
 void TSVFileReader<RecordType>::load() {
    if (!isValid()) {
       throw std::runtime_error(
-          "Reader is invalid state (Probably due to move).");
+          "Reader is in invalid state (Probably due to move).");
    }
    m_records.clear();
    const char* file_start{m_mapped_data};
