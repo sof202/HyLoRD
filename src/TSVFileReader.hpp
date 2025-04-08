@@ -35,10 +35,11 @@ concept TSVRecord = requires(const Fields& fields) {
 template <TSVRecord RecordType>
 class TSVFileReader {
   public:
-   TSVFileReader(const std::string_view file_path,
-                 const ColumnIndexes& columns_to_include = {},
-                 RowFilterFunction rowFilter = nullptr,
-                 std::size_t threads = std::thread::hardware_concurrency()) :
+   TSVFileReader(
+       const std::string_view file_path,
+       const ColumnIndexes& columns_to_include = {},
+       RowFilterFunction rowFilter = nullptr,
+       int threads = static_cast<int>(std::thread::hardware_concurrency())) :
        m_file_path{file_path},
        m_columns_to_include{columns_to_include},
        m_rowFilter{rowFilter},
@@ -91,7 +92,7 @@ class TSVFileReader {
    Records m_records{};
    ColumnIndexes m_columns_to_include{};
    RowFilterFunction m_rowFilter{};
-   std::size_t m_num_threads{};
+   int m_num_threads{};
    bool m_loaded{false};
 
    // Memory mapping
@@ -108,7 +109,7 @@ class TSVFileReader {
       Records records{};
    };
    Fields splitTSVLine(const std::string& line) const;
-   const char* findChunkEnd(const char* start, std::size_t size) const;
+   const char* findChunkEnd(const char* start, int size) const;
    Records processChunk(const char* start, const char* end) const;
 
    using ChunkResultVector = std::vector<ChunkResult>;
@@ -186,8 +187,8 @@ inline Fields TSVFileReader<RecordType>::splitTSVLine(
 }
 
 template <TSVRecord RecordType>
-inline const char* TSVFileReader<RecordType>::findChunkEnd(
-    const char* start, std::size_t size) const {
+inline const char* TSVFileReader<RecordType>::findChunkEnd(const char* start,
+                                                           int size) const {
    const char* approximate_end{start + size};
    const char* file_end{m_mapped_data + m_file_size};
 
@@ -243,10 +244,10 @@ inline typename TSVFileReader<RecordType>::ChunkResultVector
 TSVFileReader<RecordType>::processFile(const char* file_start,
                                        const char* file_end) {
    std::vector<std::pair<const char*, const char*>> chunk_ranges{};
-   std::size_t chunk_size = m_file_size / m_num_threads;
+   int chunk_size = static_cast<int>(m_file_size) / m_num_threads;
    const char* chunk_start = file_start;
 
-   for (std::size_t i{0}; i < m_num_threads; ++i) {
+   for (int i{0}; i < m_num_threads; ++i) {
       const char* chunk_end{(i == m_num_threads - 1)
                                 ? file_end
                                 : findChunkEnd(chunk_start, chunk_size)};
