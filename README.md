@@ -90,3 +90,7 @@ will further benefit from higher-fidelity 5mC/5hmC calls. We also anticipate
 extending HyLoRD to other long-read epigenetic modifications (e.g., 6mA) as
 detection methods mature.
 
+## Dependencies
+
+- [CLI11](https://github.com/CLIUtils/CLI11/) (v2.5.0): Used for command-line
+parsing. Licensed under BSD-3-Clause.
