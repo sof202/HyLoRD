@@ -282,6 +282,7 @@ void TSVFileReader<RecordType>::load() {
       throw std::runtime_error(
           "Reader is invalid state (Probably due to move).");
    }
+   m_records.clear();
    const char* file_start{m_mapped_data};
    const char* file_end{m_mapped_data + m_file_size};
 
