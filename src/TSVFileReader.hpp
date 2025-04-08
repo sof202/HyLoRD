@@ -16,13 +16,21 @@
 #include <string>
 #include <system_error>
 #include <thread>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
 using Fields = std::vector<std::string>;
 using RowFilterFunction = std::function<bool(const std::vector<std::string>&)>;
 
-template <typename RecordType>
+template <typename T>
+concept TSVRecord = requires(const Fields& fields) {
+   requires std::is_same_v<decltype(T::fromFields(fields)), T>;
+   requires !noexcept(T::fromFields(fields));
+   requires !std::is_member_function_pointer_v<decltype(&T::fromFields)>;
+};
+
+template <TSVRecord RecordType>
 class TSVFileReader {
   public:
    TSVFileReader(const std::string_view file_path,
