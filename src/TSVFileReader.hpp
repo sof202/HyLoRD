@@ -41,9 +41,7 @@ class TSVFileReader {
        m_file_path{file_path},
        m_columns_to_include{columns_to_include},
        m_rowFilter{rowFilter},
-       m_num_threads{threads} {
-      setupMemoryMap();
-   }
+       m_num_threads{threads} {}
 
    TSVFileReader(const TSVFileReader&) = delete;
    TSVFileReader& operator=(const TSVFileReader&) = delete;
@@ -77,10 +75,11 @@ class TSVFileReader {
    }
 
    void load();
-   bool isValid() const noexcept {
-      return m_file_descriptor != -1 && m_mapped_data != nullptr;
+   bool isLoaded() const noexcept { return m_loaded; }
+   const std::vector<RecordType>& getRecords() const {
+      if (!m_loaded) throw std::runtime_error("No data loaded.");
+      return m_records;
    }
-   const std::vector<RecordType>& getRecords() const { return m_records; }
 
    ~TSVFileReader() { cleanupMemoryMap(); }
 
@@ -90,6 +89,7 @@ class TSVFileReader {
    std::vector<std::size_t> m_columns_to_include{};
    RowFilterFunction m_rowFilter{};
    std::size_t m_num_threads{};
+   bool m_loaded{false};
 
    // Memory mapping
    struct stat m_file_info{};
@@ -278,24 +278,30 @@ TSVFileReader<RecordType>::processFile(const char* file_start,
 
 template <TSVRecord RecordType>
 void TSVFileReader<RecordType>::load() {
-   if (!isValid()) {
-      throw std::runtime_error(
-          "Reader is in invalid state (Probably due to move).");
+   if (m_loaded) {
+      throw std::runtime_error("File is already loaded.");
    }
-   m_records.clear();
-   const char* file_start{m_mapped_data};
-   const char* file_end{m_mapped_data + m_file_size};
+   setupMemoryMap();
+   try {
+      const char* file_start{m_mapped_data};
+      const char* file_end{m_mapped_data + m_file_size};
 
-   auto chunk_results{processFile(file_start, file_end)};
+      auto chunk_results{processFile(file_start, file_end)};
 
-   m_records.reserve(m_file_size / 100);
+      m_records.reserve(m_file_size / 100);
 
-   // Insert chunks in the correct order
-   for (auto& result : chunk_results) {
-      m_records.insert(m_records.end(),
-                       std::make_move_iterator(result.records.begin()),
-                       std::make_move_iterator(result.records.end()));
+      // Insert chunks in the correct order
+      for (auto& result : chunk_results) {
+         m_records.insert(m_records.end(),
+                          std::make_move_iterator(result.records.begin()),
+                          std::make_move_iterator(result.records.end()));
+      }
+      m_loaded = true;
+   } catch (...) {
+      cleanupMemoryMap();
+      throw;
    }
+   cleanupMemoryMap();
 }
 
 #endif
