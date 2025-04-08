@@ -23,6 +23,7 @@
 
 using Fields = std::vector<std::string>;
 using RowFilterFunction = std::function<bool(const std::vector<std::string>&)>;
+using ColumnIndexes = std::vector<std::size_t>;
 
 template <typename T>
 concept TSVRecord = requires(const Fields& fields) {
@@ -35,7 +36,7 @@ template <TSVRecord RecordType>
 class TSVFileReader {
   public:
    TSVFileReader(const std::string_view file_path,
-                 const std::vector<std::size_t>& columns_to_include = {},
+                 const ColumnIndexes& columns_to_include = {},
                  RowFilterFunction rowFilter = nullptr,
                  std::size_t threads = std::thread::hardware_concurrency()) :
        m_file_path{file_path},
@@ -76,7 +77,9 @@ class TSVFileReader {
 
    void load();
    bool isLoaded() const noexcept { return m_loaded; }
-   const std::vector<RecordType>& getRecords() const {
+
+   using Records = std::vector<RecordType>;
+   const Records& getRecords() const {
       if (!m_loaded) throw std::runtime_error("No data loaded.");
       return m_records;
    }
@@ -85,8 +88,8 @@ class TSVFileReader {
 
   private:
    std::string m_file_path{};
-   std::vector<RecordType> m_records{};
-   std::vector<std::size_t> m_columns_to_include{};
+   Records m_records{};
+   ColumnIndexes m_columns_to_include{};
    RowFilterFunction m_rowFilter{};
    std::size_t m_num_threads{};
    bool m_loaded{false};
@@ -102,14 +105,14 @@ class TSVFileReader {
    // Reading
    struct ChunkResult {
       std::size_t chunk_index{};
-      std::vector<RecordType> records{};
+      Records records{};
    };
    Fields splitTSVLine(const std::string& line) const;
    const char* findChunkEnd(const char* start, std::size_t size) const;
-   std::vector<RecordType> processChunk(const char* start,
-                                        const char* end) const;
-   std::vector<ChunkResult> processFile(const char* file_start,
-                                        const char* file_end);
+   Records processChunk(const char* start, const char* end) const;
+
+   using ChunkResultVector = std::vector<ChunkResult>;
+   ChunkResultVector processFile(const char* file_start, const char* file_end);
 };
 
 template <TSVRecord RecordType>
@@ -201,7 +204,7 @@ inline const char* TSVFileReader<RecordType>::findChunkEnd(
 template <TSVRecord RecordType>
 inline std::vector<RecordType> TSVFileReader<RecordType>::processChunk(
     const char* start, const char* end) const {
-   std::vector<RecordType> chunk_records;
+   Records chunk_records;
    const char* line_start{start};
 
    while (line_start < end) {
@@ -236,7 +239,7 @@ inline std::vector<RecordType> TSVFileReader<RecordType>::processChunk(
 }
 
 template <TSVRecord RecordType>
-inline std::vector<typename TSVFileReader<RecordType>::ChunkResult>
+inline typename TSVFileReader<RecordType>::ChunkResultVector
 TSVFileReader<RecordType>::processFile(const char* file_start,
                                        const char* file_end) {
    std::vector<std::pair<const char*, const char*>> chunk_ranges{};
@@ -262,7 +265,7 @@ TSVFileReader<RecordType>::processFile(const char* file_start,
           }));
    }
 
-   std::vector<ChunkResult> chunk_results(chunk_ranges.size());
+   ChunkResultVector chunk_results(chunk_ranges.size());
    for (auto& future : futures) {
       try {
          auto result = future.get();
