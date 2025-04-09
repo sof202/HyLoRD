@@ -227,7 +227,8 @@ inline std::vector<RecordType> TSVFileReader<RecordType>::processChunk(
          try {
             chunk_records.push_back(RecordType::fromFields(filtered_fields));
          } catch (const std::exception& e) {
-            std::cerr << "Record conversion error: " << e.what() << '\n';
+            std::cerr << "Record conversion error: " << e.what() << '\n'
+                      << "Occurred for line: " << line << '\n';
          }
       }
       line_start = line_end + 1;
