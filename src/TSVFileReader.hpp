@@ -220,11 +220,7 @@ inline std::vector<RecordType> TSVFileReader<RecordType>::processChunk(
       Fields filtered_fields{};
       filtered_fields.reserve(fields.size());
       for (auto i : m_columns_to_include) {
-         if (i < fields.size()) {
-            filtered_fields.push_back(fields[i]);
-         } else {
-            filtered_fields.emplace_back();
-         }
+         if (i < fields.size()) filtered_fields.push_back(fields[i]);
       }
 
       if (!m_rowFilter || m_rowFilter(filtered_fields)) {
