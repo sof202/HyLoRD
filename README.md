@@ -90,7 +90,23 @@ will further benefit from higher-fidelity 5mC/5hmC calls. We also anticipate
 extending HyLoRD to other long-read epigenetic modifications (e.g., 6mA) as
 detection methods mature.
 
-## Dependencies
+## Install from source
 
-- [CLI11](https://github.com/CLIUtils/CLI11/) (v2.5.0): Used for command-line
-parsing. Licensed under BSD-3-Clause.
+The build process for HyLoRD is carried out via CMake, however the process is
+made easier via a Makefile wrapper. To install:
+
+```sh
+make CMAKE_BUILD_TYPE=Release
+sudo make install
+```
+
+To install to the non-default location
+
+```sh
+# Note that the path provided MUST NOT be a relative path, but a full path
+make CMAKE_BUILD_TYPE=Release CMAKE_INSTALL_PREFIX=path/to/hylord
+sudo make install
+```
+
+See `BUILD.md` for further details, including dependencies.
+

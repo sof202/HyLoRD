@@ -30,3 +30,11 @@ whilst still adding some debug info
 - CMake version 3.14+
 - libpthread (POSIX Threads)
   - Likely already installed
+
+## Dependenices
+
+CMake will automatically bring these in for you during the standard build
+process. These are listed here for completeness.
+
+- [CLI11](https://github.com/CLIUtils/CLI11/) (v2.5.0): Used for command-line
+parsing. Licensed under BSD-3-Clause.
