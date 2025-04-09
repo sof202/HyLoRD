@@ -1,3 +1,9 @@
+/**
+ * @file    BedRecords.hpp
+ * @brief   Describes record structures of UCSC BED files
+ * @license MIT (See LICENSE file in the project root)
+ */
+
 #ifndef BEDRECORDS_H_
 #define BEDRECORDS_H_
 
@@ -8,8 +14,38 @@
 
 using Fields = std::vector<std::string>;
 
+/**
+ * @namespace BedRecords
+ * @brief Namespace containing BED format record parsers and related utilities.
+ *
+ * All record types support conversion from TSV fields via static `fromFields`
+ * methods, making them compatible with the TSVRecord concept and
+ * TSVFileReader.
+ */
 namespace BedRecords {
+
+/**
+ * @brief Converts chromosome string to standardized numeric representation.
+ *
+ * @param chr A string view of the form "chrXXX" where XXX is the chromosome
+ *            identifier (e.g., "chr1", "chrX", "chrM")
+ * @return int Numeric chromosome representation:
+ *             - 1-22 for autosomes
+ *             - 23 for X
+ *             - 24 for Y
+ *             - 25 for M (mitochondrial)
+ * @throw std::invalid_argument If chromosome format is invalid
+ * @note Handles common chromosome naming conventions ("chr1", "Chr1", "CHR1")
+ */
 int parseChromosomeNumber(const std::string_view chr);
+
+/**
+ * @brief Validates that fields meet minimum requirements for BED records.
+ *
+ * @param fields Vector of string fields from TSV parsing
+ * @param min_expected_fields Minimum number of required fields
+ * @throw std::runtime_error If fields don't meet requirements
+ */
 void validateFields(const Fields& fields, int min_expected_fields);
 
 struct Bed {

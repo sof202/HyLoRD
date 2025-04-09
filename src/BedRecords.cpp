@@ -1,3 +1,9 @@
+/**
+ * @file    BedRecords.cpp
+ * @brief   Defines functions for parsing/validating fields of BED files
+ * @license MIT (See LICENSE file in the project root)
+ */
+
 #include "BedRecords.hpp"
 
 #include <algorithm>

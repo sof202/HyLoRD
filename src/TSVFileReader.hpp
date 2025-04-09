@@ -1,3 +1,9 @@
+/**
+ * @file    TSVFileReader.hpp
+ * @brief   Implements class for reading tsv files (BED files)
+ * @license MIT (See LICENSE file in the project root)
+ */
+
 #ifndef TSVFILEREADER_H_
 #define TSVFILEREADER_H_
 
@@ -25,6 +31,38 @@ using Fields = std::vector<std::string>;
 using RowFilterFunction = std::function<bool(const std::vector<std::string>&)>;
 using ColumnIndexes = std::vector<std::size_t>;
 
+/**
+ * @concept TSVRecord
+ * @brief Requirements for types that can be parsed from TSV fields.
+ *
+ * This concept specifies the interface that record types must implement to be
+ * compatible with the TSVFileReader class.
+ *
+ * ### Requirements
+ * - Must provide a static `fromFields` method that:
+ *   - Takes a `const Fields&` parameter (vector of strings representing TSV
+ * fields)
+ *   - Returns an instance of the type T
+ *   - May throw exceptions (not marked noexcept)
+ *   - Must be a static method
+ *
+ * ### Example
+ * A conforming type would look like:
+ * @code
+ * struct Record {
+ *     int id;
+ *     std::string name;
+ *
+ *     static Record fromFields(const Fields& fields) {
+ *         if (fields.size() < 2) throw std::runtime_error("Not enough
+ * fields"); return {std::stoi(fields[0]), fields[1]};
+ *     }
+ * };
+ * @endcode
+ *
+ * @tparam T The type to check against the TSVRecord requirements
+ * @see TSVFileReader
+ */
 template <typename T>
 concept TSVRecord = requires(const Fields& fields) {
    requires std::is_same_v<decltype(T::fromFields(fields)), T>;
@@ -32,9 +70,50 @@ concept TSVRecord = requires(const Fields& fields) {
    requires !std::is_member_function_pointer_v<decltype(&T::fromFields)>;
 };
 
+/**
+ * @class TSVFileReader
+ * @brief A thread-safe TSV (Tab-Separated Values) file reader with
+ * memory-mapped file support.
+ *
+ * @tparam RecordType The type of record to parse from the TSV file. Must be
+ * compatible with TSVRecord concept.
+ *
+ * This class provides efficient reading of TSV files with the following
+ * features:
+ * - Memory-mapped file I/O for high performance
+ * - Multi-threaded parsing
+ * - Column filtering
+ * - Row filtering
+ * - Move semantics for efficient resource transfer
+ *
+ * The reader loads the entire file into memory (via memory mapping) and
+ * processes it in parallel chunks.
+ *
+ * @note This class is not copyable but supports move operations.
+ * @note The file must exist and be accessible at construction time.
+ *
+ * Example usage:
+ * @code
+ * TSVFileReader<MyRecord> reader("data.tsv", {0, 2, 3}, [](const auto& fields)
+ * { return !fields[0].empty(); // Filter out rows with empty first column });
+ * reader.load();
+ * assert(reader.isLoaded())
+ * const auto& records = reader.getRecords();
+ * @endcode
+ */
 template <TSVRecord RecordType>
 class TSVFileReader {
   public:
+   /**
+    * @brief Constructs a TSVFileReader with the given parameters.
+    *
+    * @param file_path Path to the TSV file to read.
+    * @param columns_to_include Indices of columns to include
+    * @param rowFilter Optional filter function to exclude rows (nullptr to
+    * include all rows).
+    * @param threads Number of threads to use for processing (defaults to
+    * hardware concurrency).
+    */
    TSVFileReader(
        const std::string_view file_path,
        const ColumnIndexes& columns_to_include = {},
@@ -76,6 +155,17 @@ class TSVFileReader {
       return *this;
    }
 
+   /**
+    * @brief Loads and processes the TSV file.
+    *
+    * This method:
+    * 1. Memory-maps the file
+    * 2. Divides it into chunks
+    * 3. Processes chunks in parallel
+    * 4. Combines results
+    *
+    * @throw std::runtime_error if the file cannot be loaded or parsed.
+    */
    void load();
    bool isLoaded() const noexcept { return m_loaded; }
 
