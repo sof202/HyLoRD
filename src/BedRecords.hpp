@@ -1,3 +1,6 @@
+#ifndef BEDRECORDS_H_
+#define BEDRECORDS_H_
+
 #include <cctype>
 #include <stdexcept>
 #include <string>
@@ -67,3 +70,5 @@ struct Bed9Plus9 : public BedCore {
    }
 };
 }  // namespace BedRecords
+
+#endif
