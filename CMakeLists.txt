@@ -30,3 +30,8 @@ FetchContent_MakeAvailable(cli11_proj)
 add_executable(hylord src/main.cpp src/BedRecords.cpp)
 target_link_libraries(hylord PRIVATE Threads::Threads)
 target_link_libraries(hylord PRIVATE CLI11::CLI11)
+
+## Install ##
+install(TARGETS hylord
+RUNTIME DESTINATION bin
+)
