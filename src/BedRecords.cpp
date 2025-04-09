@@ -1,7 +1,7 @@
 /**
  * @file    BedRecords.cpp
  * @brief   Defines functions for parsing/validating fields of BED files
- * @license MIT (See LICENSE file in the project root)
+ * @license MIT (See LICENSE file in the repository root)
  */
 
 #include "BedRecords.hpp"

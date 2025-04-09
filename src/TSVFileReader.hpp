@@ -1,11 +1,11 @@
-/**
- * @file    TSVFileReader.hpp
- * @brief   Implements class for reading tsv files (BED files)
- * @license MIT (See LICENSE file in the project root)
- */
-
 #ifndef TSVFILEREADER_H_
 #define TSVFILEREADER_H_
+
+/**
+ * @file    TSVFileReader.hpp
+ * @brief   Parser Implementations for reading tsv files (BED files)
+ * @license MIT (See LICENSE file in the repository root)
+ */
 
 #include <fcntl.h>
 #include <sys/mman.h>

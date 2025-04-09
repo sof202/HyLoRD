@@ -1,11 +1,11 @@
+#ifndef BEDRECORDS_H_
+#define BEDRECORDS_H_
+
 /**
  * @file    BedRecords.hpp
  * @brief   Describes record structures of UCSC BED files
- * @license MIT (See LICENSE file in the project root)
+ * @license MIT (See LICENSE file in the repository root)
  */
-
-#ifndef BEDRECORDS_H_
-#define BEDRECORDS_H_
 
 #include <cctype>
 #include <string>
@@ -16,38 +16,25 @@ using Fields = std::vector<std::string>;
 
 /**
  * @namespace BedRecords
- * @brief Namespace containing BED format record parsers and related utilities.
+ * @brief Parsers for BED genomic data formats (BED4, BED4+, BED9+9)
  *
- * All record types support conversion from TSV fields via static `fromFields`
- * methods, making them compatible with the TSVRecord concept and
- * TSVFileReader.
+ * All record types implement fromFields() for TSVRecord compatibility.
  */
 namespace BedRecords {
 
-/**
- * @brief Converts chromosome string to standardized numeric representation.
- *
- * @param chr A string view of the form "chrXXX" where XXX is the chromosome
- *            identifier (e.g., "chr1", "chrX", "chrM")
- * @return int Numeric chromosome representation:
- *             - 1-22 for autosomes
- *             - 23 for X
- *             - 24 for Y
- *             - 25 for M (mitochondrial)
- * @throw std::invalid_argument If chromosome format is invalid
- * @note Handles common chromosome naming conventions ("chr1", "Chr1", "CHR1")
+/** Converts "chrX" format strings to numeric values (1-22=autosomes, 23=X,
+ * 24=Y, 25=M)
  */
 int parseChromosomeNumber(const std::string_view chr);
 
-/**
- * @brief Validates that fields meet minimum requirements for BED records.
- *
- * @param fields Vector of string fields from TSV parsing
- * @param min_expected_fields Minimum number of required fields
- * @throw std::runtime_error If fields don't meet requirements
- */
+/// Validates minimum field count and basic format requirements
 void validateFields(const Fields& fields, int min_expected_fields);
 
+/**
+ * @brief Core BED fields shared by all variants
+ * @details Chromosome, start/end positions, and feature name.
+ * parseCoreFields() handles common parsing logic for derived types.
+ */
 struct Bed {
    int chromosome{1};
    int start{};
@@ -63,6 +50,7 @@ struct Bed {
    }
 };
 
+/// Standard BED4 format (chrom, start, end, name)
 struct Bed4 : public Bed {
    static Bed4 fromFields(const Fields& fields) {
       Bed4 parsed_row{};
@@ -71,6 +59,7 @@ struct Bed4 : public Bed {
    }
 };
 
+/// BED4+ with variable-length methylation percentages (reference matrix)
 struct Bed4PlusX : public Bed {
    std::vector<double> methylation_percentages{};
 
@@ -85,8 +74,8 @@ struct Bed4PlusX : public Bed {
    }
 };
 
+/// BED9+9 format (uses first methylation value only)
 struct Bed9Plus9 : public Bed {
-   // There are more fields in Bed9+9 files, but they aren't useful here
    double methylation_percentage{};
 
    static Bed9Plus9 fromFields(const Fields& fields) {
