@@ -12,13 +12,13 @@ using Fields = std::vector<std::string>;
 namespace BedRecords {
 int parseChromosomeNumber(const std::string_view chr);
 
-struct BedCore {
+struct Bed {
    int chromosome{1};
    int start{};
    int end{};
    char name{};  // expected m or h
 
-   static void parseCoreFields(BedCore& core,
+   static void parseCoreFields(Bed& core,
                                const Fields& fields,
                                int min_expected_fields = 4) {
       if (static_cast<int>(std::ssize(fields)) < min_expected_fields) {
@@ -37,7 +37,7 @@ struct BedCore {
    }
 };
 
-struct Bed4 : public BedCore {
+struct Bed4 : public Bed {
    static Bed4 fromFields(const Fields& fields) {
       Bed4 parsed_row{};
       parseCoreFields(parsed_row, fields);
@@ -45,7 +45,7 @@ struct Bed4 : public BedCore {
    }
 };
 
-struct Bed4PlusX : public BedCore {
+struct Bed4PlusX : public Bed {
    std::vector<double> methylation_percentages{};
 
    static Bed4PlusX fromFields(const Fields& fields) {
@@ -58,7 +58,7 @@ struct Bed4PlusX : public BedCore {
    }
 };
 
-struct Bed9Plus9 : public BedCore {
+struct Bed9Plus9 : public Bed {
    // There are more fields in Bed9+9 files, but they aren't useful here
    double methylation_percentage{};
 
