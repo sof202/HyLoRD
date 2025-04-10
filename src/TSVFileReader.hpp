@@ -108,7 +108,8 @@ class TSVFileReader {
     * @brief Constructs a TSVFileReader with the given parameters.
     *
     * @param file_path Path to the TSV file to read.
-    * @param columns_to_include Indices of columns to include
+    * @param columns_to_include Indices of columns to include (empty to include
+    * all fields)
     * @param rowFilter Optional filter function to exclude rows (nullptr to
     * include all rows).
     * @param threads Number of threads to use for processing (defaults to
@@ -309,8 +310,12 @@ inline std::vector<RecordType> TSVFileReader<RecordType>::processChunk(
 
       Fields filtered_fields{};
       filtered_fields.reserve(fields.size());
-      for (auto i : m_columns_to_include) {
-         if (i < fields.size()) filtered_fields.push_back(fields[i]);
+      if (m_columns_to_include.empty()) {
+         filtered_fields = std::move(fields);
+      } else {
+         for (auto i : m_columns_to_include) {
+            if (i < fields.size()) filtered_fields.push_back(fields[i]);
+         }
       }
 
       if (!m_rowFilter || m_rowFilter(filtered_fields)) {
