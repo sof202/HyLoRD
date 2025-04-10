@@ -6,11 +6,13 @@
 
 #include "BedRecords.hpp"
 #include "TypeDefs.hpp"
+#include "concepts.hpp"
 
 namespace Hylord::BedData {
-template <typename RecordType>
-void subset(std::vector<RecordType>& records, const RowIndexes& rows) {
-   std::vector<RecordType> subset_records;
+template <Records::TSVRecord RecordType>
+void subset(Records::Collection<RecordType>& records, const RowIndexes& rows) {
+   using Records = Records::Collection<RecordType>;
+   Records subset_records;
    subset_records.reserve(rows.size());
 
    for (auto i : rows) {

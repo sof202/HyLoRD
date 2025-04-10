@@ -27,47 +27,9 @@
 #include <vector>
 
 #include "TypeDefs.hpp"
+#include "concepts.hpp"
 
 namespace Hylord::IO {
-/**
- * @concept TSVRecord
- * @brief Requirements for types that can be parsed from TSV fields.
- *
- * This concept specifies the interface that record types must implement to be
- * compatible with the TSVFileReader class.
- *
- * ### Requirements
- * - Must provide a static `fromFields` method that:
- *   - Takes a `const Fields&` parameter (vector of strings representing TSV
- * fields)
- *   - Returns an instance of the type T
- *   - May throw exceptions (not marked noexcept)
- *   - Must be a static method
- *
- * ### Example
- * A conforming type would look like:
- * @code
- * struct Record {
- *     int id;
- *     std::string name;
- *
- *     static Record fromFields(const Fields& fields) {
- *         if (fields.size() < 2) throw std::runtime_error("Not enough
- * fields"); return {std::stoi(fields[0]), fields[1]};
- *     }
- * };
- * @endcode
- *
- * @tparam T The type to check against the TSVRecord requirements
- * @see TSVFileReader
- */
-template <typename T>
-concept TSVRecord = requires(const Fields& fields) {
-   requires std::is_same_v<decltype(T::fromFields(fields)), T>;
-   requires !noexcept(T::fromFields(fields));
-   requires !std::is_member_function_pointer_v<decltype(&T::fromFields)>;
-};
-
 /**
  * @class TSVFileReader
  * @brief A thread-safe TSV (Tab-Separated Values) file reader with
@@ -99,7 +61,7 @@ concept TSVRecord = requires(const Fields& fields) {
  * const auto& records = reader.getRecords();
  * @endcode
  */
-template <TSVRecord RecordType>
+template <Records::TSVRecord RecordType>
 class TSVFileReader {
   public:
    /**
@@ -168,7 +130,7 @@ class TSVFileReader {
    void load();
    bool isLoaded() const noexcept { return m_loaded; }
 
-   using Records = std::vector<RecordType>;
+   using Records = Records::Collection<RecordType>;
    Records extractRecords() {
       if (!isLoaded()) throw std::runtime_error("No data loaded.");
       return std::move(m_records);
@@ -205,7 +167,7 @@ class TSVFileReader {
    ChunkResults processFile(const char* file_start, const char* file_end);
 };
 
-template <TSVRecord RecordType>
+template <Records::TSVRecord RecordType>
 inline void TSVFileReader<RecordType>::setupMemoryMap() {
    m_file_descriptor = open(m_file_path.c_str(), O_RDONLY);
    if (m_file_descriptor == -1) {
@@ -245,7 +207,7 @@ inline void TSVFileReader<RecordType>::setupMemoryMap() {
    madvise(m_mapped_data, m_file_size, MADV_SEQUENTIAL | MADV_WILLNEED);
 }
 
-template <TSVRecord RecordType>
+template <Records::TSVRecord RecordType>
 inline void TSVFileReader<RecordType>::cleanupMemoryMap() {
    if (m_mapped_data) {
       munmap(m_mapped_data, m_file_size);
@@ -257,7 +219,7 @@ inline void TSVFileReader<RecordType>::cleanupMemoryMap() {
    }
 }
 
-template <TSVRecord RecordType>
+template <Records::TSVRecord RecordType>
 inline Fields TSVFileReader<RecordType>::splitTSVLine(
     const std::string& line) const {
    Fields fields;
@@ -275,7 +237,7 @@ inline Fields TSVFileReader<RecordType>::splitTSVLine(
    return fields;
 }
 
-template <TSVRecord RecordType>
+template <Records::TSVRecord RecordType>
 inline const char* TSVFileReader<RecordType>::findChunkEnd(const char* start,
                                                            int size) const {
    const char* approximate_end{start + size};
@@ -291,7 +253,7 @@ inline const char* TSVFileReader<RecordType>::findChunkEnd(const char* start,
    return end ? end : file_end;
 }
 
-template <TSVRecord RecordType>
+template <Records::TSVRecord RecordType>
 inline std::vector<RecordType> TSVFileReader<RecordType>::processChunk(
     const char* start, const char* end) const {
    Records chunk_records;
@@ -329,7 +291,7 @@ inline std::vector<RecordType> TSVFileReader<RecordType>::processChunk(
    return chunk_records;
 }
 
-template <TSVRecord RecordType>
+template <Records::TSVRecord RecordType>
 inline typename TSVFileReader<RecordType>::ChunkResults
 TSVFileReader<RecordType>::processFile(const char* file_start,
                                        const char* file_end) {
@@ -370,7 +332,7 @@ TSVFileReader<RecordType>::processFile(const char* file_start,
    return chunk_results;
 }
 
-template <TSVRecord RecordType>
+template <Records::TSVRecord RecordType>
 void TSVFileReader<RecordType>::load() {
    if (m_loaded) {
       throw std::runtime_error("File is already loaded.");
