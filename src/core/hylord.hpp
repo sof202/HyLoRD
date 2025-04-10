@@ -8,9 +8,13 @@
  */
 
 #include <cstddef>
+#include <iostream>
+#include <numeric>
 #include <string_view>
 #include <tuple>
 
+#include "data/BedData.hpp"
+#include "data/BedRecords.hpp"
 #include "types.hpp"
 
 namespace Hylord {
@@ -50,6 +54,36 @@ std::pair<RowIndexes, RowIndexes> findOverLappingIndexes(
       }
    }
    return {bed_one_overlapping_indexes, bed_two_overlapping_indexes};
+}
+
+template <typename Records>
+RowIndexes findIndexesInCpGList(const BedData::CpGData& cpg_list,
+                                const Records& bed_entries) {
+   const std::vector<BedRecords::Bed4>& cpgs{cpg_list.records()};
+   RowIndexes bed_indexes_in_cpg_list{};
+   bed_indexes_in_cpg_list.reserve(cpgs.size());
+
+   for (RowIndex cpg{}; cpg < cpgs.size(); ++cpg) {
+      auto cpg_key{
+          std::tie(cpgs[cpg].chromosome, cpgs[cpg].start, cpgs[cpg].name)};
+      RowIndex low{};
+      RowIndex high{bed_entries.size() - 1};
+      while (low <= high) {
+         RowIndex mid{std::midpoint(low, high)};
+         auto row_key{std::tie(bed_entries[mid].chromosome,
+                               bed_entries[mid].start,
+                               bed_entries[mid].name)};
+         if (row_key == cpg_key) {
+            bed_indexes_in_cpg_list.push_back(mid);
+            break;
+         } else if (row_key < cpg_key) {
+            low = mid + 1;
+         } else {
+            high = mid - 1;
+         }
+      }
+   }
+   return bed_indexes_in_cpg_list;
 }
 
 void run(const std::string_view bedmethyl_file,
