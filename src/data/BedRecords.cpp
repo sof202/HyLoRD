@@ -4,7 +4,7 @@
  * @license MIT (See LICENSE file in the repository root)
  */
 
-#include "BedRecords.hpp"
+#include "data/BedRecords.hpp"
 
 #include <algorithm>
 #include <iostream>

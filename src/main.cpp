@@ -2,7 +2,7 @@
 #include <thread>
 
 #include "CLI/CLI.hpp"
-#include "hylord.hpp"
+#include "core/hylord.hpp"
 
 int main(int argc, char** argv) {
    CLI::App application{

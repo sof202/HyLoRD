@@ -11,7 +11,7 @@
 #include <string_view>
 #include <vector>
 
-#include "TypeDefs.hpp"
+#include "types.hpp"
 
 /**
  * @namespace BedRecords

@@ -9,7 +9,7 @@
 
 #include <string_view>
 
-#include "TypeDefs.hpp"
+#include "types.hpp"
 
 namespace Hylord {
 template <typename BedTypeOne, typename BedTypeTwo>

@@ -4,9 +4,9 @@
 #include <stdexcept>
 #include <vector>
 
-#include "BedRecords.hpp"
-#include "TypeDefs.hpp"
 #include "concepts.hpp"
+#include "data/BedRecords.hpp"
+#include "types.hpp"
 
 namespace Hylord::BedData {
 template <Records::TSVRecord RecordType>

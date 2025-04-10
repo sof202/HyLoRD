@@ -27,8 +27,13 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(cli11_proj)
 
 ## Build ##
-file(GLOB HyLoRD_SRC "src/*.hpp" "src/*.cpp")
-add_executable(hylord ${HyLoRD_SRC})
+file(GLOB HyLoRD
+  src/main.cpp
+  src/core/hylord.cpp
+  src/data/BedRecords.cpp
+)
+add_executable(hylord ${HyLoRD})
+target_include_directories(hylord PRIVATE src)
 target_link_libraries(hylord PRIVATE Threads::Threads)
 target_link_libraries(hylord PRIVATE CLI11::CLI11)
 
