@@ -31,7 +31,7 @@ int parseChromosomeNumber(const std::string_view chr) {
 
 void validateFields(const Fields& fields, int min_expected_fields) {
    if (static_cast<int>(std::ssize(fields)) < min_expected_fields) {
-      throw std::runtime_error(
+      throw std::out_of_range(
           "Could not parse field, too few fields (expected >=" +
           std::to_string(min_expected_fields) + ")");
    }
