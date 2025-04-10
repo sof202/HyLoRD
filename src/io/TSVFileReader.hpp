@@ -22,7 +22,6 @@
 #include <string>
 #include <system_error>
 #include <thread>
-#include <type_traits>
 #include <utility>
 #include <vector>
 
