@@ -12,8 +12,6 @@
 #include <string_view>
 #include <vector>
 
-using Fields = std::vector<std::string>;
-
 /**
  * @namespace BedRecords
  * @brief Parsers for BED genomic data formats (BED4, BED4+, BED9+9)
@@ -21,6 +19,7 @@ using Fields = std::vector<std::string>;
  * All record types implement fromFields() for TSVRecord compatibility.
  */
 namespace BedRecords {
+using Fields = std::vector<std::string>;
 
 /** Converts "chrX" format strings to numeric values (1-22=autosomes, 23=X,
  * 24=Y, 25=M)
