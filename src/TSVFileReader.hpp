@@ -171,9 +171,9 @@ class TSVFileReader {
    bool isLoaded() const noexcept { return m_loaded; }
 
    using Records = std::vector<RecordType>;
-   const Records& getRecords() const {
+   Records extractRecords() {
       if (!isLoaded()) throw std::runtime_error("No data loaded.");
-      return m_records;
+      return std::move(m_records);
    }
 
    ~TSVFileReader() { cleanupMemoryMap(); }
