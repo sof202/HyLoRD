@@ -7,7 +7,9 @@
  * @license MIT (See LICENSE file in the repository root)
  */
 
+#include <cstddef>
 #include <string_view>
+#include <tuple>
 
 #include "types.hpp"
 
