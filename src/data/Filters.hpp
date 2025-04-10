@@ -24,12 +24,21 @@ class FilterCombiner {
 };
 
 template <int min_reads>
-bool has_high_read_count(const Fields& fields) {
+bool low_read_filter(const Fields& fields) {
    if (fields.size() < 5) {
       throw std::out_of_range(
           "Could not apply row filter, not enough fields.");
    }
    return std::stoi(fields[4]) > min_reads;
+}
+
+template <int max_reads>
+bool high_read_filter(const Fields& fields) {
+   if (fields.size() < 5) {
+      throw std::out_of_range(
+          "Could not apply row filter, not enough fields.");
+   }
+   return std::stoi(fields[4]) < max_reads;
 }
 
 inline bool is_hydroxy_read(const Fields& fields) {
