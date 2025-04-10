@@ -27,7 +27,7 @@ class CpGData {
    CpGData(std::vector<BedRecords::Bed4> records) :
        m_records{std::move(records)} {}
 
-   const std::vector<BedRecords::Bed4>& records() { return m_records; }
+   const std::vector<BedRecords::Bed4>& records() const { return m_records; }
    void subsetRows(RowIndexes rows) { subset(m_records, rows); };
 
   private:
@@ -39,7 +39,9 @@ class ReferenceMatrixData {
    ReferenceMatrixData(std::vector<BedRecords::Bed4PlusX> records) :
        m_records{std::move(records)} {}
 
-   const std::vector<BedRecords::Bed4PlusX>& records() { return m_records; }
+   const std::vector<BedRecords::Bed4PlusX>& records() const {
+      return m_records;
+   }
    void subsetRows(RowIndexes rows) { subset(m_records, rows); };
 
   private:
@@ -51,7 +53,9 @@ class BedMethylData {
    BedMethylData(std::vector<BedRecords::Bed9Plus9> records) :
        m_records{std::move(records)} {}
 
-   const std::vector<BedRecords::Bed9Plus9>& records() { return m_records; }
+   const std::vector<BedRecords::Bed9Plus9>& records() const {
+      return m_records;
+   }
    void subsetRows(RowIndexes rows) { subset(m_records, rows); };
 
   private:
