@@ -77,7 +77,7 @@ class TSVFileReader {
    TSVFileReader(
        const std::string_view file_path,
        const ColumnIndexes& columns_to_include = {},
-       RowFilterFunction rowFilter = nullptr,
+       RowFilter rowFilter = nullptr,
        int threads = static_cast<int>(std::thread::hardware_concurrency())) :
        m_file_path{file_path},
        m_columns_to_include{columns_to_include},
@@ -141,7 +141,7 @@ class TSVFileReader {
    std::string m_file_path{};
    Records m_records{};
    ColumnIndexes m_columns_to_include{};
-   RowFilterFunction m_rowFilter{};
+   RowFilter m_rowFilter{};
    int m_num_threads{};
    bool m_loaded{false};
 

@@ -11,7 +11,7 @@ using RowIndexes = std::vector<RowIndex>;
 using Fields = std::vector<std::string>;
 
 namespace IO {
-using RowFilterFunction = std::function<bool(const std::vector<std::string>&)>;
+using RowFilter = std::function<bool(const Fields&)>;
 using ColumnIndexes = std::vector<std::size_t>;
 }  // namespace IO
 }  // namespace Hylord
