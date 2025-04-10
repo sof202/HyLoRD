@@ -1,20 +1,15 @@
 #ifndef BEDDATA_H_
 #define BEDDATA_H_
 
-#include <functional>
 #include <stdexcept>
-#include <string>
 #include <vector>
 
 #include "BedRecords.hpp"
+#include "TypeDefs.hpp"
 
-using RowFilterFunction = std::function<bool(const std::vector<std::string>&)>;
-using ColumnIndexes = std::vector<std::size_t>;
-using RowIndexes = std::vector<std::size_t>;
-
-namespace Hylord {
+namespace Hylord::BedData {
 template <typename RecordType>
-void subsetRows(std::vector<RecordType>& records, const RowIndexes& rows) {
+void subset(std::vector<RecordType>& records, const RowIndexes& rows) {
    std::vector<RecordType> subset_records;
    subset_records.reserve(rows.size());
 
@@ -24,7 +19,6 @@ void subsetRows(std::vector<RecordType>& records, const RowIndexes& rows) {
    }
    records = std::move(subset_records);
 }
-}  // namespace Hylord
 
 class CpGData {
   public:
@@ -32,7 +26,7 @@ class CpGData {
        m_records{std::move(records)} {}
 
    const std::vector<BedRecords::Bed4>& records() { return m_records; }
-   void subsetRows(RowIndexes rows) { Hylord::subsetRows(m_records, rows); };
+   void subsetRows(RowIndexes rows) { subset(m_records, rows); };
 
   private:
    std::vector<BedRecords::Bed4> m_records{};
@@ -44,7 +38,7 @@ class ReferenceMatrixData {
        m_records{std::move(records)} {}
 
    const std::vector<BedRecords::Bed4PlusX>& records() { return m_records; }
-   void subsetRows(RowIndexes rows) { Hylord::subsetRows(m_records, rows); };
+   void subsetRows(RowIndexes rows) { subset(m_records, rows); };
 
   private:
    std::vector<BedRecords::Bed4PlusX> m_records{};
@@ -56,10 +50,11 @@ class BedMethylData {
        m_records{std::move(records)} {}
 
    const std::vector<BedRecords::Bed9Plus9>& records() { return m_records; }
-   void subsetRows(RowIndexes rows) { Hylord::subsetRows(m_records, rows); };
+   void subsetRows(RowIndexes rows) { subset(m_records, rows); };
 
   private:
    std::vector<BedRecords::Bed9Plus9> m_records{};
 };
+}  // namespace Hylord::BedData
 
 #endif

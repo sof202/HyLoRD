@@ -15,7 +15,6 @@
 #include <cerrno>
 #include <cstddef>
 #include <cstring>
-#include <functional>
 #include <future>
 #include <iostream>
 #include <iterator>
@@ -27,10 +26,9 @@
 #include <utility>
 #include <vector>
 
-using Fields = std::vector<std::string>;
-using RowFilterFunction = std::function<bool(const std::vector<std::string>&)>;
-using ColumnIndexes = std::vector<std::size_t>;
+#include "TypeDefs.hpp"
 
+namespace Hylord::IO {
 /**
  * @concept TSVRecord
  * @brief Requirements for types that can be parsed from TSV fields.
@@ -203,8 +201,8 @@ class TSVFileReader {
    const char* findChunkEnd(const char* start, int size) const;
    Records processChunk(const char* start, const char* end) const;
 
-   using ChunkResultVector = std::vector<ChunkResult>;
-   ChunkResultVector processFile(const char* file_start, const char* file_end);
+   using ChunkResults = std::vector<ChunkResult>;
+   ChunkResults processFile(const char* file_start, const char* file_end);
 };
 
 template <TSVRecord RecordType>
@@ -332,7 +330,7 @@ inline std::vector<RecordType> TSVFileReader<RecordType>::processChunk(
 }
 
 template <TSVRecord RecordType>
-inline typename TSVFileReader<RecordType>::ChunkResultVector
+inline typename TSVFileReader<RecordType>::ChunkResults
 TSVFileReader<RecordType>::processFile(const char* file_start,
                                        const char* file_end) {
    std::vector<std::pair<const char*, const char*>> chunk_ranges{};
@@ -358,7 +356,7 @@ TSVFileReader<RecordType>::processFile(const char* file_start,
           }));
    }
 
-   ChunkResultVector chunk_results(chunk_ranges.size());
+   ChunkResults chunk_results(chunk_ranges.size());
    for (auto& future : futures) {
       try {
          auto result = future.get();
@@ -399,5 +397,6 @@ void TSVFileReader<RecordType>::load() {
    }
    cleanupMemoryMap();
 }
+}  // namespace Hylord::IO
 
 #endif

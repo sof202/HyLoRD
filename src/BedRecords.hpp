@@ -6,11 +6,12 @@
  * @brief   Describes record structures of UCSC BED files
  * @license MIT (See LICENSE file in the repository root)
  */
-
 #include <cctype>
 #include <string>
 #include <string_view>
 #include <vector>
+
+#include "TypeDefs.hpp"
 
 /**
  * @namespace BedRecords
@@ -18,9 +19,7 @@
  *
  * All record types implement fromFields() for TSVRecord compatibility.
  */
-namespace BedRecords {
-using Fields = std::vector<std::string>;
-
+namespace Hylord::BedRecords {
 /** Converts "chrX" format strings to numeric values (1-22=autosomes, 23=X,
  * 24=Y, 25=M)
  */
@@ -85,6 +84,6 @@ struct Bed9Plus9 : public Bed {
       return parsed_row;
    }
 };
-}  // namespace BedRecords
+}  // namespace Hylord::BedRecords
 
 #endif

@@ -11,7 +11,8 @@
 #include <stdexcept>
 #include <string>
 
-int BedRecords::parseChromosomeNumber(const std::string_view chr) {
+namespace Hylord::BedRecords {
+int parseChromosomeNumber(const std::string_view chr) {
    std::string chromosomeNumber{chr.substr(3, chr.size())};
    std::transform(chromosomeNumber.begin(),
                   chromosomeNumber.end(),
@@ -28,11 +29,11 @@ int BedRecords::parseChromosomeNumber(const std::string_view chr) {
    }
 }
 
-void BedRecords::validateFields(const Fields& fields,
-                                int min_expected_fields) {
+void validateFields(const Fields& fields, int min_expected_fields) {
    if (static_cast<int>(std::ssize(fields)) < min_expected_fields) {
       throw std::runtime_error(
           "Could not parse field, too few fields (expected >=" +
           std::to_string(min_expected_fields) + ")");
    }
 }
+}  // namespace Hylord::BedRecords
