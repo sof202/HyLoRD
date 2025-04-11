@@ -69,7 +69,8 @@ struct Bed4PlusX : public Bed {
       Bed4PlusX parsed_row{};
       parseCoreFields(parsed_row, fields);
       for (std::size_t i{4}; i < fields.size(); ++i) {
-         parsed_row.methylation_percentages.emplace_back(std::stod(fields[i]));
+         parsed_row.methylation_percentages.emplace_back(std::stod(fields[i]) /
+                                                         100);
       }
       return parsed_row;
    }
