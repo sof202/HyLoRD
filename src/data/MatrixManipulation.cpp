@@ -1,3 +1,9 @@
+/**
+ * @file    MatrixManipulation.cpp
+ * @brief   Implements matrix preprocessing for QPP solver inputs
+ * @license MIT (See LICENSE file in the repository root)
+ */
+
 #include "data/MatrixManipulation.hpp"
 
 #include <stdexcept>
@@ -5,9 +11,6 @@
 #include "types.hpp"
 
 namespace Hylord::MatrixManipulation {
-// Guarantees property of positive semi-definite. If the columns are linearly
-// independent (very likely when number of rows is high and number of columns
-// is low), the resultant matrix is positive definite.
 Matrix gramMatrix(const Matrix& m) { return m.transpose() * m; }
 
 Vector generateCoefficientVector(const Matrix& reference_matrix,

@@ -1,6 +1,12 @@
 #ifndef HYLORDTYPEDEFS_H_
 #define HYLORDTYPEDEFS_H_
 
+/**
+ * @file    types.hpp
+ * @brief   Defines all typedefs used in HyLoRD
+ * @license MIT (See LICENSE file in the repository root)
+ */
+
 #include <functional>
 #include <string>
 #include <vector>
