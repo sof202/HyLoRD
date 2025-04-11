@@ -8,7 +8,6 @@
  */
 
 #include <cstddef>
-#include <iostream>
 #include <numeric>
 #include <string_view>
 #include <tuple>
