@@ -52,6 +52,7 @@ file(GLOB HyLoRD
   src/core/hylord.cpp
   src/data/BedRecords.cpp
   src/data/BedData.cpp
+  src/data/MatrixManipulation.cpp
 )
 add_executable(hylord ${HyLoRD})
 target_include_directories(hylord PRIVATE src)
