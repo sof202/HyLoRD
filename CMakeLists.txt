@@ -25,6 +25,13 @@ FetchContent_Declare(
     GIT_TAG        4160d259d961cd393fd8d67590a8c7d210207348 # v2.5.0
 )
 FetchContent_MakeAvailable(cli11_proj)
+FetchContent_Declare(
+    eigen
+    QUIET
+    GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
+    GIT_TAG        3147391d946bb4b6c68edd901f2add6ac1f31f8c # v3.4.0
+)
+FetchContent_MakeAvailable(eigen)
 
 ## Build ##
 file(GLOB HyLoRD
@@ -36,6 +43,7 @@ add_executable(hylord ${HyLoRD})
 target_include_directories(hylord PRIVATE src)
 target_link_libraries(hylord PRIVATE Threads::Threads)
 target_link_libraries(hylord PRIVATE CLI11::CLI11)
+target_include_directories(hylord PRIVATE ${eigen_SOURCE_DIR})
 
 ## Install ##
 install(TARGETS hylord
