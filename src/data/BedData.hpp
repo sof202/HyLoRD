@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <vector>
 
+#include "Eigen/Dense"
 #include "concepts.hpp"
 #include "data/BedRecords.hpp"
 #include "types.hpp"
@@ -43,6 +44,7 @@ class ReferenceMatrixData {
       return m_records;
    }
    void subsetRows(RowIndexes rows) { subset(m_records, rows); };
+   Matrix getAsEigenMatrix() const;
 
   private:
    std::vector<BedRecords::Bed4PlusX> m_records{};
@@ -57,6 +59,7 @@ class BedMethylData {
       return m_records;
    }
    void subsetRows(RowIndexes rows) { subset(m_records, rows); };
+   Vector getAsEigenVector() const;
 
   private:
    std::vector<BedRecords::Bed9Plus9> m_records{};
