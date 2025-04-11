@@ -44,6 +44,7 @@ class ReferenceMatrixData {
       return m_records;
    }
    void subsetRows(RowIndexes rows) { subset(m_records, rows); };
+   void addMoreCellTypes(int num_cell_types);
    Matrix getAsEigenMatrix() const;
 
   private:

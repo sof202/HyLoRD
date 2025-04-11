@@ -3,6 +3,7 @@
 #include <stdexcept>
 
 #include "Eigen/Dense"
+#include "random/rng.hpp"
 #include "types.hpp"
 
 namespace Hylord::BedData {
@@ -12,6 +13,15 @@ Vector BedMethylData::getAsEigenVector() const {
       methylation_percentages(i) = m_records[i].methylation_percentage;
    }
    return methylation_percentages;
+}
+
+void ReferenceMatrixData::addMoreCellTypes(int num_cell_types) {
+   for (auto& row : m_records) {
+      for (int i{}; i < num_cell_types; ++i) {
+         row.methylation_percentages.emplace_back(
+             RNG::get_random_methylation());
+      }
+   }
 }
 
 Matrix ReferenceMatrixData::getAsEigenMatrix() const {
