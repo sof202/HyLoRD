@@ -58,6 +58,9 @@ target_include_directories(hylord PRIVATE src)
 target_link_libraries(hylord PRIVATE Threads::Threads)
 target_link_libraries(hylord PRIVATE CLI11::CLI11)
 target_link_libraries(hylord PRIVATE Eigen3::Eigen)
+target_include_directories(hylord PUBLIC 
+${CMAKE_CURRENT_SOURCE_DIR}/third_party/pcg/include
+)
 
 ## Install ##
 install(TARGETS hylord
