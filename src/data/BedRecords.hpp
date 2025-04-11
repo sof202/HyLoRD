@@ -7,6 +7,9 @@
  * @license MIT (See LICENSE file in the repository root)
  */
 #include <cctype>
+#include <iostream>
+#include <sstream>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -80,7 +83,7 @@ struct Bed9Plus9 : public Bed {
       validateFields(fields, 5);
       Bed9Plus9 parsed_row{};
       parseCoreFields(parsed_row, fields);
-      parsed_row.methylation_percentage = std::stod(fields[4]);
+      parsed_row.methylation_percentage = std::stod(fields[4]) / 100.0;
       return parsed_row;
    }
 };

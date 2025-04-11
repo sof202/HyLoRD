@@ -223,12 +223,12 @@ inline Fields TSVFileReader<RecordType>::splitTSVLine(
     const std::string& line) const {
    Fields fields;
    std::size_t start{0};
-   std::size_t end{line.find('\t')};
+   std::size_t end{line.find_first_of("\t ")};
 
    while (end != std::string::npos) {
       fields.push_back(line.substr(start, end - start));
       start = end + 1;
-      end = line.find('\t', start);
+      end = line.find_first_of("\t ", start);
    }
    // Final field
    fields.push_back(line.substr(start));
