@@ -37,22 +37,6 @@ class CpGData {
    std::vector<BedRecords::Bed4> m_records{};
 };
 
-class ReferenceMatrixData {
-  public:
-   ReferenceMatrixData(std::vector<BedRecords::Bed4PlusX> records) :
-       m_records{std::move(records)} {}
-
-   const std::vector<BedRecords::Bed4PlusX>& records() const {
-      return m_records;
-   }
-   void subsetRows(RowIndexes rows) { subset(m_records, rows); };
-   void addMoreCellTypes(int num_cell_types);
-   Matrix getAsEigenMatrix() const;
-
-  private:
-   std::vector<BedRecords::Bed4PlusX> m_records{};
-};
-
 class BedMethylData {
   public:
    BedMethylData(std::vector<BedRecords::Bed9Plus9> records) :
@@ -66,6 +50,28 @@ class BedMethylData {
 
   private:
    std::vector<BedRecords::Bed9Plus9> m_records{};
+};
+
+class ReferenceMatrixData {
+  public:
+   ReferenceMatrixData(std::vector<BedRecords::Bed4PlusX> records) :
+       m_records{std::move(records)} {}
+   ReferenceMatrixData(const BedMethylData& bedmethyl) {
+      for (const auto& row : bedmethyl.records()) {
+         m_records.push_back(BedRecords::Bed4PlusX{
+             row.chromosome, row.start, row.end, row.name, {}});
+      }
+   }
+
+   const std::vector<BedRecords::Bed4PlusX>& records() const {
+      return m_records;
+   }
+   void subsetRows(RowIndexes rows) { subset(m_records, rows); };
+   void addMoreCellTypes(int num_cell_types);
+   Matrix getAsEigenMatrix() const;
+
+  private:
+   std::vector<BedRecords::Bed4PlusX> m_records{};
 };
 
 template <typename BedTypeOne, typename BedTypeTwo>
