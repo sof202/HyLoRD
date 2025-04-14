@@ -45,3 +45,5 @@ for Vector and Matrix interfaces. Licensed under MPL2.
 - [PGC](https://www.pcg-random.org)
 (commit:428802d1a5634f96bcd0705fab379ff0113bcf13): Used for random number
 generation. Licensed under MIT and Apache2.0.
+- [qpmad](https://github.com/asherikov/qpmad/) (v1.4.0): Used for solving main
+quadratic programming problem. Licensed under Apache2.0.
