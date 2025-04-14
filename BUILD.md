@@ -34,7 +34,14 @@ whilst still adding some debug info
 ## Dependenices
 
 CMake will automatically bring these in for you during the standard build
-process. These are listed here for completeness.
+processs. CMake will automatically fetch these dependencies during the build
+process. Full license texts for all third-party dependencies are available in
+the [`third_party/`](third_party/) directory for reference.
 
 - [CLI11](https://github.com/CLIUtils/CLI11/) (v2.5.0): Used for command-line
 parsing. Licensed under BSD-3-Clause.
+- [Eigen](https://eigen.tuxfamily.org/index.php?title=Main_Page) (v3.4.0): Used
+for Vector and Matrix interfaces. Licensed under MPL2.
+- [PGC](https://www.pcg-random.org)
+(commit:428802d1a5634f96bcd0705fab379ff0113bcf13): Used for random number
+generation. Licensed under MIT and Apache2.0.
