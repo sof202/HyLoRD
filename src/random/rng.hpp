@@ -1,8 +1,10 @@
 #ifndef HYLORDRNG_H_
 #define HYLORDRNG_H_
 
-#include <map>
+#include <algorithm>
+#include <iterator>
 #include <random>
+#include <vector>
 
 #include "pcg_random.hpp"
 
@@ -18,33 +20,50 @@ inline pcg32 rng{generate()};
 // bimodal distribution with peaks around 0 and 1 (0% and 100%). The mapping
 // below recreates that bimodal distribution as a discrete distribution. This
 // is done as it is quicker to generate random numbers.
-static inline std::map<int, double> methylation_mapping{{1, 0.0},
-                                                        {2, 0.0408},
-                                                        {3, 0.1209},
-                                                        {4, 0.2},
-                                                        {5, 0.3},
-                                                        {6, 0.5},
-                                                        {7, 0.6},
-                                                        {8, 0.85},
-                                                        {9, 1}};
+static inline std::vector<double> methylation_cdf{0.06884382,
+                                                  0.10354818,
+                                                  0.12962329,
+                                                  0.16059704,
+                                                  0.20894288,
+                                                  0.27983389,
+                                                  0.38286741,
+                                                  0.53027698,
+                                                  0.76769743,
+                                                  0.97110349,
+                                                  1};
 // Hydoxymethylation is similar, but shows a massively different distrubtion
 // in neurons than other cell types. We stick with the distributions seen in
 // other cell types seen.
-static inline std::map<int, double> hydroxymethylation_mapping{{1, 0.0},
-                                                               {2, 0.0},
-                                                               {3, 0.0},
-                                                               {4, 0.0},
-                                                               {5, 0.1},
-                                                               {6, 0.1},
-                                                               {7, 0.1},
-                                                               {8, 0.2},
-                                                               {9, 0.4}};
+static inline std::vector<double> hydroxymethylation_cdf{0.06884382,
+                                                         0.10354818,
+                                                         0.12962329,
+                                                         0.16059704,
+                                                         0.20894288,
+                                                         0.27983389,
+                                                         0.38286741,
+                                                         0.53027698,
+                                                         0.76769743,
+                                                         0.97110349,
+                                                         1};
 inline double get_random_methylation() {
-   return methylation_mapping[std::uniform_int_distribution<int>(0, 10)(rng)];
+   double r{std::uniform_real_distribution<double>(0.0, 1.0)(rng)};
+   auto it{
+       std::lower_bound(methylation_cdf.begin(), methylation_cdf.end(), r)};
+   auto index{std::distance(methylation_cdf.begin(), it)};
+
+   // In case of rounding errors
+   index = std::min(index, std::ssize(methylation_cdf) - 1);
+   return static_cast<double>(index) / (methylation_cdf.size() - 1);
 }
 inline double get_random_hydroxymethylation() {
-   return hydroxymethylation_mapping[std::uniform_int_distribution<int>(
-       1, 9)(rng)];
+   double r{std::uniform_real_distribution<double>(0.0, 1.0)(rng)};
+   auto it{std::lower_bound(
+       hydroxymethylation_cdf.begin(), methylation_cdf.end(), r)};
+   auto index{std::distance(hydroxymethylation_cdf.begin(), it)};
+
+   // In case of rounding errors
+   index = std::min(index, std::ssize(hydroxymethylation_cdf) - 1);
+   return static_cast<double>(index) / (methylation_cdf.size() - 1);
 }
 
 }  // namespace Hylord::RNG
