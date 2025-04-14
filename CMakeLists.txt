@@ -4,19 +4,25 @@ project(HyLoRD)
 include(FetchContent)
 include(ExternalProject)
 
+# ------------------
+# Options
+# ------------------
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+# ------------------
+# Git
+# ------------------
 if(NOT PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
   # Auto-create a .gitignore in the specified "build" directory.
   file(GENERATE OUTPUT .gitignore CONTENT "*")
 endif()
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
-## External Libs ##
+# ------------------
+# External Libraries
+# ------------------
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 FetchContent_Declare(
@@ -64,7 +70,9 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(qpmad)
 
-## Build ##
+# ------------------
+# Build
+# ------------------
 file(GLOB HyLoRD
   src/main.cpp
   src/core/hylord.cpp
@@ -82,7 +90,9 @@ target_include_directories(hylord PUBLIC
 ${CMAKE_CURRENT_SOURCE_DIR}/third_party/pcg/include
 )
 
-## Install ##
+# ------------------
+# Install
+# ------------------
 install(TARGETS hylord
 RUNTIME DESTINATION bin
 )
