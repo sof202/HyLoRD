@@ -46,6 +46,24 @@ set(EIGEN_BUILD_DOC OFF)
 FetchContent_MakeAvailable(Eigen)
 set(BUILD_TESTING ${original_BUILD_TESTING})
 
+# qpmad's CMakeLists.txt contains 'find_package(Eigen3)'. We just retrieved
+# this above, so we just ensure that qpmad knows it exists and can find it.
+set(EIGEN3_INCLUDE_DIR ${eigen_SOURCE_DIR})
+set(Eigen3_FOUND TRUE)
+if(NOT TARGET Eigen3::Eigen)
+  add_library(Eigen3::Eigen INTERFACE IMPORTED)
+  set_target_properties(Eigen3::Eigen PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${eigen_SOURCE_DIR}"
+  )
+endif()
+FetchContent_Declare(
+  qpmad
+  QUIET
+  GIT_REPOSITORY https://github.com/asherikov/qpmad.git
+  GIT_TAG b2fd8d57d973cab5d74decc1bbfc3c622d111240 #1.4.0
+)
+FetchContent_MakeAvailable(qpmad)
+
 ## Build ##
 file(GLOB HyLoRD
   src/main.cpp
@@ -59,6 +77,7 @@ target_include_directories(hylord PRIVATE src)
 target_link_libraries(hylord PRIVATE Threads::Threads)
 target_link_libraries(hylord PRIVATE CLI11::CLI11)
 target_link_libraries(hylord PRIVATE Eigen3::Eigen)
+target_link_libraries(hylord PRIVATE qpmad)
 target_include_directories(hylord PUBLIC 
 ${CMAKE_CURRENT_SOURCE_DIR}/third_party/pcg/include
 )
