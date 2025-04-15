@@ -32,7 +32,7 @@ class CpGData {
        m_records{std::move(records)} {}
 
    const std::vector<BedRecords::Bed4>& records() const { return m_records; }
-   bool empty() { return m_records.empty(); }
+   bool empty() const { return m_records.empty(); }
    void subsetRows(RowIndexes rows) { subset(m_records, rows); };
 
   private:
@@ -48,7 +48,7 @@ class BedMethylData {
    const std::vector<BedRecords::Bed9Plus9>& records() const {
       return m_records;
    }
-   bool empty() { return m_records.empty(); }
+   bool empty() const { return m_records.empty(); }
    void subsetRows(RowIndexes rows) { subset(m_records, rows); };
    Vector getAsEigenVector() const;
 
@@ -71,7 +71,7 @@ class ReferenceMatrixData {
    const std::vector<BedRecords::Bed4PlusX>& records() const {
       return m_records;
    }
-   bool empty() { return m_records.empty(); }
+   bool empty() const { return m_records.empty(); }
    void subsetRows(RowIndexes rows) { subset(m_records, rows); };
    void addMoreCellTypes(int num_cell_types);
    Matrix getAsEigenMatrix() const;
