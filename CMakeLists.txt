@@ -75,6 +75,7 @@ FetchContent_MakeAvailable(qpmad)
 # ------------------
 file(GLOB HyLoRD
   src/main.cpp
+  src/cli.cpp
   src/core/hylord.cpp
   src/data/BedRecords.cpp
   src/data/BedData.cpp

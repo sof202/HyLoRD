@@ -10,6 +10,7 @@
 #include <string_view>
 
 #include "Eigen/Dense"
+#include "cli.hpp"
 #include "data/BedData.hpp"
 #include "io/TSVFileReader.hpp"
 #include "qpmad/solver.h"
@@ -80,12 +81,7 @@ void update_reference_matrix(Eigen::Ref<Matrix> reference_matrix,
                              const Vector& bulk_profile,
                              int additional_cell_types);
 
-int run(const std::string_view bedmethyl_file,
-        const std::string_view reference_matrix_file,
-        const std::string_view cpg_list_file,
-        const std::string_view cell_type_list_file,
-        const int additional_cell_types,
-        const int threads);
+int run(CMD::HylordConfig& config);
 
 }  // namespace Hylord
 
