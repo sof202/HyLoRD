@@ -86,6 +86,9 @@ void update_reference_matrix(Eigen::Ref<Matrix> reference_matrix,
 
 int run(CMD::HylordConfig& config) {
    try {
+      // --------------- //
+      // Data processing //
+      // --------------- //
       BedData::CpGData cpg_list{readFile<BedData::CpGData, BedRecords::Bed4>(
           config.cpg_list_file, config.num_threads)};
 
@@ -108,6 +111,9 @@ int run(CMD::HylordConfig& config) {
       Vector bulk_profile{bedmethyl.getAsEigenVector()};
       Matrix reference_matrix{reference_matrix_data.getAsEigenMatrix()};
 
+      // ------------- //
+      // Deconvolution //
+      // ------------- //
       Deconvolver deconvolver{reference_matrix_data.numberOfCellTypes(),
                               bulk_profile};
       if (config.additional_cell_types == 0) {
