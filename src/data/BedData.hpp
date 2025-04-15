@@ -27,10 +27,12 @@ void subset(Records::Collection<RecordType>& records, const RowIndexes& rows) {
 
 class CpGData {
   public:
+   CpGData() = default;
    CpGData(std::vector<BedRecords::Bed4> records) :
        m_records{std::move(records)} {}
 
    const std::vector<BedRecords::Bed4>& records() const { return m_records; }
+   bool empty() { return m_records.empty(); }
    void subsetRows(RowIndexes rows) { subset(m_records, rows); };
 
   private:
@@ -39,12 +41,14 @@ class CpGData {
 
 class BedMethylData {
   public:
+   BedMethylData() = default;
    BedMethylData(std::vector<BedRecords::Bed9Plus9> records) :
        m_records{std::move(records)} {}
 
    const std::vector<BedRecords::Bed9Plus9>& records() const {
       return m_records;
    }
+   bool empty() { return m_records.empty(); }
    void subsetRows(RowIndexes rows) { subset(m_records, rows); };
    Vector getAsEigenVector() const;
 
@@ -54,6 +58,7 @@ class BedMethylData {
 
 class ReferenceMatrixData {
   public:
+   ReferenceMatrixData() = default;
    ReferenceMatrixData(std::vector<BedRecords::Bed4PlusX> records) :
        m_records{std::move(records)} {}
    ReferenceMatrixData(const BedMethylData& bedmethyl) {
@@ -66,6 +71,7 @@ class ReferenceMatrixData {
    const std::vector<BedRecords::Bed4PlusX>& records() const {
       return m_records;
    }
+   bool empty() { return m_records.empty(); }
    void subsetRows(RowIndexes rows) { subset(m_records, rows); };
    void addMoreCellTypes(int num_cell_types);
    Matrix getAsEigenMatrix() const;
