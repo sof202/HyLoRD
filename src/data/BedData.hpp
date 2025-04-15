@@ -74,6 +74,10 @@ class ReferenceMatrixData {
    bool empty() const { return m_records.empty(); }
    void subsetRows(RowIndexes rows) { subset(m_records, rows); };
    void addMoreCellTypes(int num_cell_types);
+   int numberOfCellTypes() const {
+      return static_cast<int>(
+          std::ssize(m_records[0].methylation_percentages));
+   }
    Matrix getAsEigenMatrix() const;
 
   private:
