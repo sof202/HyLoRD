@@ -76,7 +76,7 @@ int run(const std::string_view bedmethyl_file,
       BedData::CpGData cpg_list{readFile<BedData::CpGData, BedRecords::Bed4>(
           cpg_list_file, threads)};
 
-      BedData::ReferenceMatrixData reference_matrix{
+      BedData::ReferenceMatrixData reference_matrix_data{
           readFile<BedData::ReferenceMatrixData, BedRecords::Bed4PlusX>(
               reference_matrix_file, threads)};
 
@@ -87,12 +87,13 @@ int run(const std::string_view bedmethyl_file,
               bedmethyl_file, threads, bedmethyl_important_fields)};
 
       preprocessInputData(
-          bedmethyl, reference_matrix, cpg_list, additional_cell_types);
+          bedmethyl, reference_matrix_data, cpg_list, additional_cell_types);
 
       int num_cell_types{reference_matrix.numberOfCellTypes()};
       Deconvolver deconvolver{num_cell_types};
-      deconvolver.runQpmad(reference_matrix.getAsEigenMatrix(),
-                           bedmethyl.getAsEigenVector());
+      Matrix reference_matrix{reference_matrix_data.getAsEigenMatrix()};
+      Vector bulk_profile{bedmethyl.getAsEigenVector()};
+      deconvolver.runQpmad(reference_matrix, bulk_profile);
 
       std::cout << deconvolver.cell_proportions() << '\n';
 
