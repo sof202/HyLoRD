@@ -115,7 +115,7 @@ int run(CMD::HylordConfig& config) {
          return 0;
       }
 
-      for (int i{}; i < 5; ++i) {
+      for (int iter{}; iter < config.max_iterations; ++iter) {
          deconvolver.runQpmad(reference_matrix);
          try {
             update_reference_matrix(reference_matrix,
