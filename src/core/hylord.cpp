@@ -110,19 +110,23 @@ int run(const std::string_view bedmethyl_file,
 
       preprocessInputData(
           bedmethyl, reference_matrix_data, cpg_list, additional_cell_types);
-
+      Vector bulk_profile{bedmethyl.getAsEigenVector()};
       Matrix reference_matrix{reference_matrix_data.getAsEigenMatrix()};
-      Deconvolver deconvolver{reference_matrix_data.numberOfCellTypes(),
-                              bedmethyl.getAsEigenVector()};
-      deconvolver.runQpmad(reference_matrix);
 
-      std::cout << reference_matrix << '\n';
-      if (additional_cell_types > 0) {
+      Deconvolver deconvolver{reference_matrix_data.numberOfCellTypes(),
+                              bulk_profile};
+      if (additional_cell_types == 0) {
+         deconvolver.runQpmad(reference_matrix);
+         return 0;
+      }
+
+      for (int i{}; i < 5; ++i) {
+         deconvolver.runQpmad(reference_matrix);
          update_reference_matrix(reference_matrix,
                                  deconvolver.cell_proportions(),
+                                 bulk_profile,
                                  additional_cell_types);
       }
-      std::cout << reference_matrix << '\n';
       return 0;
    } catch (const std::exception& e) {
       std::cerr << "Error: " << e.what() << '\n';
