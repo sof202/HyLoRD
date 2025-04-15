@@ -28,12 +28,13 @@ BedFile readFile(const std::string_view file_name,
       return reader.extractRecords();
    }()};
 }
-void run(const std::string_view bedmethyl_file,
-         const std::string_view reference_matrix_file,
-         const std::string_view cpg_list_file,
-         const std::string_view cell_type_list_file,
-         const int additional_cell_types,
-         const int threads);
+
+int run(const std::string_view bedmethyl_file,
+        const std::string_view reference_matrix_file,
+        const std::string_view cpg_list_file,
+        const std::string_view cell_type_list_file,
+        const int additional_cell_types,
+        const int threads);
 
 }  // namespace Hylord
 

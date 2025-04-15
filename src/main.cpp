@@ -64,13 +64,12 @@ int main(int argc, char** argv) {
       if (num_threads == 0)
          num_threads = static_cast<int>(std::thread::hardware_concurrency());
 
-      Hylord::run(bedmethyl_file,
-                  reference_matrix_file,
-                  cpg_list_file,
-                  cell_type_list_file,
-                  additional_cell_types,
-                  num_threads);
-      return 0;
+      return Hylord::run(bedmethyl_file,
+                         reference_matrix_file,
+                         cpg_list_file,
+                         cell_type_list_file,
+                         additional_cell_types,
+                         num_threads);
    } catch (...) {
       std::cerr << "An unexpected fatal error occurred.\n";
       return 1;
