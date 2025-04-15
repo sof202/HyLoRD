@@ -12,6 +12,7 @@
 #include "Eigen/Dense"
 #include "data/BedData.hpp"
 #include "io/TSVFileReader.hpp"
+#include "qpmad/solver.h"
 #include "types.hpp"
 
 namespace Hylord {
@@ -30,6 +31,34 @@ BedFile readFile(const std::string_view file_name,
       return reader.extractRecords();
    }()};
 }
+
+class Deconvolver {
+  public:
+   Deconvolver(int num_cell_types) : m_num_cell_types(num_cell_types) {
+      initialise();
+   }
+
+   qpmad::Solver::ReturnStatus runQpmad(const Matrix& reference,
+                                        const Vector& bulk);
+   Vector cell_proportions() { return m_cell_proportions; }
+
+  private:
+   void initialise() {
+      m_proportions_lower_bound = Vector::Zero(m_num_cell_types);
+      m_proportions_upper_bound = Vector::Ones(m_num_cell_types);
+      m_sum_lower_bound = Vector::Ones(1);
+      m_sum_upper_bound = Vector::Ones(1);
+      m_inequality_matrix = Vector::Ones(m_num_cell_types).transpose();
+   }
+
+   int m_num_cell_types;
+   Vector m_cell_proportions;         // x
+   Vector m_proportions_lower_bound;  // lb
+   Vector m_proportions_upper_bound;  // ub
+   Vector m_sum_lower_bound;          // Alb
+   Vector m_sum_upper_bound;          // Aub
+   Matrix m_inequality_matrix;        // A
+};
 
 /**
  * @brief Subsets input data to common CpGs and adds random additional cell

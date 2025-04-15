@@ -1,16 +1,12 @@
 #include "core/hylord.hpp"
 
-#include <algorithm>
 #include <exception>
-#include <iomanip>
-#include <ios>
 #include <iostream>
 #include <stdexcept>
 #include <string_view>
 #include <utility>
 
 #include "Eigen/Dense"
-#include "Eigen/src/Core/util/Constants.h"
 #include "data/BedData.hpp"
 #include "data/BedRecords.hpp"
 #include "data/MatrixManipulation.hpp"
@@ -53,6 +49,23 @@ void preprocessInputData(BedData::BedMethylData& bedmethyl,
    reference_matrix.addMoreCellTypes(additional_cell_types);
 }
 
+qpmad::Solver::ReturnStatus Deconvolver::runQpmad(const Matrix& reference,
+                                                  const Vector& bulk) {
+   Matrix Hessian{MatrixManipulation::gramMatrix(reference)};
+   Vector linear_terms{
+       MatrixManipulation::generateCoefficientVector(reference, bulk)};
+
+   qpmad::Solver qpp_solver;
+   return qpp_solver.solve(m_cell_proportions,
+                           Hessian,
+                           linear_terms,
+                           m_proportions_lower_bound,
+                           m_proportions_upper_bound,
+                           m_inequality_matrix,
+                           m_sum_lower_bound,
+                           m_sum_upper_bound);
+}
+
 int run(const std::string_view bedmethyl_file,
         const std::string_view reference_matrix_file,
         const std::string_view cpg_list_file,
@@ -76,34 +89,12 @@ int run(const std::string_view bedmethyl_file,
       preprocessInputData(
           bedmethyl, reference_matrix, cpg_list, additional_cell_types);
 
-      qpmad::Solver qpp_solver;
       int num_cell_types{reference_matrix.numberOfCellTypes()};
+      Deconvolver deconvolver{num_cell_types};
+      deconvolver.runQpmad(reference_matrix.getAsEigenMatrix(),
+                           bedmethyl.getAsEigenVector());
 
-      // Defining qpmad solver requirements -------------------------------- //
-      Vector proportions_lower_bound{Vector::Zero(num_cell_types)};  // lb
-      Vector proportions_upper_bound{Vector::Ones(num_cell_types)};  // ub
-      Vector sum_lower_bound{1};                                     // Alb
-      Vector sum_upper_bound{1};                                     // Aub
-      Vector cell_proportions;                                       // x
-      Matrix Hessian{MatrixManipulation::gramMatrix(                 // H
-          reference_matrix.getAsEigenMatrix())};                     // H
-      Vector linear_terms{MatrixManipulation::generateCoefficientVector(   // h
-          reference_matrix.getAsEigenMatrix(),                             // h
-          bedmethyl.getAsEigenVector())};                                  // h
-      Matrix inequality_matrix{Vector::Ones(num_cell_types).transpose()};  // A
-      // ------------------------------------------------------------------- //
-
-      qpmad::Solver::ReturnStatus status{
-          qpp_solver.solve(cell_proportions,
-                           Hessian,
-                           linear_terms,
-                           proportions_lower_bound,
-                           proportions_upper_bound,
-                           inequality_matrix,
-                           sum_lower_bound,
-                           sum_upper_bound)};
-
-      std::cout << cell_proportions << '\n';
+      std::cout << deconvolver.cell_proportions() << '\n';
 
       return 0;
    } catch (const std::exception& e) {
