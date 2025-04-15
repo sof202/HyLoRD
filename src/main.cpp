@@ -50,6 +50,29 @@ int main(int argc, char** argv) {
           "The number of expected additional cell types. Read "
           "docs for additional information.");
 
+      std::string out_file_path{};
+      application.add_option(
+          "-o,--outdir",
+          out_file_path,
+          "A file path to write the determined cell proportions to (e.g. "
+          ".../proportions.txt). By default, this information is written to "
+          "stdout.");
+
+      int max_iterations{5};
+      application.add_option(
+          "--max-iterations",
+          max_iterations,
+          "The maximum number of iterations of main deconvolution loop. Note: "
+          "This does nothing if additional-cell-types is not set. [5]");
+
+      double loop_tolerance{1e-8};
+      application.add_option(
+          "--loop-tolerance",
+          loop_tolerance,
+          "The criterion for executing another iteration of the main "
+          "deconvolution loop. Note: This does nothing if "
+          "additional-cell-types is not set. [1e-8]");
+
       std::string bedmethyl_file{};
       application
           .add_option("bedMethyl",
