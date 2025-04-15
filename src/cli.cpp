@@ -1,6 +1,10 @@
 #include "cli.hpp"
 
+#include <limits>
 #include <string>
+#include <thread>
+
+#include "CLI/CLI.hpp"
 
 namespace Hylord::CMD {
 void setup_cli(CLI::App& app, HylordConfig& config) {
@@ -8,8 +12,11 @@ void setup_cli(CLI::App& app, HylordConfig& config) {
        "HyLoRD, A hybrid cell type deconvolution algorithm for long read "
        "(ONT) data.");
 
-   app.add_option(
-       "-t,--threads", config.num_threads, "Number of threads to use [0].");
+   app.add_option("-t,--threads",
+                  config.num_threads,
+                  "Number of threads to use (range [0-total_threads]). [0]")
+       ->check(CLI::Range(
+           0, static_cast<int>(std::thread::hardware_concurrency())));
 
    app.add_option("-c,--cpg-list",
                   config.cpg_list_file,
@@ -32,10 +39,12 @@ void setup_cli(CLI::App& app, HylordConfig& config) {
                   "generic (cell_type_1, cell_type_2, etc.).")
        ->check(CLI::ExistingFile);
 
-   app.add_option("--additional-cell-types",
-                  config.additional_cell_types,
-                  "The number of expected additional cell types. Read "
-                  "docs for additional information.");
+   app.add_option(
+          "--additional-cell-types",
+          config.additional_cell_types,
+          "The number of expected additional cell types (range [0-100]). Read "
+          "docs for additional information. [0]")
+       ->check(CLI::Range(0, 100));
 
    app.add_option(
        "-o,--outdir",
@@ -45,16 +54,19 @@ void setup_cli(CLI::App& app, HylordConfig& config) {
        "stdout.");
 
    app.add_option(
-       "--max-iterations",
-       config.max_iterations,
-       "The maximum number of iterations of main deconvolution loop. Note: "
-       "This does nothing if additional-cell-types is not set. [5]");
+          "--max-iterations",
+          config.max_iterations,
+          "The maximum number of iterations of main deconvolution loop (range "
+          "[1-100]). Note: "
+          "This does nothing if additional-cell-types is not set. [5]")
+       ->check(CLI::Range(1, 100));
 
    app.add_option("--loop-tolerance",
                   config.loop_tolerance,
                   "The criterion for executing another iteration of the main "
-                  "deconvolution loop. Note: This does nothing if "
-                  "additional-cell-types is not set. [1e-8]");
+                  "deconvolution loop (min: 0). Note: This does nothing if "
+                  "additional-cell-types is not set. [1e-8]")
+       ->check(CLI::Range(0.0, std::numeric_limits<double>::max()));
 
    app.add_option("bedMethyl",
                   config.bedmethyl_file,
