@@ -1,14 +1,20 @@
 #include "core/hylord.hpp"
 
+#include <algorithm>
 #include <exception>
+#include <iomanip>
+#include <ios>
 #include <iostream>
 #include <stdexcept>
 #include <string_view>
 #include <utility>
 
 #include "Eigen/Dense"
+#include "Eigen/src/Core/util/Constants.h"
 #include "data/BedData.hpp"
 #include "data/BedRecords.hpp"
+#include "data/MatrixManipulation.hpp"
+#include "qpmad/solver.h"
 #include "types.hpp"
 
 namespace Hylord {
@@ -69,6 +75,35 @@ int run(const std::string_view bedmethyl_file,
 
       preprocessInputData(
           bedmethyl, reference_matrix, cpg_list, additional_cell_types);
+
+      qpmad::Solver qpp_solver;
+      int num_cell_types{reference_matrix.numberOfCellTypes()};
+
+      // Defining qpmad solver requirements -------------------------------- //
+      Vector proportions_lower_bound{Vector::Zero(num_cell_types)};  // lb
+      Vector proportions_upper_bound{Vector::Ones(num_cell_types)};  // ub
+      Vector sum_lower_bound{1};                                     // Alb
+      Vector sum_upper_bound{1};                                     // Aub
+      Vector cell_proportions;                                       // x
+      Matrix Hessian{MatrixManipulation::gramMatrix(                 // H
+          reference_matrix.getAsEigenMatrix())};                     // H
+      Vector linear_terms{MatrixManipulation::generateCoefficientVector(   // h
+          reference_matrix.getAsEigenMatrix(),                             // h
+          bedmethyl.getAsEigenVector())};                                  // h
+      Matrix inequality_matrix{Vector::Ones(num_cell_types).transpose()};  // A
+      // ------------------------------------------------------------------- //
+
+      qpmad::Solver::ReturnStatus status{
+          qpp_solver.solve(cell_proportions,
+                           Hessian,
+                           linear_terms,
+                           proportions_lower_bound,
+                           proportions_upper_bound,
+                           inequality_matrix,
+                           sum_lower_bound,
+                           sum_upper_bound)};
+
+      std::cout << cell_proportions << '\n';
 
       return 0;
    } catch (const std::exception& e) {
