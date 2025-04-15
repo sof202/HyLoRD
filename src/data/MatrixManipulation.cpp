@@ -11,7 +11,12 @@
 #include "types.hpp"
 
 namespace Hylord::MatrixManipulation {
-Matrix gramMatrix(const Matrix& m) { return m.transpose() * m; }
+Matrix gramMatrix(const Matrix& m) {
+   Matrix gram_matrix{m.transpose() * m};
+   static constexpr double epsilon{1e-8};
+   return gram_matrix +=
+          epsilon * Matrix::Identity(gram_matrix.rows(), gram_matrix.cols());
+}
 
 Vector generateCoefficientVector(const Matrix& reference_matrix,
                                  const Vector& bulk_data) {
