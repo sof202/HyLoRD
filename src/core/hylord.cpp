@@ -67,10 +67,6 @@ qpmad::Solver::ReturnStatus Deconvolver::runQpmad(
                            m_sum_upper_bound);
 }
 
-/**
- * @brief Update process for unknown reference profiles (see docs for more
- * info).
- */
 void update_reference_matrix(Eigen::Ref<Matrix> reference_matrix,
                              const Vector& cell_proportions,
                              const Vector& bulk_profile,
