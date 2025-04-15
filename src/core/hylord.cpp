@@ -89,10 +89,9 @@ int run(const std::string_view bedmethyl_file,
       preprocessInputData(
           bedmethyl, reference_matrix_data, cpg_list, additional_cell_types);
 
-      int num_cell_types{reference_matrix.numberOfCellTypes()};
-      Deconvolver deconvolver{num_cell_types};
       Matrix reference_matrix{reference_matrix_data.getAsEigenMatrix()};
       Vector bulk_profile{bedmethyl.getAsEigenVector()};
+      Deconvolver deconvolver{reference_matrix_data.numberOfCellTypes()};
       deconvolver.runQpmad(reference_matrix, bulk_profile);
 
       std::cout << deconvolver.cell_proportions() << '\n';
