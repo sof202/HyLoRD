@@ -49,11 +49,10 @@ void preprocessInputData(BedData::BedMethylData& bedmethyl,
    reference_matrix.addMoreCellTypes(additional_cell_types);
 }
 
-qpmad::Solver::ReturnStatus Deconvolver::runQpmad(const Matrix& reference,
-                                                  const Vector& bulk) {
+qpmad::Solver::ReturnStatus Deconvolver::runQpmad(const Matrix& reference) {
    Matrix Hessian{MatrixManipulation::gramMatrix(reference)};
-   Vector linear_terms{
-       MatrixManipulation::generateCoefficientVector(reference, bulk)};
+   Vector linear_terms{MatrixManipulation::generateCoefficientVector(
+       reference, m_bulk_profile)};
 
    qpmad::Solver qpp_solver;
    return qpp_solver.solve(m_cell_proportions,
@@ -90,9 +89,9 @@ int run(const std::string_view bedmethyl_file,
           bedmethyl, reference_matrix_data, cpg_list, additional_cell_types);
 
       Matrix reference_matrix{reference_matrix_data.getAsEigenMatrix()};
-      Vector bulk_profile{bedmethyl.getAsEigenVector()};
-      Deconvolver deconvolver{reference_matrix_data.numberOfCellTypes()};
-      deconvolver.runQpmad(reference_matrix, bulk_profile);
+      Deconvolver deconvolver{reference_matrix_data.numberOfCellTypes(),
+                              bedmethyl.getAsEigenVector()};
+      deconvolver.runQpmad(reference_matrix);
 
       std::cout << deconvolver.cell_proportions() << '\n';
 

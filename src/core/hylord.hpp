@@ -34,12 +34,13 @@ BedFile readFile(const std::string_view file_name,
 
 class Deconvolver {
   public:
-   Deconvolver(int num_cell_types) : m_num_cell_types(num_cell_types) {
+   Deconvolver(int num_cell_types, const Vector& bulk_profile) :
+       m_num_cell_types(num_cell_types),
+       m_bulk_profile{bulk_profile} {
       initialise();
    }
 
-   qpmad::Solver::ReturnStatus runQpmad(const Matrix& reference,
-                                        const Vector& bulk);
+   qpmad::Solver::ReturnStatus runQpmad(const Matrix& reference);
    Vector cell_proportions() { return m_cell_proportions; }
 
   private:
@@ -58,6 +59,7 @@ class Deconvolver {
    Vector m_sum_lower_bound;          // Alb
    Vector m_sum_upper_bound;          // Aub
    Matrix m_inequality_matrix;        // A
+   Vector m_bulk_profile;             // h
 };
 
 /**
