@@ -6,16 +6,16 @@
 
 int main(int argc, char** argv) {
    try {
-      CLI::App application{
+      CLI::App hylord_cli{
           "HyLoRD, A hybrid cell type deconvolution algorithm for long read "
           "(ONT) data."};
 
       int num_threads{};
-      application.add_option(
+      hylord_cli.add_option(
           "-t,--threads", num_threads, "Number of threads to use [0].");
 
       std::string cpg_list_file{};
-      application
+      hylord_cli
           .add_option("-c,--cpg-list",
                       cpg_list_file,
                       "List of CpG sites (BED4 format) to use with "
@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
           ->check(CLI::ExistingFile);
 
       std::string reference_matrix_file{};
-      application
+      hylord_cli
           .add_option(
               "-r,--reference-matrix",
               reference_matrix_file,
@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
           ->check(CLI::ExistingFile);
 
       std::string cell_type_list_file{};
-      application
+      hylord_cli
           .add_option(
               "-l,--cell-type-list",
               cell_type_list_file,
@@ -44,14 +44,14 @@ int main(int argc, char** argv) {
           ->check(CLI::ExistingFile);
 
       int additional_cell_types{};
-      application.add_option(
+      hylord_cli.add_option(
           "--additional-cell-types",
           additional_cell_types,
           "The number of expected additional cell types. Read "
           "docs for additional information.");
 
       std::string out_file_path{};
-      application.add_option(
+      hylord_cli.add_option(
           "-o,--outdir",
           out_file_path,
           "A file path to write the determined cell proportions to (e.g. "
@@ -59,14 +59,14 @@ int main(int argc, char** argv) {
           "stdout.");
 
       int max_iterations{5};
-      application.add_option(
+      hylord_cli.add_option(
           "--max-iterations",
           max_iterations,
           "The maximum number of iterations of main deconvolution loop. Note: "
           "This does nothing if additional-cell-types is not set. [5]");
 
       double loop_tolerance{1e-8};
-      application.add_option(
+      hylord_cli.add_option(
           "--loop-tolerance",
           loop_tolerance,
           "The criterion for executing another iteration of the main "
@@ -74,7 +74,7 @@ int main(int argc, char** argv) {
           "additional-cell-types is not set. [1e-8]");
 
       std::string bedmethyl_file{};
-      application
+      hylord_cli
           .add_option("bedMethyl",
                       bedmethyl_file,
                       "The bedMethyl file for your long read dataset obtained "
@@ -82,7 +82,7 @@ int main(int argc, char** argv) {
           ->required()
           ->check(CLI::ExistingFile);
 
-      CLI11_PARSE(application, argc, argv);
+      CLI11_PARSE(hylord_cli, argc, argv);
 
       if (num_threads == 0)
          num_threads = static_cast<int>(std::thread::hardware_concurrency());
