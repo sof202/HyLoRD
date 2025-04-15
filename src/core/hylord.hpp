@@ -71,6 +71,11 @@ void preprocessInputData(const BedData::BedMethylData& bedmethyl,
                          const BedData::CpGData& cpg_list,
                          int additional_cell_types);
 
+void update_reference_matrix(Eigen::Ref<Matrix> reference_matrix,
+                             const Vector& cell_proportions,
+                             const Vector& bulk_profile,
+                             int additional_cell_types);
+
 int run(const std::string_view bedmethyl_file,
         const std::string_view reference_matrix_file,
         const std::string_view cpg_list_file,

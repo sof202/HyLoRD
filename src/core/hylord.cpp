@@ -1,5 +1,6 @@
 #include "core/hylord.hpp"
 
+#include <cassert>
 #include <exception>
 #include <iostream>
 #include <stdexcept>
@@ -66,6 +67,27 @@ qpmad::Solver::ReturnStatus Deconvolver::runQpmad(
                            m_sum_upper_bound);
 }
 
+/**
+ * @brief Update process for unknown reference profiles (see docs for more
+ * info).
+ */
+void update_reference_matrix(Eigen::Ref<Matrix> reference_matrix,
+                             const Vector& cell_proportions,
+                             const Vector& bulk_profile,
+                             int additional_cell_types) {
+   assert(additional_cell_types > 0 &&
+          "Reference matrix must be extended from original.");
+   const int total_cell_types{static_cast<int>(reference_matrix.cols())};
+   const int k{total_cell_types - additional_cell_types};
+
+   auto r_k = reference_matrix.leftCols(k);
+   auto p_k = cell_proportions.head(k);
+   const auto p_l = cell_proportions.tail(additional_cell_types);
+
+   reference_matrix.rightCols(additional_cell_types) =
+       (bulk_profile - r_k * p_k) * MatrixManipulation::pseudoInverse(p_l);
+}
+
 int run(const std::string_view bedmethyl_file,
         const std::string_view reference_matrix_file,
         const std::string_view cpg_list_file,
@@ -94,8 +116,13 @@ int run(const std::string_view bedmethyl_file,
                               bedmethyl.getAsEigenVector()};
       deconvolver.runQpmad(reference_matrix);
 
-      std::cout << deconvolver.cell_proportions() << '\n';
-
+      std::cout << reference_matrix << '\n';
+      if (additional_cell_types > 0) {
+         update_reference_matrix(reference_matrix,
+                                 deconvolver.cell_proportions(),
+                                 additional_cell_types);
+      }
+      std::cout << reference_matrix << '\n';
       return 0;
    } catch (const std::exception& e) {
       std::cerr << "Error: " << e.what() << '\n';

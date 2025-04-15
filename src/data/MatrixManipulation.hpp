@@ -35,6 +35,17 @@ Matrix gramMatrix(const Matrix& m);
 Vector generateCoefficientVector(const Matrix& reference_matrix,
                                  const Vector& bulk_data);
 
+template <typename Derived>
+Eigen::RowVectorXd pseudoInverse(const Eigen::MatrixBase<Derived>& v) {
+   static_assert(Derived::ColsAtCompileTime == 1,
+                 "Input must be a column vector");
+   const double squared_norm = v.squaredNorm();
+   if (squared_norm < 1e-10) {
+      throw std::runtime_error(
+          "Norm of vector is too small for numerical stability.");
+   }
+   return v.transpose() / squared_norm;
+}
 }  // namespace Hylord::MatrixManipulation
 
 #endif
