@@ -118,10 +118,19 @@ int run(const std::string_view bedmethyl_file,
 
       for (int i{}; i < 5; ++i) {
          deconvolver.runQpmad(reference_matrix);
-         update_reference_matrix(reference_matrix,
-                                 deconvolver.cell_proportions(),
-                                 bulk_profile,
-                                 additional_cell_types);
+         try {
+            update_reference_matrix(reference_matrix,
+                                    deconvolver.cell_proportions(),
+                                    bulk_profile,
+                                    additional_cell_types);
+         } catch (const std::exception& e) {
+            std::cerr
+                << "Error: " << e.what()
+                << "\n Rerunning HyLoRD with a lower number of iterations "
+                   "(--max-iterations) might help. If not, please "
+                   "consult the documentation.\n";
+            break;
+         }
       }
       return 0;
    } catch (const std::exception& e) {
