@@ -9,6 +9,8 @@
 
 #include <string_view>
 
+#include "Eigen/Dense"
+#include "data/BedData.hpp"
 #include "io/TSVFileReader.hpp"
 #include "types.hpp"
 
@@ -28,6 +30,15 @@ BedFile readFile(const std::string_view file_name,
       return reader.extractRecords();
    }()};
 }
+
+/**
+ * @brief Subsets input data to common CpGs and adds random additional cell
+ * type data
+ */
+void preprocessInputData(const BedData::BedMethylData& bedmethyl,
+                         const BedData::ReferenceMatrixData& reference_matrix,
+                         const BedData::CpGData& cpg_list,
+                         int additional_cell_types);
 
 int run(const std::string_view bedmethyl_file,
         const std::string_view reference_matrix_file,
