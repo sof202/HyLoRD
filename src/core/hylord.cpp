@@ -62,7 +62,8 @@ int run(CMD::HylordConfig& config) {
          return 0;
       }
 
-      for (int iter{}; iter < config.max_iterations; ++iter) {
+      int iteration{1};
+      while (iteration <= config.max_iterations) {
          deconvolver.runQpmad(reference_matrix);
          try {
             LinearAlgebra::update_reference_matrix(
@@ -72,7 +73,8 @@ int run(CMD::HylordConfig& config) {
                 config.additional_cell_types);
          } catch (const std::exception& e) {
             std::cerr
-                << "Warning: " << e.what() << " (iteration: " << iter << ')'
+                << "Warning: " << e.what() << " (iteration: " << iteration
+                << ')'
                 << "\n Rerunning HyLoRD with a lower number of iterations "
                    "(--max-iterations) might help. If not, please "
                    "consult the documentation.\n";
@@ -80,13 +82,13 @@ int run(CMD::HylordConfig& config) {
          }
          // On first iteration, there is no 'previous' cell proportions
          // yet and so the distance metric will fail.
-         if (iter > 0 && deconvolver.change_in_proportions() <
-                             config.convergence_threshold) {
-            std::cout << "Deconvolution loop finished after " << iter
-                      << " iterations.\n";
+         if (iteration > 1 && deconvolver.change_in_proportions() <
+                                  config.convergence_threshold) {
             break;
          }
       }
+      std::cout << "Deconvolution loop finished after " << iteration
+                << " iteration" << (iteration == 1 ? ".\n" : "s.\n");
 
       // ------- //
       // Outputs //
