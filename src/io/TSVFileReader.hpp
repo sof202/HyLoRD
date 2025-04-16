@@ -171,26 +171,24 @@ template <Records::TSVRecord RecordType>
 inline void TSVFileReader<RecordType>::setupMemoryMap() {
    m_file_descriptor = open(m_file_path.c_str(), O_RDONLY);
    if (m_file_descriptor == -1) {
-      throw std::system_error(errno,
-                              std::system_category(),
-                              "Failed to open file: " + m_file_path);
+      throw std::system_error(
+          errno, std::system_category(), "Failed to open file");
    }
    if (fstat(m_file_descriptor, &m_file_info) == -1) {
       int fstat_error_number = errno;
       close(m_file_descriptor);
-      throw std::system_error(fstat_error_number,
-                              std::system_category(),
-                              "fstat failed for file: " + m_file_path);
+      throw std::system_error(
+          fstat_error_number, std::system_category(), "fstat failed for file");
    }
    if (!S_ISREG(m_file_info.st_mode)) {
       close(m_file_descriptor);
-      throw std::runtime_error("Not a regular file: " + m_file_path);
+      throw FileReadException(m_file_path, "Not a regular file");
    }
 
    m_file_size = static_cast<std::size_t>(m_file_info.st_size);
    if (m_file_size == 0) {
       close(m_file_descriptor);
-      throw std::runtime_error("This file is empty: " + m_file_path);
+      throw FileReadException(m_file_path, "File is empty.");
    }
 
    m_mapped_data = static_cast<char*>(mmap(
@@ -199,9 +197,8 @@ inline void TSVFileReader<RecordType>::setupMemoryMap() {
    if (m_mapped_data == MAP_FAILED) {
       int mmap_error_number = errno;
       close(m_file_descriptor);
-      throw std::system_error(mmap_error_number,
-                              std::system_category(),
-                              "Memory mapping failed for: " + m_file_path);
+      throw std::system_error(
+          mmap_error_number, std::system_category(), "Memory mapping failed");
    }
 
    madvise(m_mapped_data, m_file_size, MADV_SEQUENTIAL | MADV_WILLNEED);
@@ -337,8 +334,8 @@ void TSVFileReader<RecordType>::load() {
    if (m_loaded) {
       throw HylordException("File is already loaded.");
    }
-   setupMemoryMap();
    try {
+      setupMemoryMap();
       const char* file_start{m_mapped_data};
       const char* file_end{m_mapped_data + m_file_size};
 
@@ -353,6 +350,12 @@ void TSVFileReader<RecordType>::load() {
                           std::make_move_iterator(result.records.end()));
       }
       m_loaded = true;
+   } catch (const std::system_error& e) {
+      cleanupMemoryMap();
+      throw FileReadException(m_file_path,
+                              "Caught system_error with code " +
+                                  std::to_string(e.code().value()) + " [" +
+                                  e.what() + "].");
    } catch (...) {
       cleanupMemoryMap();
       throw;
