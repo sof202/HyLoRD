@@ -72,12 +72,15 @@ int run(CMD::HylordConfig& config) {
                 bulk_profile,
                 config.additional_cell_types);
          } catch (const std::exception& e) {
-            std::cerr
-                << "Warning: " << e.what() << " (iteration: " << iteration
-                << ')'
-                << "\n Rerunning HyLoRD with a lower number of iterations "
-                   "(--max-iterations) might help. If not, please "
-                   "consult the documentation.\n";
+            std::cerr << "Warning: " << e.what()
+                      << " Reference matrix could not be updated as a result "
+                         "(iteration: "
+                      << iteration << ").\n"
+                      << "Rerunning HyLoRD with a lower number of iterations "
+                         "(--max-iterations) might help.\n"
+                      << "If this doesn't help, please consult the "
+                         "documentation or consider opening an issue at "
+                         "https://github.com/sof202/HyLoRD/issues.\n";
             break;
          }
          // On first iteration, there is no 'previous' cell proportions
