@@ -280,7 +280,8 @@ inline std::vector<RecordType> TSVFileReader<RecordType>::processChunk(
             chunk_records.push_back(RecordType::fromFields(filtered_fields));
          } catch (const std::exception& e) {
             std::cerr << "Record conversion error: " << e.what() << '\n'
-                      << "Occurred for line: " << line << '\n';
+                      << "Occurred for line: " << line << '\n'
+                      << "Line will be skipped and not used by HyLoRD.\n";
          }
       }
       line_start = line_end + 1;
