@@ -72,7 +72,7 @@ int run(CMD::HylordConfig& config) {
                 config.additional_cell_types);
          } catch (const std::exception& e) {
             std::cerr
-                << "Error: " << e.what() << " (iteration: " << iter << ')'
+                << "Warning: " << e.what() << " (iteration: " << iter << ')'
                 << "\n Rerunning HyLoRD with a lower number of iterations "
                    "(--max-iterations) might help. If not, please "
                    "consult the documentation.\n";
