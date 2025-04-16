@@ -12,20 +12,25 @@
 
 namespace Hylord::BedRecords {
 int parseChromosomeNumber(const std::string_view chr) {
-   std::string chromosomeNumber{chr.substr(3, chr.size())};
-   std::transform(chromosomeNumber.begin(),
-                  chromosomeNumber.end(),
-                  chromosomeNumber.begin(),
-                  [](unsigned char c) { return std::tolower(c); });
-   if (chromosomeNumber == "x") return 23;
-   if (chromosomeNumber == "y") return 24;
-   if (chromosomeNumber == "m") return 25;
-   try {
-      return std::stoi(chromosomeNumber);
-   } catch (const std::invalid_argument& e) {
-      throw std::runtime_error("Failed to glean chromosome number for: " +
-                               std::string(chr));
+   size_t start_pos = 0;
+   if (chr.size() >= 3 && std::tolower(chr[0]) == 'c' &&
+       std::tolower(chr[1]) == 'h' && std::tolower(chr[2]) == 'r') {
+      start_pos = 3;
    }
+
+   std::string_view number_part = chr.substr(start_pos);
+
+   if (number_part.size() == 1) {
+      const char c = std::tolower(number_part[0]);
+      if (c == 'x') return 23;
+      if (c == 'y') return 24;
+      if (c == 'm') return 25;
+   }
+   if (std::all_of(number_part.begin(), number_part.end(), ::isdigit)) {
+      return std::stoi(std::string(number_part));
+   }
+   throw std::runtime_error("Failed to glean chromosome number for: " +
+                            std::string(chr));
 }
 
 void validateFields(const Fields& fields, int min_expected_fields) {
