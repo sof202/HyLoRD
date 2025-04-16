@@ -22,6 +22,9 @@ std::vector<CellType> generateCellTypeList(
     const std::string_view cell_type_list_file,
     const Deconvolver& deconvolver);
 
+void writeToFile(const std::stringstream& buffer,
+                 const std::filesystem::path& out_path);
+
 void writeMetrics(const CMD::HylordConfig& config,
                   const Deconvolver& deconvolver);
 }  // namespace Hylord::IO

@@ -1,6 +1,7 @@
 #include "io/writeMetrics.hpp"
 
 #include <cassert>
+#include <filesystem>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -35,6 +36,72 @@ double convertToPercent(double d, int precision) {
    return percent > 0 ? percent : 0;
 }
 
+void writeToFile(const std::stringstream& buffer,
+                 const std::filesystem::path& out_path) {
+   if (std::filesystem::exists(out_path) &&
+       std::filesystem::is_directory(out_path)) {
+      throw std::runtime_error("Output path is an existing directory: " +
+                               out_path.string());
+   }
+
+   if (out_path.has_parent_path()) {
+      std::filesystem::create_directories(out_path.parent_path());
+   }
+
+   auto parent_dir = out_path.has_parent_path()
+                         ? out_path.parent_path()
+                         : std::filesystem::current_path();
+   auto permissions = std::filesystem::status(parent_dir).permissions();
+   if ((permissions & std::filesystem::perms::owner_write) ==
+           std::filesystem::perms::none &&
+       (permissions & std::filesystem::perms::group_write) ==
+           std::filesystem::perms::none) {
+      throw std::runtime_error("No write permissions in directory: " +
+                               parent_dir.string());
+   }
+
+   std::filesystem::path final_path = out_path;
+
+   // Handle case where file already exists as we don't want to overwrite any
+   // files
+   if (std::filesystem::exists(out_path) &&
+       std::filesystem::is_regular_file(out_path)) {
+      int counter = 1;
+      std::filesystem::path new_path;
+      std::filesystem::path stem = out_path.stem();
+      std::filesystem::path extension = out_path.extension();
+
+      do {
+         new_path = out_path.parent_path() /
+                    (stem.string() + "_" + std::to_string(counter) +
+                     extension.string());
+         counter++;
+      } while (std::filesystem::exists(new_path));
+
+      std::cerr << "Warning: File " << out_path.filename().string()
+                << " already exists. Writing to "
+                << new_path.filename().string() << " instead.\n";
+      final_path = new_path;
+   }
+
+   std::ofstream outfile(final_path, std::ios::binary);
+   if (!outfile) {
+      throw std::runtime_error("Failed to open file for writing: " +
+                               final_path.string());
+   }
+   outfile << buffer.rdbuf();
+
+   if (!outfile) {
+      throw std::runtime_error("Failed to write to file: " +
+                               final_path.string());
+   }
+   outfile.close();
+   if (!outfile) {
+      throw std::runtime_error("Failed to properly close file: " +
+                               final_path.string());
+   }
+}
+
 void writeMetrics(const CMD::HylordConfig& config,
                   const Deconvolver& deconvolver) {
    std::vector<CellType> cell_type_list{
@@ -53,8 +120,7 @@ void writeMetrics(const CMD::HylordConfig& config,
    if (config.out_file_path.empty()) {
       std::cout << output_buffer.str();
    } else {
-      std::ofstream out_file(config.out_file_path);
-      out_file << output_buffer.str();
+      writeToFile(output_buffer, config.out_file_path);
    }
 }
 
