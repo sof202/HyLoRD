@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -34,17 +35,26 @@ double convertToPercent(double d, int precision) {
    return percent > 0 ? percent : 0;
 }
 
-void writeMetrics(const std::string_view output_file_path,
-                  const CMD::HylordConfig& config,
+void writeMetrics(const CMD::HylordConfig& config,
                   const Deconvolver& deconvolver) {
    std::vector<CellType> cell_type_list{
        generateCellTypeList(config.cell_type_list_file, deconvolver)};
    assert(
        cell_type_list.size() == deconvolver.cell_proportions().size() &&
        "Cell proportions vector and names of cell types must match in size.");
+
+   std::stringstream output_buffer;
    for (std::size_t i{}; i < cell_type_list.size(); ++i) {
-      std::cout << cell_type_list[i].cell_type << '\t'
-                << convertToPercent(deconvolver.cell_proportions()[i]) << '\n';
+      output_buffer << cell_type_list[i].cell_type << '\t'
+                    << convertToPercent(deconvolver.cell_proportions()[i])
+                    << '\n';
+   }
+
+   if (config.out_file_path.empty()) {
+      std::cout << output_buffer.str();
+   } else {
+      std::ofstream out_file(config.out_file_path);
+      out_file << output_buffer.str();
    }
 }
 
