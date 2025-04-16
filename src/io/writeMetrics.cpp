@@ -13,6 +13,13 @@
 #include "io/TSVFileReader.hpp"
 
 namespace Hylord::IO {
+struct CellType {
+   std::string cell_type;
+   static CellType fromFields(const Fields& fields) {
+      return CellType{fields[0]};
+   }
+};
+
 std::vector<CellType> generateCellTypeList(
     const std::string_view cell_type_list_file,
     const Deconvolver& deconvolver) {
@@ -31,7 +38,7 @@ std::vector<CellType> generateCellTypeList(
    return cell_type_list;
 }
 
-double convertToPercent(double d, int precision) {
+double convertToPercent(double d, int precision = 2) {
    double percent{std::round(d * 100 * precision) / precision};
    return percent > 0 ? percent : 0;
 }
