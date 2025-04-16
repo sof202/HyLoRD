@@ -2,6 +2,7 @@
 #define DATA_PROCESSING_H_
 
 #include "data/BedData.hpp"
+#include "data/Filters.hpp"
 #include "io/TSVFileReader.hpp"
 #include "types.hpp"
 

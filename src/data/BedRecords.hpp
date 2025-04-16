@@ -78,10 +78,10 @@ struct Bed9Plus9 : public Bed {
    double methylation_percentage{};
 
    static Bed9Plus9 fromFields(const Fields& fields) {
-      validateFields(fields, 5);
+      validateFields(fields, 6);
       Bed9Plus9 parsed_row{};
       parseCoreFields(parsed_row, fields);
-      parsed_row.methylation_percentage = std::stod(fields[4]) / 100.0;
+      parsed_row.methylation_percentage = std::stod(fields[5]) / 100.0;
       return parsed_row;
    }
 };

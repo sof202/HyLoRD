@@ -11,6 +11,7 @@
 #include "data/BedData.hpp"
 #include "data/BedRecords.hpp"
 #include "data/DataProcessing.hpp"
+#include "data/Filters.hpp"
 #include "data/LinearAlgebra.hpp"
 #include "io/writeMetrics.hpp"
 #include "types.hpp"
@@ -22,6 +23,7 @@ int run(CMD::HylordConfig& config) {
       // --------------- //
       // Data processing //
       // --------------- //
+
       BedData::CpGData cpg_list{
           Processing::readFile<BedData::CpGData, BedRecords::Bed4>(
               config.cpg_list_file, config.num_threads)};
@@ -31,13 +33,17 @@ int run(CMD::HylordConfig& config) {
                                BedRecords::Bed4PlusX>(
               config.reference_matrix_file, config.num_threads)};
 
-      // chr, start, end, name and fraction modified (see Modkit README)
-      IO::ColumnIndexes bedmethyl_important_fields{0, 1, 2, 3, 10};
+      // chr, start, end, name, score (read_depth) and fraction modified (see
+      // Modkit README)
+      IO::ColumnIndexes bedmethyl_important_fields{0, 1, 2, 3, 4, 10};
+      IO::RowFilter bedmethyl_row_filter{
+          Filters::generateFullRowFilter(config)};
       BedData::BedMethylData bedmethyl{
           Processing::readFile<BedData::BedMethylData, BedRecords::Bed9Plus9>(
               config.bedmethyl_file,
               config.num_threads,
-              bedmethyl_important_fields)};
+              bedmethyl_important_fields,
+              bedmethyl_row_filter)};
 
       Processing::preprocessInputData(bedmethyl,
                                       reference_matrix_data,

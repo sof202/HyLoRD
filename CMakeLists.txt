@@ -83,6 +83,7 @@ file(GLOB HyLoRD
   src/data/LinearAlgebra.cpp
   src/io/writeMetrics.cpp
   src/data/DataProcessing.cpp
+  src/data/Filters.cpp
 )
 add_executable(hylord ${HyLoRD})
 target_include_directories(hylord PRIVATE src)

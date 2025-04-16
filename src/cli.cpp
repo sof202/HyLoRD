@@ -39,6 +39,20 @@ void setup_cli(CLI::App& app, HylordConfig& config) {
                   "generic (cell_type_1, cell_type_2, etc.).")
        ->check(CLI::ExistingFile);
 
+   app.add_option("--min-read-depth",
+                  config.min_read_depth,
+                  "Determines the minimum read depth required for a CpG site "
+                  "(in the input data) "
+                  "to be considered for deconvolution (range >=0). [10]")
+       ->check(CLI::Range(0, std::numeric_limits<int>::max()));
+
+   app.add_option("--max-read-depth",
+                  config.max_read_depth,
+                  "Determines the maximum read depth a CpG site (in the input "
+                  "data) can have to be considered for deconvolution "
+                  "(range >=0). Not set by default.")
+       ->check(CLI::Range(0, std::numeric_limits<int>::max()));
+
    app.add_option(
           "--additional-cell-types",
           config.additional_cell_types,
