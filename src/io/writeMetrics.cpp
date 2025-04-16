@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <iostream>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -17,6 +18,9 @@ namespace Hylord::IO {
 struct CellType {
    std::string cell_type;
    static CellType fromFields(const Fields& fields) {
+      if (fields[0].empty())
+         throw std::runtime_error("Failed to parse fields (empty).");
+
       return CellType{fields[0]};
    }
 };
