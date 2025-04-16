@@ -11,6 +11,7 @@
 #include "data/BedData.hpp"
 #include "data/BedRecords.hpp"
 #include "data/LinearAlgebra.hpp"
+#include "io/writeMetrics.hpp"
 #include "qpmad/solver.h"
 #include "types.hpp"
 
@@ -146,6 +147,12 @@ int run(CMD::HylordConfig& config) {
             break;
          }
       }
+
+      // ------- //
+      // Outputs //
+      // ------- //
+      IO::writeMetrics(config, deconvolver);
+
       return 0;
    } catch (const std::exception& e) {
       std::cerr << "Error: " << e.what() << '\n';
