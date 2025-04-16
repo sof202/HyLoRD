@@ -1,8 +1,8 @@
-#ifndef MATRIX_MANIPULATION_H_
-#define MATRIX_MANIPULATION_H_
+#ifndef LINEAR_ALGEBRA_H_
+#define LINEAR_ALGEBRA_H_
 
 /**
- * @file    MatrixManipulation.hpp
+ * @file    LinearAlgebra.hpp
  * @brief   Defines matrix preprocessing for QPP solver inputs
  * @license MIT (See LICENSE file in the repository root)
  */
@@ -10,9 +10,9 @@
 #include "types.hpp"
 
 /**
- * @brief Matrix manipulation utilities for QPP solver input preparation
+ * @brief Eigen utilities for main HyLoRD QPP solving
  */
-namespace Hylord::MatrixManipulation {
+namespace Hylord::LinearAlgebra {
 
 /**
  * @brief Computes Gram matrix (AᵀA) which is positive semi-definite
@@ -51,6 +51,6 @@ Eigen::RowVectorXd pseudoInverse(const Eigen::MatrixBase<Derived>& v) {
  * @brief Computes the squared distance between two dynamic vectors
  */
 double squaredDistance(const Vector& v1, const Vector& v2);
-}  // namespace Hylord::MatrixManipulation
+}  // namespace Hylord::LinearAlgebra
 
 #endif

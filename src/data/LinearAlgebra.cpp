@@ -1,16 +1,15 @@
 /**
- * @file    MatrixManipulation.cpp
+ * @file    LinearAlgebra.cpp
  * @brief   Implements matrix preprocessing for QPP solver inputs
  * @license MIT (See LICENSE file in the repository root)
  */
 
-#include "data/MatrixManipulation.hpp"
-
 #include <stdexcept>
 
+#include "data/LinearAlgebra.hpp"
 #include "types.hpp"
 
-namespace Hylord::MatrixManipulation {
+namespace Hylord::LinearAlgebra {
 Matrix gramMatrix(const Matrix& m) {
    Matrix gram_matrix{m.transpose() * m};
    static constexpr double epsilon{1e-8};
@@ -35,4 +34,4 @@ double squaredDistance(const Vector& v1, const Vector& v2) {
    return (v1 - v2).squaredNorm();
 }
 
-}  // namespace Hylord::MatrixManipulation
+}  // namespace Hylord::LinearAlgebra

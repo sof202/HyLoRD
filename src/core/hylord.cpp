@@ -10,7 +10,7 @@
 #include "cli.hpp"
 #include "data/BedData.hpp"
 #include "data/BedRecords.hpp"
-#include "data/MatrixManipulation.hpp"
+#include "data/LinearAlgebra.hpp"
 #include "qpmad/solver.h"
 #include "types.hpp"
 
@@ -52,8 +52,8 @@ void preprocessInputData(BedData::BedMethylData& bedmethyl,
 
 qpmad::Solver::ReturnStatus Deconvolver::runQpmad(
     const Matrix& reference_matrix) {
-   Matrix Hessian{MatrixManipulation::gramMatrix(reference_matrix)};
-   Vector linear_terms{MatrixManipulation::generateCoefficientVector(
+   Matrix Hessian{LinearAlgebra::gramMatrix(reference_matrix)};
+   Vector linear_terms{LinearAlgebra::generateCoefficientVector(
        reference_matrix, m_bulk_profile)};
 
    qpmad::Solver qpp_solver;
@@ -82,7 +82,7 @@ void update_reference_matrix(Eigen::Ref<Matrix> reference_matrix,
    const auto p_l = cell_proportions.tail(additional_cell_types);
 
    reference_matrix.rightCols(additional_cell_types) =
-       (bulk_profile - r_k * p_k) * MatrixManipulation::pseudoInverse(p_l);
+       (bulk_profile - r_k * p_k) * LinearAlgebra::pseudoInverse(p_l);
 }
 
 int run(CMD::HylordConfig& config) {

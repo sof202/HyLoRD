@@ -12,7 +12,7 @@
 #include "Eigen/Dense"
 #include "cli.hpp"
 #include "data/BedData.hpp"
-#include "data/MatrixManipulation.hpp"
+#include "data/LinearAlgebra.hpp"
 #include "io/TSVFileReader.hpp"
 #include "qpmad/solver.h"
 #include "types.hpp"
@@ -45,8 +45,8 @@ class Deconvolver {
    qpmad::Solver::ReturnStatus runQpmad(const Matrix& reference);
    Vector cell_proportions() { return m_cell_proportions; }
    double change_in_proportions() {
-      return MatrixManipulation::squaredDistance(m_cell_proportions,
-                                                 m_prev_cell_proportions);
+      return LinearAlgebra::squaredDistance(m_cell_proportions,
+                                            m_prev_cell_proportions);
    }
 
   private:
