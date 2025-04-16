@@ -139,8 +139,8 @@ int run(CMD::HylordConfig& config) {
          }
          // On first iteration, there is no 'previous' cell proportions
          // yet and so the distance metric will fail.
-         if (iter > 0 &&
-             deconvolver.change_in_proportions() < config.loop_tolerance) {
+         if (iter > 0 && deconvolver.change_in_proportions() <
+                             config.convergence_threshold) {
             std::cout << "Deconvolution loop finished after " << iter
                       << " iterations.\n";
             break;

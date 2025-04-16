@@ -61,10 +61,12 @@ void setup_cli(CLI::App& app, HylordConfig& config) {
           "This does nothing if additional-cell-types is not set. [5]")
        ->check(CLI::Range(1, 100));
 
-   app.add_option("--loop-tolerance",
-                  config.loop_tolerance,
-                  "The criterion for executing another iteration of the main "
-                  "deconvolution loop (min: 0). Note: This does nothing if "
+   app.add_option("--convergence-threshold",
+                  config.convergence_threshold,
+                  "The criterion for breaking out of the main "
+                  "deconvolution loop. i.e. if the change in cell proportions "
+                  "between iterations is smaller than this threshold, the "
+                  "loop breaks (min: 0). Note: This does nothing if "
                   "additional-cell-types is not set. [1e-8]")
        ->check(CLI::Range(0.0, std::numeric_limits<double>::max()));
 
