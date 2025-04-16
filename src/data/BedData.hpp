@@ -63,8 +63,8 @@ class ReferenceMatrixData {
        m_records{std::move(records)} {}
    ReferenceMatrixData(const BedMethylData& bedmethyl) {
       for (const auto& row : bedmethyl.records()) {
-         m_records.push_back(BedRecords::Bed4PlusX{
-             row.chromosome, row.start, row.end, row.name, {}});
+         m_records.push_back(
+             BedRecords::Bed4PlusX{row.chromosome, row.start, row.name, {}});
       }
    }
 

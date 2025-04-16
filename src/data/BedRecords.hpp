@@ -30,20 +30,19 @@ void validateFields(const Fields& fields, int min_expected_fields);
 
 /**
  * @brief Core BED fields shared by all variants
- * @details Chromosome, start/end positions, and feature name.
+ * @details Chromosome, start position, and feature name.
  * parseCoreFields() handles common parsing logic for derived types.
+ * End position is not accounted for because it is never used
  */
 struct Bed {
    int chromosome{1};
    int start{};
-   int end{};
    char name{};  // expected m or h
 
    static void parseCoreFields(Bed& core, const Fields& fields) {
       validateFields(fields, 4);
       core.chromosome = parseChromosomeNumber(fields[0]);
       core.start = std::stoi(fields[1]);
-      core.end = std::stoi(fields[2]);
       core.name = fields[3][0];
    }
 };
