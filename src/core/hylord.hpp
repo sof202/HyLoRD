@@ -43,7 +43,7 @@ class Deconvolver {
    }
 
    qpmad::Solver::ReturnStatus runQpmad(const Matrix& reference);
-   Vector cell_proportions() { return m_cell_proportions; }
+   Vector cell_proportions() const { return m_cell_proportions; }
    double change_in_proportions() {
       return LinearAlgebra::squaredDistance(m_cell_proportions,
                                             m_prev_cell_proportions);
