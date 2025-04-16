@@ -1,8 +1,7 @@
 #include "data/BedData.hpp"
 
-#include <stdexcept>
-
 #include "Eigen/Dense"
+#include "HylordException.hpp"
 #include "random/rng.hpp"
 #include "types.hpp"
 
@@ -30,7 +29,8 @@ Matrix ReferenceMatrixData::getAsEigenMatrix() const {
 
    for (const auto& record : m_records) {
       if (record.methylation_percentages.size() != cols) {
-         throw std::runtime_error(
+         throw PreprocessingException(
+             "Eigen Matrix Conversion",
              "Inconsistent number of entries in reference matrix.");
       }
    }

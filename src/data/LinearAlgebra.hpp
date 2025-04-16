@@ -7,6 +7,8 @@
  * @license MIT (See LICENSE file in the repository root)
  */
 
+#include <stdexcept>
+
 #include "types.hpp"
 
 /**
@@ -30,7 +32,7 @@ Matrix gramMatrix(const Matrix& m);
  * @param reference_matrix Reference data matrix
  * @param bulk_data Observation vector from bedmethyl file
  * @return Coefficient vector for quadratic program
- * @throws std::invalid_argument If dimensions don't match
+ * @throws DeconvolutionException If dimensions don't match
  */
 Vector generateCoefficientVector(const Matrix& reference_matrix,
                                  const Vector& bulk_data);
@@ -41,7 +43,7 @@ Eigen::RowVectorXd pseudoInverse(const Eigen::MatrixBase<Derived>& v) {
                  "Input must be a column vector");
    const double squared_norm = v.squaredNorm();
    if (squared_norm < 1e-10) {
-      throw std::runtime_error(
+      throw std::invalid_argument(
           "Norm of vector is too small for numerical stability.");
    }
    return v.transpose() / squared_norm;

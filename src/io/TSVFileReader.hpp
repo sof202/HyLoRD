@@ -25,6 +25,7 @@
 #include <utility>
 #include <vector>
 
+#include "HylordException.hpp"
 #include "concepts.hpp"
 #include "types.hpp"
 
@@ -334,7 +335,7 @@ TSVFileReader<RecordType>::processFile(const char* file_start,
 template <Records::TSVRecord RecordType>
 void TSVFileReader<RecordType>::load() {
    if (m_loaded) {
-      throw std::runtime_error("File is already loaded.");
+      throw HylordException("File is already loaded.");
    }
    setupMemoryMap();
    try {

@@ -7,7 +7,6 @@
 #include "data/BedRecords.hpp"
 
 #include <algorithm>
-#include <iostream>
 #include <stdexcept>
 #include <string>
 
@@ -24,8 +23,8 @@ int parseChromosomeNumber(const std::string_view chr) {
    try {
       return std::stoi(chromosomeNumber);
    } catch (const std::invalid_argument& e) {
-      std::cerr << "Could not obtain chromosome number for: " << chr << '\n';
-      throw;
+      throw std::runtime_error("Failed to glean chromosome number for: " +
+                               std::string(chr));
    }
 }
 

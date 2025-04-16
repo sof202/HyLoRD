@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <utility>
 
+#include "HylordException.hpp"
 #include "data/BedData.hpp"
 
 namespace Hylord::Processing {
@@ -12,10 +13,10 @@ void preprocessInputData(BedData::BedMethylData& bedmethyl,
                          int additional_cell_types) {
    if (reference_matrix.empty()) {
       if (additional_cell_types < 1) {
-         throw std::invalid_argument(
+         throw PreprocessingException(
+             "Reference Matrix Generation",
              "If no reference matrix is provided, additional_cell_types "
-             "should "
-             "be set (>0).");
+             "should be set (>0).");
       }
       reference_matrix = BedData::ReferenceMatrixData{bedmethyl};
    }
@@ -31,7 +32,8 @@ void preprocessInputData(BedData::BedMethylData& bedmethyl,
 
    if (overlapping_indexes.first.empty() ||
        overlapping_indexes.second.empty()) {
-      throw std::runtime_error(
+      throw PreprocessingException(
+          "Find Overlapping Indexes",
           "No overlapping indexes found between reference matrix and input "
           "bedmethyl file.");
    }

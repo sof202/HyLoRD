@@ -8,8 +8,9 @@
 #include <string_view>
 #include <vector>
 
+#include "HylordException.hpp"
 #include "cli.hpp"
-#include "core/hylord.hpp"
+#include "core/Deconvolver.hpp"
 #include "io/TSVFileReader.hpp"
 
 namespace Hylord::IO {
@@ -47,8 +48,8 @@ void writeToFile(const std::stringstream& buffer,
                  const std::filesystem::path& out_path) {
    if (std::filesystem::exists(out_path) &&
        std::filesystem::is_directory(out_path)) {
-      throw std::runtime_error("Output path is an existing directory: " +
-                               out_path.string());
+      throw FileWriteException(out_path.filename().string(),
+                               "Path is an existing directory");
    }
 
    if (out_path.has_parent_path()) {
@@ -63,8 +64,9 @@ void writeToFile(const std::stringstream& buffer,
            std::filesystem::perms::none &&
        (permissions & std::filesystem::perms::group_write) ==
            std::filesystem::perms::none) {
-      throw std::runtime_error("No write permissions in directory: " +
-                               parent_dir.string());
+      throw FileWriteException(
+          out_path.filename().string(),
+          "No write permissions in directory: " + parent_dir.string());
    }
 
    std::filesystem::path final_path = out_path;
@@ -93,19 +95,19 @@ void writeToFile(const std::stringstream& buffer,
 
    std::ofstream outfile(final_path, std::ios::binary);
    if (!outfile) {
-      throw std::runtime_error("Failed to open file for writing: " +
-                               final_path.string());
+      throw FileWriteException(final_path.string(),
+                               "Failed to open file for writing.");
    }
    outfile << buffer.rdbuf();
 
    if (!outfile) {
-      throw std::runtime_error("Failed to write to file: " +
-                               final_path.string());
+      throw FileWriteException(final_path.string(),
+                               "Failed to write to file.");
    }
    outfile.close();
    if (!outfile) {
-      throw std::runtime_error("Failed to properly close file: " +
-                               final_path.string());
+      throw FileWriteException(final_path.string(),
+                               "Failed to properly close file.");
    }
 }
 

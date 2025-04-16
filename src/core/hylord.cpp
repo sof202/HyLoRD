@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include "Eigen/Dense"
+#include "HylordException.hpp"
 #include "cli.hpp"
 #include "core/Deconvolver.hpp"
 #include "data/BedData.hpp"
@@ -87,6 +88,9 @@ int run(CMD::HylordConfig& config) {
       IO::writeMetrics(config, deconvolver);
 
       return 0;
+   } catch (const HylordException& e) {
+      std::cerr << e.what() << '\n';
+      return 1;
    } catch (const std::exception& e) {
       std::cerr << "Error: " << e.what() << '\n';
       return 1;

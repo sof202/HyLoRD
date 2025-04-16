@@ -6,8 +6,7 @@
 
 #include "data/LinearAlgebra.hpp"
 
-#include <stdexcept>
-
+#include "HylordException.hpp"
 #include "types.hpp"
 
 namespace Hylord::LinearAlgebra {
@@ -22,7 +21,8 @@ Vector generateCoefficientVector(const Matrix& reference_matrix,
                                  const Vector& bulk_data) {
    // Shouldn't happen under proper usage
    if (reference_matrix.rows() != bulk_data.rows()) {
-      throw std::invalid_argument(
+      throw DeconvolutionException(
+          "Coefficient Vector Generation",
           "CpGs in bulk_data must be equal to CpGs in reference data.");
    }
    return bulk_data.transpose() * reference_matrix / 2.0;
