@@ -2,11 +2,11 @@
 #define WRITE_METRICS_H_
 
 #include "cli.hpp"
-#include "core/hylord.hpp"
+#include "core/Deconvolver.hpp"
 
 namespace Hylord::IO {
 void writeMetrics(const CMD::HylordConfig& config,
-                  const Deconvolver& deconvolver);
+                  const Deconvolution::Deconvolver& deconvolver);
 }  // namespace Hylord::IO
 
 #endif

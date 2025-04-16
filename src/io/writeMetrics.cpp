@@ -22,7 +22,7 @@ struct CellType {
 
 std::vector<CellType> generateCellTypeList(
     const std::string_view cell_type_list_file,
-    const Deconvolver& deconvolver) {
+    const Deconvolution::Deconvolver& deconvolver) {
    std::vector<CellType> cell_type_list{};
    if (!cell_type_list_file.empty()) {
       TSVFileReader<CellType> reader{cell_type_list_file};
@@ -110,7 +110,7 @@ void writeToFile(const std::stringstream& buffer,
 }
 
 void writeMetrics(const CMD::HylordConfig& config,
-                  const Deconvolver& deconvolver) {
+                  const Deconvolution::Deconvolver& deconvolver) {
    std::vector<CellType> cell_type_list{
        generateCellTypeList(config.cell_type_list_file, deconvolver)};
    assert(

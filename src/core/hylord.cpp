@@ -8,11 +8,11 @@
 
 #include "Eigen/Dense"
 #include "cli.hpp"
+#include "core/Deconvolver.hpp"
 #include "data/BedData.hpp"
 #include "data/BedRecords.hpp"
 #include "data/LinearAlgebra.hpp"
 #include "io/writeMetrics.hpp"
-#include "qpmad/solver.h"
 #include "types.hpp"
 
 namespace Hylord {
@@ -49,24 +49,6 @@ void preprocessInputData(BedData::BedMethylData& bedmethyl,
    bedmethyl.subsetRows(overlapping_indexes.second);
 
    reference_matrix.addMoreCellTypes(additional_cell_types);
-}
-
-qpmad::Solver::ReturnStatus Deconvolver::runQpmad(
-    const Matrix& reference_matrix) {
-   Matrix Hessian{LinearAlgebra::gramMatrix(reference_matrix)};
-   Vector linear_terms{LinearAlgebra::generateCoefficientVector(
-       reference_matrix, m_bulk_profile)};
-
-   qpmad::Solver qpp_solver;
-   m_prev_cell_proportions.noalias() = m_cell_proportions;
-   return qpp_solver.solve(m_cell_proportions,
-                           Hessian,
-                           linear_terms,
-                           m_proportions_lower_bound,
-                           m_proportions_upper_bound,
-                           m_inequality_matrix,
-                           m_sum_lower_bound,
-                           m_sum_upper_bound);
 }
 
 void update_reference_matrix(Eigen::Ref<Matrix> reference_matrix,
@@ -116,8 +98,8 @@ int run(CMD::HylordConfig& config) {
       // ------------- //
       // Deconvolution //
       // ------------- //
-      Deconvolver deconvolver{reference_matrix_data.numberOfCellTypes(),
-                              bulk_profile};
+      Deconvolution::Deconvolver deconvolver{
+          reference_matrix_data.numberOfCellTypes(), bulk_profile};
       if (config.additional_cell_types == 0) {
          deconvolver.runQpmad(reference_matrix);
          return 0;

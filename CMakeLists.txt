@@ -77,6 +77,7 @@ file(GLOB HyLoRD
   src/main.cpp
   src/cli.cpp
   src/core/hylord.cpp
+  src/core/Deconvolver.cpp
   src/data/BedRecords.cpp
   src/data/BedData.cpp
   src/data/LinearAlgebra.cpp
