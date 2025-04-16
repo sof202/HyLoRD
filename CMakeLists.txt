@@ -80,6 +80,7 @@ file(GLOB HyLoRD
   src/data/BedRecords.cpp
   src/data/BedData.cpp
   src/data/LinearAlgebra.cpp
+  src/io/writeMetrics.cpp
 )
 add_executable(hylord ${HyLoRD})
 target_include_directories(hylord PRIVATE src)
