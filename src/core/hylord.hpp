@@ -41,15 +41,6 @@ void preprocessInputData(const BedData::BedMethylData& bedmethyl,
                          const BedData::CpGData& cpg_list,
                          int additional_cell_types);
 
-/**
- * @brief Update process for unknown reference profiles (see docs for more
- * info).
- */
-void update_reference_matrix(Eigen::Ref<Matrix> reference_matrix,
-                             const Vector& cell_proportions,
-                             const Vector& bulk_profile,
-                             int additional_cell_types);
-
 int run(CMD::HylordConfig& config);
 
 }  // namespace Hylord

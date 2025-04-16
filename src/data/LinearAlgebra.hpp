@@ -51,6 +51,16 @@ Eigen::RowVectorXd pseudoInverse(const Eigen::MatrixBase<Derived>& v) {
  * @brief Computes the squared distance between two dynamic vectors
  */
 double squaredDistance(const Vector& v1, const Vector& v2);
+
+/**
+ * @brief Update process for unknown reference profiles (see docs for more
+ * info).
+ */
+void update_reference_matrix(Eigen::Ref<Matrix> reference_matrix,
+                             const Vector& cell_proportions,
+                             const Vector& bulk_profile,
+                             int additional_cell_types);
+
 }  // namespace Hylord::LinearAlgebra
 
 #endif

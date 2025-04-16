@@ -51,23 +51,6 @@ void preprocessInputData(BedData::BedMethylData& bedmethyl,
    reference_matrix.addMoreCellTypes(additional_cell_types);
 }
 
-void update_reference_matrix(Eigen::Ref<Matrix> reference_matrix,
-                             const Vector& cell_proportions,
-                             const Vector& bulk_profile,
-                             int additional_cell_types) {
-   assert(additional_cell_types > 0 &&
-          "Reference matrix must be extended from original.");
-   const int total_cell_types{static_cast<int>(reference_matrix.cols())};
-   const int k{total_cell_types - additional_cell_types};
-
-   auto r_k = reference_matrix.leftCols(k);
-   auto p_k = cell_proportions.head(k);
-   const auto p_l = cell_proportions.tail(additional_cell_types);
-
-   reference_matrix.rightCols(additional_cell_types) =
-       (bulk_profile - r_k * p_k) * LinearAlgebra::pseudoInverse(p_l);
-}
-
 int run(CMD::HylordConfig& config) {
    try {
       // --------------- //
@@ -108,10 +91,11 @@ int run(CMD::HylordConfig& config) {
       for (int iter{}; iter < config.max_iterations; ++iter) {
          deconvolver.runQpmad(reference_matrix);
          try {
-            update_reference_matrix(reference_matrix,
-                                    deconvolver.cell_proportions(),
-                                    bulk_profile,
-                                    config.additional_cell_types);
+            LinearAlgebra::update_reference_matrix(
+                reference_matrix,
+                deconvolver.cell_proportions(),
+                bulk_profile,
+                config.additional_cell_types);
          } catch (const std::exception& e) {
             std::cerr
                 << "Error: " << e.what() << " (iteration: " << iter << ')'
