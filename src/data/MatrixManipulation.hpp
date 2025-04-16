@@ -46,6 +46,11 @@ Eigen::RowVectorXd pseudoInverse(const Eigen::MatrixBase<Derived>& v) {
    }
    return v.transpose() / squared_norm;
 }
+
+/**
+ * @brief Computes the squared distance between two dynamic vectors
+ */
+double squaredDistance(const Vector& v1, const Vector& v2);
 }  // namespace Hylord::MatrixManipulation
 
 #endif

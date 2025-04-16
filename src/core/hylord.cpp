@@ -57,6 +57,7 @@ qpmad::Solver::ReturnStatus Deconvolver::runQpmad(
        reference_matrix, m_bulk_profile)};
 
    qpmad::Solver qpp_solver;
+   m_prev_cell_proportions.noalias() = m_cell_proportions;
    return qpp_solver.solve(m_cell_proportions,
                            Hessian,
                            linear_terms,
@@ -134,6 +135,14 @@ int run(CMD::HylordConfig& config) {
                 << "\n Rerunning HyLoRD with a lower number of iterations "
                    "(--max-iterations) might help. If not, please "
                    "consult the documentation.\n";
+            break;
+         }
+         // On first iteration, there is no 'previous' cell proportions
+         // yet and so the distance metric will fail.
+         if (iter > 0 &&
+             deconvolver.change_in_proportions() < config.loop_tolerance) {
+            std::cout << "Deconvolution loop finished after " << iter
+                      << " iterations.\n";
             break;
          }
       }

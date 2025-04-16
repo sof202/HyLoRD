@@ -28,4 +28,11 @@ Vector generateCoefficientVector(const Matrix& reference_matrix,
    return bulk_data.transpose() * reference_matrix / 2.0;
 }
 
+double squaredDistance(const Vector& v1, const Vector& v2) {
+   assert(v1.size() == v2.size() &&
+          "Vectors must be of the same length to compute distance between the "
+          "two of them.");
+   return (v1 - v2).squaredNorm();
+}
+
 }  // namespace Hylord::MatrixManipulation
