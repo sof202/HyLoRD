@@ -42,7 +42,8 @@ RowFilter makeHighReadFilter(int max_reads) {
 
 RowFilter generateFullRowFilter(const CMD::HylordConfig& config) {
    FilterCombiner combined_filters{};
-   combined_filters.addFilter(makeLowReadFilter(config.min_read_depth));
+   if (config.min_read_depth != 0)
+      combined_filters.addFilter(makeLowReadFilter(config.min_read_depth));
    if (config.max_read_depth != std::numeric_limits<int>::max())
       combined_filters.addFilter(makeHighReadFilter(config.max_read_depth));
 
