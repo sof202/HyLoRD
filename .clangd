@@ -2,10 +2,12 @@ CompileFlags:
   CompilationDatabase: build
 Diagnostics:
   ClangTidy:
-    checks: >
-      -*,
+    Add: [
       clang-analyzer-*,
       modernize-*,
       bugprone-*,
       performance-*
-    Add: [readability-*]
+    ]
+    Remove: [
+      readability-braces-around-statements
+    ]
