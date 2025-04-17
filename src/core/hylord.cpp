@@ -31,14 +31,18 @@ int run(CMD::HylordConfig& config) {
       // Data processing //
       // --------------- //
 
+      IO::RowFilter mark_filter{Filters::generateNameFilter(config)};
       BedData::CpGData cpg_list{
           Processing::readFile<BedData::CpGData, BedRecords::Bed4>(
-              config.cpg_list_file, config.num_threads)};
+              config.cpg_list_file, config.num_threads, {}, mark_filter)};
 
       BedData::ReferenceMatrixData reference_matrix_data{
           Processing::readFile<BedData::ReferenceMatrixData,
                                BedRecords::Bed4PlusX>(
-              config.reference_matrix_file, config.num_threads)};
+              config.reference_matrix_file,
+              config.num_threads,
+              {},
+              mark_filter)};
 
       // chr, start, end, name, score (read_depth) and fraction modified (see
       // Modkit README)

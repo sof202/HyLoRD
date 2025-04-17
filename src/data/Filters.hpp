@@ -8,7 +8,6 @@
  * file in the repository root or https://mit-license.org)
  */
 
-#include <stdexcept>
 #include <vector>
 
 #include "cli.hpp"
@@ -27,23 +26,8 @@ class FilterCombiner {
    std::vector<RowFilter> m_filters;
 };
 
+RowFilter generateNameFilter(const CMD::HylordConfig& config);
 RowFilter generateFullRowFilter(const CMD::HylordConfig& config);
-
-inline bool isHydroxyRead(const Fields& fields) {
-   if (fields.size() < 4) {
-      throw std::out_of_range(
-          "Could not apply row filter, not enough fields.");
-   }
-   return fields[3][0] == 'h';
-}
-
-inline bool isMethylRead(const Fields& fields) {
-   if (fields.size() < 4) {
-      throw std::out_of_range(
-          "Could not apply row filter, not enough fields.");
-   }
-   return fields[3][0] == 'm';
-}
 
 }  // namespace Hylord::Filters
 

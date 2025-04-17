@@ -25,6 +25,8 @@ struct HylordConfig {
    std::string bedmethyl_file;
    int min_read_depth = 10;
    int max_read_depth = std::numeric_limits<int>::max();
+   bool use_only_methylation_signal = false;
+   bool use_only_hydroxy_signal = false;
 };
 void setupCLI(CLI::App& app, HylordConfig& config);
 }  // namespace Hylord::CMD

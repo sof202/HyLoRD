@@ -60,11 +60,23 @@ void setupCLI(CLI::App& app, HylordConfig& config) {
                   "(range >=0). Not set by default.")
        ->check(CLI::Range(0, std::numeric_limits<int>::max()));
 
-   app.add_option(
-          "--additional-cell-types",
-          config.additional_cell_types,
-          "The number of expected additional cell types (range [0-100]). Read "
-          "docs for additional information. [0]")
+   app.add_flag("--only-methylation-signal",
+                config.use_only_methylation_signal,
+                "Set this flag to only use methylation signals in "
+                "deconvolution process (speed up if one of the input files "
+                "has no hydroxymethylation signal).");
+
+   app.add_flag("--only-hydroxy-signal",
+                config.use_only_hydroxy_signal,
+                "Set this flag to only use hydroxymethylation signals in "
+                "deconvolution process (useful when inspecting tissues with "
+                "vastly different hydroxymethylation profiles, like brain).");
+
+   app.add_option("--additional-cell-types",
+                  config.additional_cell_types,
+                  "The number of expected additional cell types (range "
+                  "[0-100]). Read "
+                  "docs for additional information. [0]")
        ->check(CLI::Range(0, 100));
 
    app.add_option(
