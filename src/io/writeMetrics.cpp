@@ -1,3 +1,11 @@
+/**
+ * @file    writeMetrics.cpp
+ * @brief   Defines write function for the outputs of the deconvolution
+ * algorithm
+ * @copyright 2025 Sam Fletcher. Licensed under the MIT License. (See LICENSE
+ * file in the repository root or https://mit-license.org)
+ */
+
 #include "io/writeMetrics.hpp"
 
 #include <cassert>

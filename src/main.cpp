@@ -1,3 +1,10 @@
+/**
+ * @file    main.cpp
+ * @brief   Defines entry point for HyLoRD.
+ * @copyright 2025 Sam Fletcher. Licensed under the MIT License. (See LICENSE
+ * file in the repository root or https://mit-license.org)
+ */
+
 #include <thread>
 
 #include "CLI/CLI.hpp"

@@ -1,3 +1,10 @@
+/**
+ * @file    cli.cpp
+ * @brief   Details the setup of the CLI11 parser
+ * @copyright 2025 Sam Fletcher. Licensed under the MIT License. (See LICENSE
+ * file in the repository root or https://mit-license.org)
+ */
+
 #include "cli.hpp"
 
 #include <limits>

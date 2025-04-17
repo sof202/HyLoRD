@@ -1,6 +1,13 @@
 #ifndef DECONVOLVER_H_
 #define DECONVOLVER_H_
 
+/**
+ * @file    Deconvolver.hpp
+ * @brief   Defines class for handling the deconvolution process using qpmad.
+ * @copyright 2025 Sam Fletcher. Licensed under the MIT License. (See LICENSE
+ * file in the repository root or https://mit-license.org)
+ */
+
 #include "data/LinearAlgebra.hpp"
 #include "qpmad/solver.h"
 #include "types.hpp"

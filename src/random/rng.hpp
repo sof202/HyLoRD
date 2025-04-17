@@ -1,6 +1,13 @@
 #ifndef HYLORDRNG_H_
 #define HYLORDRNG_H_
 
+/**
+ * @file    rng.hpp
+ * @brief   Defines random number generation for filling out reference matrix
+ * @copyright 2025 Sam Fletcher. Licensed under the MIT License. (See LICENSE
+ * file in the repository root or https://mit-license.org)
+ */
+
 #include <algorithm>
 #include <iterator>
 #include <random>

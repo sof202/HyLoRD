@@ -1,6 +1,13 @@
 #ifndef DATA_PROCESSING_H_
 #define DATA_PROCESSING_H_
 
+/**
+ * @file    DataProcessing.hpp
+ * @brief   Declares functions to load and preprocess input files for HyLoRD.
+ * @copyright 2025 Sam Fletcher. Licensed under the MIT License. (See LICENSE
+ * file in the repository root or https://mit-license.org)
+ */
+
 #include "data/BedData.hpp"
 #include "io/TSVFileReader.hpp"
 #include "types.hpp"

@@ -3,8 +3,9 @@
 
 /**
  * @file    hylord.hpp
- * @brief   Contains methods for the main function of hylord
- * @license MIT (See LICENSE file in the repository root)
+ * @brief   Declares the main Hylord run function.
+ * @copyright 2025 Sam Fletcher. Licensed under the MIT License. (See LICENSE
+ * file in the repository root or https://mit-license.org)
  */
 
 #include "cli.hpp"

@@ -1,6 +1,13 @@
 #ifndef BEDDATA_H_
 #define BEDDATA_H_
 
+/**
+ * @file    BedData.hpp
+ * @brief   Defines data storage containers for certain bed files.
+ * @copyright 2025 Sam Fletcher. Licensed under the MIT License. (See LICENSE
+ * file in the repository root or https://mit-license.org)
+ */
+
 #include <numeric>
 #include <stdexcept>
 #include <tuple>

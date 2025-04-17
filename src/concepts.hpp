@@ -1,6 +1,13 @@
 #ifndef HYLORDCONCEPTS_H_
 #define HYLORDCONCEPTS_H_
 
+/**
+ * @file    concepts.hpp
+ * @brief   Defines concepts to be used in HyLoRD.
+ * @copyright 2025 Sam Fletcher. Licensed under the MIT License. (See LICENSE
+ * file in the repository root or https://mit-license.org)
+ */
+
 #include "types.hpp"
 
 namespace Hylord::Records {

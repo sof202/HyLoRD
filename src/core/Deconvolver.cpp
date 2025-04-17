@@ -1,3 +1,10 @@
+/**
+ * @file    Deconvolver.cpp
+ * @brief   Defines main run method for Deconvolver class.
+ * @copyright 2025 Sam Fletcher. Licensed under the MIT License. (See LICENSE
+ * file in the repository root or https://mit-license.org)
+ */
+
 #include "core/Deconvolver.hpp"
 
 #include "qpmad/solver.h"

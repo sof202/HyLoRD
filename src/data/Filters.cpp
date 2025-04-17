@@ -1,3 +1,10 @@
+/**
+ * @file    Filters.cpp
+ * @brief   Defines filters that can be used when reading in files.
+ * @copyright 2025 Sam Fletcher. Licensed under the MIT License. (See LICENSE
+ * file in the repository root or https://mit-license.org)
+ */
+
 #include "data/Filters.hpp"
 
 #include <limits>

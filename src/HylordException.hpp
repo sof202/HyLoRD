@@ -1,6 +1,13 @@
 #ifndef HYLORD_EXCEPTION_H_
 #define HYLORD_EXCEPTION_H_
 
+/**
+ * @file    HylordException.hpp
+ * @brief   Defines custom exception classes to be used by HyLoRD.
+ * @copyright 2025 Sam Fletcher. Licensed under the MIT License. (See LICENSE
+ * file in the repository root or https://mit-license.org)
+ */
+
 #include <stdexcept>
 #include <string>
 

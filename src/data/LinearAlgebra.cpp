@@ -1,7 +1,8 @@
 /**
  * @file    LinearAlgebra.cpp
  * @brief   Implements matrix preprocessing for QPP solver inputs
- * @license MIT (See LICENSE file in the repository root)
+ * @copyright 2025 Sam Fletcher. Licensed under the MIT License. (See LICENSE
+ * file in the repository root or https://mit-license.org)
  */
 
 #include "data/LinearAlgebra.hpp"

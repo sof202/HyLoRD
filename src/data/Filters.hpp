@@ -1,6 +1,13 @@
 #ifndef FILTERS_H_
 #define FILTERS_H_
 
+/**
+ * @file    Filters.hpp
+ * @brief   Declares filters that can be used when reading in files.
+ * @copyright 2025 Sam Fletcher. Licensed under the MIT License. (See LICENSE
+ * file in the repository root or https://mit-license.org)
+ */
+
 #include <stdexcept>
 #include <vector>
 

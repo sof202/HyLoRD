@@ -1,6 +1,12 @@
+/**
+ * @file    DataProcessing.cpp
+ * @brief   Defines functions to load and preprocess input files for HyLoRD.
+ * @copyright 2025 Sam Fletcher. Licensed under the MIT License. (See LICENSE
+ * file in the repository root or https://mit-license.org)
+ */
+
 #include "data/DataProcessing.hpp"
 
-#include <stdexcept>
 #include <utility>
 
 #include "HylordException.hpp"

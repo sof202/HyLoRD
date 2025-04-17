@@ -1,3 +1,10 @@
+/**
+ * @file    hylord.cpp
+ * @brief   Defines the main Hylord run function.
+ * @copyright 2025 Sam Fletcher. Licensed under the MIT License. (See LICENSE
+ * file in the repository root or https://mit-license.org)
+ */
+
 #include "core/hylord.hpp"
 
 #include <cassert>
