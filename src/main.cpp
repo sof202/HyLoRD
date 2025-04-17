@@ -16,7 +16,7 @@ int main(int argc, char** argv) {
       CLI::App hylord_cli;
       Hylord::CMD::HylordConfig config;
 
-      Hylord::CMD::setup_cli(hylord_cli, config);
+      Hylord::CMD::setupCLI(hylord_cli, config);
       CLI11_PARSE(hylord_cli, argc, argv);
 
       if (config.num_threads == 0)

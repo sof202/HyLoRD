@@ -14,7 +14,7 @@
 #include "CLI/CLI.hpp"
 
 namespace Hylord::CMD {
-void setup_cli(CLI::App& app, HylordConfig& config) {
+void setupCLI(CLI::App& app, HylordConfig& config) {
    app.description(
        "HyLoRD, A hybrid cell type deconvolution algorithm for long read "
        "(ONT) data.");

@@ -26,7 +26,7 @@ struct HylordConfig {
    int min_read_depth = 10;
    int max_read_depth = std::numeric_limits<int>::max();
 };
-void setup_cli(CLI::App& app, HylordConfig& config);
+void setupCLI(CLI::App& app, HylordConfig& config);
 }  // namespace Hylord::CMD
 
 #endif

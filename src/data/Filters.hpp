@@ -28,7 +28,7 @@ class FilterCombiner {
 
 RowFilter generateFullRowFilter(const CMD::HylordConfig& config);
 
-inline bool is_hydroxy_read(const Fields& fields) {
+inline bool isHydroxyRead(const Fields& fields) {
    if (fields.size() < 4) {
       throw std::out_of_range(
           "Could not apply row filter, not enough fields.");
@@ -36,7 +36,7 @@ inline bool is_hydroxy_read(const Fields& fields) {
    return fields[3][0] == 'h';
 }
 
-inline bool is_methyl_read(const Fields& fields) {
+inline bool isMethylRead(const Fields& fields) {
    if (fields.size() < 4) {
       throw std::out_of_range(
           "Could not apply row filter, not enough fields.");

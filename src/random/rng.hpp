@@ -52,7 +52,7 @@ static inline std::vector<double> hydroxymethylation_cdf{0.23067502,
                                                          0.99974549,
                                                          0.99975449,
                                                          1};
-inline double get_random_methylation() {
+inline double getRandomMethylation() {
    double r{std::uniform_real_distribution<double>(0.0, 1.0)(rng)};
    auto it{
        std::lower_bound(methylation_cdf.begin(), methylation_cdf.end(), r)};
@@ -62,7 +62,7 @@ inline double get_random_methylation() {
    index = std::min(index, std::ssize(methylation_cdf) - 1);
    return static_cast<double>(index) / (methylation_cdf.size() - 1);
 }
-inline double get_random_hydroxymethylation() {
+inline double getRandomHydroxymethylation() {
    double r{std::uniform_real_distribution<double>(0.0, 1.0)(rng)};
    auto it{std::lower_bound(
        hydroxymethylation_cdf.begin(), methylation_cdf.end(), r)};
