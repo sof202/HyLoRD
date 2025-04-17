@@ -19,6 +19,8 @@
 #include <future>
 #include <iostream>
 #include <iterator>
+#include <mutex>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <system_error>
@@ -166,6 +168,11 @@ class TSVFileReader {
 
    using ChunkResults = std::vector<ChunkResult>;
    ChunkResults processFile(const char* file_start, const char* file_end);
+
+   // error catching (thread safe)
+   mutable std::mutex m_warning_mutex;
+   mutable std::vector<std::string> m_warning_messages;
+   int m_max_warning_messages{5};
 };
 
 template <Records::TSVRecord RecordType>
@@ -276,14 +283,20 @@ inline std::vector<RecordType> TSVFileReader<RecordType>::processChunk(
          }
       }
 
-      if (!m_rowFilter || m_rowFilter(filtered_fields)) {
-         try {
+      try {
+         if (!m_rowFilter || m_rowFilter(filtered_fields)) {
             chunk_records.push_back(RecordType::fromFields(filtered_fields));
-         } catch (const std::exception& e) {
-            std::cerr << "Record conversion error: " << e.what() << '\n'
-                      << "Occurred for line: " << line << '\n'
-                      << "Line will be skipped and not used by HyLoRD.\n";
          }
+      } catch (const std::exception& e) {
+         std::lock_guard<std::mutex> lock(m_warning_mutex);
+         std::ostringstream oss;
+         oss << "Record conversion warning: " << e.what() << '\n';
+         if (line.empty()) {
+            oss << "Line was empty.\n";
+         } else {
+            oss << line << '\n';
+         }
+         m_warning_messages.emplace_back(oss.str());
       }
       line_start = line_end + 1;
    }
@@ -352,6 +365,28 @@ void TSVFileReader<RecordType>::load() {
                           std::make_move_iterator(result.records.end()));
       }
       m_loaded = true;
+
+      if (!m_warning_messages.empty()) {
+         int num_warning_messages{static_cast<int>(m_warning_messages.size())};
+         std::cerr << "===\n"
+                   << num_warning_messages << " warning"
+                   << (num_warning_messages > 1 ? "s" : "")
+                   << " occurred whilst processing '" << m_file_path << "'.\n";
+         for (int i{};
+              i < std::min(m_max_warning_messages, num_warning_messages);
+              ++i) {
+            std::cerr << m_warning_messages[static_cast<std::size_t>(i)]
+                      << '\n';
+         }
+         std::cerr << "These lines will be skipped.\n";
+         int remaining_messages{num_warning_messages - m_max_warning_messages};
+         if (remaining_messages > 0) {
+            std::cerr << remaining_messages << " warning message"
+                      << (remaining_messages > 1 ? "s were" : " was")
+                      << " surpressed.\n"
+                      << "===\n";
+         }
+      }
    } catch (const std::system_error& e) {
       cleanupMemoryMap();
       throw FileReadException(m_file_path,
