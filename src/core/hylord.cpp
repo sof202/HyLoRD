@@ -31,6 +31,13 @@ int run(CMD::HylordConfig& config) {
       // Data processing //
       // --------------- //
 
+      if (config.reference_matrix_file.empty() &&
+          config.additional_cell_types == 0) {
+         throw HylordException(
+             "If no reference matrix is provided, additional_cell_types "
+             "should be set (>0).");
+      }
+
       IO::RowFilter mark_filter{Filters::generateNameFilter(config)};
       BedData::CpGData cpg_list{
           Processing::readFile<BedData::CpGData, BedRecords::Bed4>(

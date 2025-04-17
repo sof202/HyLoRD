@@ -74,9 +74,9 @@ void setupCLI(CLI::App& app, HylordConfig& config) {
 
    app.add_option("--additional-cell-types",
                   config.additional_cell_types,
-                  "The number of expected additional cell types (range "
-                  "[0-100]). Read "
-                  "docs for additional information. [0]")
+                  "The number of expected additional cell types, you MUST set "
+                  "this if not providing a reference matrix (range [0-100])."
+                  "Read docs for additional information. [0]")
        ->check(CLI::Range(0, 100));
 
    app.add_option(

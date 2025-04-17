@@ -17,15 +17,8 @@ void preprocessInputData(BedData::BedMethylData& bedmethyl,
                          BedData::ReferenceMatrixData& reference_matrix,
                          const BedData::CpGData& cpg_list,
                          int additional_cell_types) {
-   if (reference_matrix.empty()) {
-      if (additional_cell_types < 1) {
-         throw PreprocessingException(
-             "Reference Matrix Generation",
-             "If no reference matrix is provided, additional_cell_types "
-             "should be set (>0).");
-      }
+   if (reference_matrix.empty())
       reference_matrix = BedData::ReferenceMatrixData{bedmethyl};
-   }
    if (!cpg_list.empty()) {
       try {
          reference_matrix.subsetRows(BedData::findIndexesInCpGList(
