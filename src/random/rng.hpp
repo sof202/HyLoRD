@@ -65,12 +65,12 @@ inline double getRandomMethylation() {
 inline double getRandomHydroxymethylation() {
    double r{std::uniform_real_distribution<double>(0.0, 1.0)(rng)};
    auto it{std::lower_bound(
-       hydroxymethylation_cdf.begin(), methylation_cdf.end(), r)};
+       hydroxymethylation_cdf.begin(), hydroxymethylation_cdf.end(), r)};
    auto index{std::distance(hydroxymethylation_cdf.begin(), it)};
 
    // In case of rounding errors
    index = std::min(index, std::ssize(hydroxymethylation_cdf) - 1);
-   return static_cast<double>(index) / (methylation_cdf.size() - 1);
+   return static_cast<double>(index) / (hydroxymethylation_cdf.size() - 1);
 }
 
 }  // namespace Hylord::RNG
