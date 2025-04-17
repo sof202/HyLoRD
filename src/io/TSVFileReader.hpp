@@ -80,16 +80,16 @@ class TSVFileReader {
     */
    TSVFileReader(
        const std::string_view file_path,
-       const ColumnIndexes& columns_to_include = {},
+       ColumnIndexes columns_to_include = {},
        RowFilter rowFilter = nullptr,
        int threads = static_cast<int>(std::thread::hardware_concurrency())) :
        m_file_path{file_path},
-       m_columns_to_include{columns_to_include},
-       m_rowFilter{rowFilter},
+       m_columns_to_include{std::move(columns_to_include)},
+       m_rowFilter{std::move(rowFilter)},
        m_num_threads{threads} {}
 
    TSVFileReader(const TSVFileReader&) = delete;
-   TSVFileReader& operator=(const TSVFileReader&) = delete;
+   auto operator=(const TSVFileReader&) -> TSVFileReader& = delete;
 
    TSVFileReader(TSVFileReader&& other) noexcept :
        m_file_path{std::move(other.m_file_path)},
@@ -102,7 +102,7 @@ class TSVFileReader {
        m_file_descriptor{std::exchange(other.m_file_descriptor, -1)},
        m_mapped_data{std::exchange(other.m_mapped_data, nullptr)} {}
 
-   TSVFileReader& operator=(TSVFileReader&& other) noexcept {
+   auto operator=(TSVFileReader&& other) noexcept -> TSVFileReader& {
       if (this != &other) {
          cleanupMemoryMap();
 
@@ -131,10 +131,10 @@ class TSVFileReader {
     * @throw std::runtime_error if the file cannot be loaded or parsed.
     */
    void load();
-   bool isLoaded() const noexcept { return m_loaded; }
+   auto isLoaded() const noexcept -> bool { return m_loaded; }
 
    using Records = Records::Collection<RecordType>;
-   Records extractRecords() {
+   auto extractRecords() -> Records {
       if (!isLoaded()) throw std::runtime_error("No data loaded.");
       return std::move(m_records);
    }
@@ -142,10 +142,10 @@ class TSVFileReader {
    ~TSVFileReader() { cleanupMemoryMap(); }
 
   private:
-   std::string m_file_path{};
+   std::string m_file_path;
    Records m_records{};
-   ColumnIndexes m_columns_to_include{};
-   RowFilter m_rowFilter{};
+   ColumnIndexes m_columns_to_include;
+   RowFilter m_rowFilter;
    int m_num_threads{};
    bool m_loaded{false};
 
@@ -162,17 +162,18 @@ class TSVFileReader {
       std::size_t chunk_index{};
       Records records{};
    };
-   Fields splitTSVLine(const std::string& line) const;
-   const char* findChunkEnd(const char* start, int size) const;
-   Records processChunk(const char* start, const char* end) const;
+   auto splitTSVLine(const std::string& line) const -> Fields;
+   auto findChunkEnd(const char* start, int size) const -> const char*;
+   auto processChunk(const char* start, const char* end) const -> Records;
 
    using ChunkResults = std::vector<ChunkResult>;
-   ChunkResults processFile(const char* file_start, const char* file_end);
+   auto processFile(const char* file_start, const char* file_end)
+       -> ChunkResults;
 
    // error catching (thread safe)
    mutable std::mutex m_warning_mutex;
    mutable std::vector<std::string> m_warning_messages;
-   int m_max_warning_messages{5};
+   const int m_max_warning_messages{5};
 };
 
 template <Records::TSVRecord RecordType>
@@ -214,7 +215,7 @@ inline void TSVFileReader<RecordType>::setupMemoryMap() {
 
 template <Records::TSVRecord RecordType>
 inline void TSVFileReader<RecordType>::cleanupMemoryMap() {
-   if (m_mapped_data) {
+   if (m_mapped_data != nullptr) {
       munmap(m_mapped_data, m_file_size);
       m_mapped_data = nullptr;
    }
@@ -225,8 +226,8 @@ inline void TSVFileReader<RecordType>::cleanupMemoryMap() {
 }
 
 template <Records::TSVRecord RecordType>
-inline Fields TSVFileReader<RecordType>::splitTSVLine(
-    const std::string& line) const {
+inline auto TSVFileReader<RecordType>::splitTSVLine(
+    const std::string& line) const -> Fields {
    Fields fields;
    std::size_t start{0};
    std::size_t end{line.find_first_of("\t ")};
@@ -243,8 +244,9 @@ inline Fields TSVFileReader<RecordType>::splitTSVLine(
 }
 
 template <Records::TSVRecord RecordType>
-inline const char* TSVFileReader<RecordType>::findChunkEnd(const char* start,
-                                                           int size) const {
+inline auto TSVFileReader<RecordType>::findChunkEnd(const char* start,
+                                                    int size) const -> const
+    char* {
    const char* approximate_end{start + size};
    const char* file_end{m_mapped_data + m_file_size};
 
@@ -255,19 +257,20 @@ inline const char* TSVFileReader<RecordType>::findChunkEnd(const char* start,
               '\n',
               static_cast<std::size_t>(file_end - approximate_end)))};
 
-   return end ? end : file_end;
+   return (end != nullptr) ? end : file_end;
 }
 
 template <Records::TSVRecord RecordType>
-inline std::vector<RecordType> TSVFileReader<RecordType>::processChunk(
-    const char* start, const char* end) const {
+inline auto TSVFileReader<RecordType>::processChunk(const char* start,
+                                                    const char* end) const
+    -> std::vector<RecordType> {
    Records chunk_records;
    const char* line_start{start};
 
    while (line_start < end) {
       const char* line_end{static_cast<const char*>(memchr(
           line_start, '\n', static_cast<std::size_t>(end - line_start)))};
-      if (!line_end) line_end = end;
+      if (line_end == nullptr) line_end = end;
 
       std::string line(line_start,
                        static_cast<std::size_t>(line_end - line_start));
@@ -304,9 +307,9 @@ inline std::vector<RecordType> TSVFileReader<RecordType>::processChunk(
 }
 
 template <Records::TSVRecord RecordType>
-inline typename TSVFileReader<RecordType>::ChunkResults
-TSVFileReader<RecordType>::processFile(const char* file_start,
-                                       const char* file_end) {
+inline auto TSVFileReader<RecordType>::processFile(const char* file_start,
+                                                   const char* file_end) ->
+    typename TSVFileReader<RecordType>::ChunkResults {
    std::vector<std::pair<const char*, const char*>> chunk_ranges{};
    int chunk_size = static_cast<int>(m_file_size) / m_num_threads;
    const char* chunk_start = file_start;
