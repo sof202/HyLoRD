@@ -1,2 +1,11 @@
 CompileFlags:
   CompilationDatabase: build
+Diagnostics:
+  ClangTidy:
+    checks: >
+      -*,
+      clang-analyzer-*,
+      modernize-*,
+      bugprone-*,
+      performance-*
+    Add: [readability-*]
