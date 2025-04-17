@@ -356,7 +356,11 @@ void TSVFileReader<RecordType>::load() {
 
       auto chunk_results{processFile(file_start, file_end)};
 
-      m_records.reserve(m_file_size / 100);
+      // Performance enhancement, we don't know how long a line is going to
+      // be, but this is a nice conservative estimate that isn't too large.
+      // (based off of BED9+9)
+      const std::size_t approximate_line_length{50};
+      m_records.reserve(m_file_size / approximate_line_length);
 
       // Insert chunks in the correct order
       for (auto& result : chunk_results) {
