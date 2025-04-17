@@ -47,7 +47,8 @@ RowFilter generateFullRowFilter(const CMD::HylordConfig& config) {
    if (config.max_read_depth != std::numeric_limits<int>::max())
       combined_filters.addFilter(makeHighReadFilter(config.max_read_depth));
 
-   return combined_filters.combinedFilter();
+   return combined_filters.empty() ? nullptr
+                                   : combined_filters.combinedFilter();
 }
 
 }  // namespace Hylord::Filters

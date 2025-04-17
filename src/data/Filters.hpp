@@ -21,6 +21,7 @@ class FilterCombiner {
   public:
    void addFilter(RowFilter filter) { m_filters.push_back(std::move(filter)); }
    RowFilter combinedFilter() const;
+   bool empty() { return m_filters.empty(); }
 
   private:
    std::vector<RowFilter> m_filters;
