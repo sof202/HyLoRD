@@ -8,6 +8,7 @@
  * file in the repository root or https://mit-license.org)
  */
 
+#include <iostream>
 #include <numeric>
 #include <stdexcept>
 #include <tuple>
@@ -140,7 +141,7 @@ RowIndexes findIndexesInCpGList(const BedData::CpGData& cpg_list,
       auto cpg_key{
           std::tie(cpgs[cpg].chromosome, cpgs[cpg].start, cpgs[cpg].name)};
       RowIndex low{};
-      RowIndex high{bed_entries.size() - 1};
+      RowIndex high{static_cast<RowIndex>(bed_entries.size() - 1)};
       while (low <= high) {
          RowIndex mid{std::midpoint(low, high)};
          auto row_key{std::tie(bed_entries[mid].chromosome,

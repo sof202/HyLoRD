@@ -8,6 +8,7 @@
  * file in the repository root or https://mit-license.org)
  */
 
+#include <cstddef>
 #include <functional>
 #include <string>
 #include <vector>
@@ -15,7 +16,7 @@
 #include "Eigen/Dense"
 
 namespace Hylord {
-using RowIndex = std::size_t;
+using RowIndex = std::ptrdiff_t;
 using RowIndexes = std::vector<RowIndex>;
 using Fields = std::vector<std::string>;
 using Vector = Eigen::VectorXd;
