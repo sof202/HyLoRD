@@ -157,6 +157,8 @@ RowIndexes findIndexesInCpGList(const BedData::CpGData& cpg_list,
          }
       }
    }
+   if (bed_indexes_in_cpg_list.empty())
+      throw std::runtime_error("No row overlap with cpg_list.");
    return bed_indexes_in_cpg_list;
 }
 }  // namespace Hylord::BedData

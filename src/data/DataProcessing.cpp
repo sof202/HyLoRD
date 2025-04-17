@@ -27,10 +27,20 @@ void preprocessInputData(BedData::BedMethylData& bedmethyl,
       reference_matrix = BedData::ReferenceMatrixData{bedmethyl};
    }
    if (!cpg_list.empty()) {
-      reference_matrix.subsetRows(
-          BedData::findIndexesInCpGList(cpg_list, reference_matrix.records()));
-      bedmethyl.subsetRows(
-          BedData::findIndexesInCpGList(cpg_list, bedmethyl.records()));
+      try {
+         reference_matrix.subsetRows(BedData::findIndexesInCpGList(
+             cpg_list, reference_matrix.records()));
+      } catch (const std::exception& e) {
+         throw PreprocessingException("Subset Reference Matrix on CpG List",
+                                      e.what());
+      }
+      try {
+         bedmethyl.subsetRows(
+             BedData::findIndexesInCpGList(cpg_list, bedmethyl.records()));
+      } catch (const std::exception& e) {
+         throw PreprocessingException("Subset Bedmethyl File on CpG List",
+                                      e.what());
+      }
    }
    std::pair<RowIndexes, RowIndexes> overlapping_indexes{
        BedData::findOverLappingIndexes(reference_matrix.records(),
