@@ -48,7 +48,7 @@ int run(CMD::HylordConfig& config) {
       // Modkit README)
       IO::ColumnIndexes bedmethyl_important_fields{0, 1, 2, 3, 4, 10};
       IO::RowFilter bedmethyl_row_filter{
-          Filters::generateFullRowFilter(config)};
+          Filters::generateBedmethylRowFilter(config)};
       BedData::BedMethylData bedmethyl{
           Processing::readFile<BedData::BedMethylData, BedRecords::Bed9Plus9>(
               config.bedmethyl_file,

@@ -27,7 +27,7 @@ class FilterCombiner {
 };
 
 RowFilter generateNameFilter(const CMD::HylordConfig& config);
-RowFilter generateFullRowFilter(const CMD::HylordConfig& config);
+RowFilter generateBedmethylRowFilter(const CMD::HylordConfig& config);
 
 }  // namespace Hylord::Filters
 

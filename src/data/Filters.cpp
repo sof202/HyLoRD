@@ -68,7 +68,7 @@ RowFilter generateNameFilter(const CMD::HylordConfig& config) {
                                    : combined_filters.combinedFilter();
 }
 
-RowFilter generateFullRowFilter(const CMD::HylordConfig& config) {
+RowFilter generateBedmethylRowFilter(const CMD::HylordConfig& config) {
    FilterCombiner combined_filters{};
    if (config.min_read_depth != 0)
       combined_filters.addFilter(makeLowReadFilter(config.min_read_depth));
