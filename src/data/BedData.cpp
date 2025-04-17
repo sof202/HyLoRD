@@ -23,8 +23,16 @@ Vector BedMethylData::getAsEigenVector() const {
 
 void ReferenceMatrixData::addMoreCellTypes(int num_cell_types) {
    for (auto& row : m_records) {
-      for (int i{}; i < num_cell_types; ++i) {
-         row.methylation_percentages.emplace_back(RNG::getRandomMethylation());
+      if (row.name == 'm') {
+         for (int i{}; i < num_cell_types; ++i) {
+            row.methylation_percentages.emplace_back(
+                RNG::getRandomMethylation());
+         }
+      } else {
+         for (int i{}; i < num_cell_types; ++i) {
+            row.methylation_percentages.emplace_back(
+                RNG::getRandomHydroxymethylation());
+         }
       }
    }
 }
