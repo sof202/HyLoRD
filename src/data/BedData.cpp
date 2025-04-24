@@ -26,12 +26,12 @@ void ReferenceMatrixData::addMoreCellTypes(int num_cell_types) {
       if (row.name == 'm') {
          for (int i{}; i < num_cell_types; ++i) {
             row.methylation_proportions.emplace_back(
-                RNG::getRandomMethylation());
+                RNG::getRandomValueFromCDF(RNG::methylation_cdf));
          }
       } else {
          for (int i{}; i < num_cell_types; ++i) {
             row.methylation_proportions.emplace_back(
-                RNG::getRandomHydroxymethylation());
+                RNG::getRandomValueFromCDF(RNG::hydroxymethylation_cdf));
          }
       }
    }

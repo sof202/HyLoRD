@@ -52,34 +52,18 @@ static const inline std::vector<double> hydroxymethylation_cdf{0.23067502,
                                                                0.99974549,
                                                                0.99975449,
                                                                1};
-inline auto getRandomMethylation() -> double {
+
+inline auto getRandomValueFromCDF(const std::vector<double>& cdf) -> double {
    const double random_value{
        std::uniform_real_distribution<double>(0.0, 1.0)(rng)};
-   auto cdf_lower_bound{
-       std::ranges::lower_bound(methylation_cdf, random_value)};
-   auto sampled_index{std::distance(methylation_cdf.begin(), cdf_lower_bound)};
+   auto cdf_lower_bound{std::ranges::lower_bound(cdf, random_value)};
+   auto sampled_index{std::distance(cdf.begin(), cdf_lower_bound)};
 
    // In case of rounding errors
-   sampled_index = std::min(sampled_index, std::ssize(methylation_cdf) - 1);
+   sampled_index = std::min(sampled_index, std::ssize(cdf) - 1);
    return static_cast<double>(sampled_index) /
-          static_cast<double>(methylation_cdf.size() - 1);
+          static_cast<double>(cdf.size() - 1);
 }
-
-inline auto getRandomHydroxymethylation() -> double {
-   const double random_value{
-       std::uniform_real_distribution<double>(0.0, 1.0)(rng)};
-   auto cdf_lower_bound{
-       std::ranges::lower_bound(hydroxymethylation_cdf, random_value)};
-   auto sampled_index{
-       std::distance(hydroxymethylation_cdf.begin(), cdf_lower_bound)};
-
-   // In case of rounding errors
-   sampled_index =
-       std::min(sampled_index, std::ssize(hydroxymethylation_cdf) - 1);
-   return static_cast<double>(sampled_index) /
-          static_cast<double>(hydroxymethylation_cdf.size() - 1);
-}
-
 }  // namespace Hylord::RNG
 
 #endif
