@@ -12,6 +12,7 @@ Diagnostics:
     ]
     Remove: [
       readability-braces-around-statements
+      bugprone-easily-swappable-parameters
     ]
     CheckOptions:
       readability-identifier-naming.ClassCase: CamelCase
