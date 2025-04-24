@@ -96,6 +96,13 @@ ${CMAKE_CURRENT_SOURCE_DIR}/third_party/pcg/include
 )
 
 # ------------------
+# Install
+# ------------------
+install(TARGETS hylord
+RUNTIME DESTINATION bin
+)
+
+# ------------------
 # Doxygen
 # ------------------
 find_package( Doxygen QUIET )
@@ -104,13 +111,21 @@ if(NOT DOXYGEN_FOUND)
     return()
 endif()
 
+include(FetchContent)
 FetchContent_Declare(
     doxygen-awesome-css
-    URL https://github.com/jothepro/doxygen-awesome-css/archive/refs/heads/main.zip
+    GIT_REPOSITORY https://github.com/jothepro/doxygen-awesome-css.git
+    GIT_TAG 568f56cde6ac78b6dfcc14acd380b2e745c301ea # v2.3.4
 )
 FetchContent_MakeAvailable(doxygen-awesome-css)
 
 FetchContent_GetProperties(doxygen-awesome-css SOURCE_DIR AWESOME_CSS_DIR)
+
+if(DOT)
+    set(HAVE_DOT YES)
+else(DOT)
+    set(HAVE_DOT NO)
+endif(DOT)
 
 configure_file(
   ${PROJECT_SOURCE_DIR}/docs/doxyfile.cmake 
@@ -118,14 +133,8 @@ configure_file(
 )
 
 add_custom_target(
-  docs ${DOXYGEN} 
-  ${PROJECT_BINARY_DIR}/docs/${PROJECT_NAME}.doxyfile
+  docs
+  DEPENDS ${PROJECT_BINARY_DIR}/docs/${PROJECT_NAME}.doxyfile
+  COMMAND ${DOXYGEN} ${PROJECT_BINARY_DIR}/docs/${PROJECT_NAME}.doxyfile
 )
 
-
-# ------------------
-# Install
-# ------------------
-install(TARGETS hylord
-RUNTIME DESTINATION bin
-)
