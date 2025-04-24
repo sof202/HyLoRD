@@ -26,6 +26,10 @@ namespace IO {
 using RowFilter = std::function<bool(const Fields&)>;
 using ColumnIndexes = std::vector<std::size_t>;
 }  // namespace IO
+
+namespace RNG {
+using CDF = std::vector<double>;
+}  // namespace RNG
 }  // namespace Hylord
 
 #endif
