@@ -6,7 +6,9 @@ Diagnostics:
       clang-analyzer-*,
       modernize-*,
       bugprone-*,
-      performance-*
+      performance-*,
+      cppcoreguidelines-*,
+      readability-*
     ]
     Remove: [
       readability-braces-around-statements
