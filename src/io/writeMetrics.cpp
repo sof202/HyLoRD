@@ -22,6 +22,7 @@
 #include "cli.hpp"
 #include "core/Deconvolver.hpp"
 #include "io/TSVFileReader.hpp"
+#include "maths/percentage.hpp"
 
 namespace Hylord::IO {
 struct CellType {
@@ -50,13 +51,6 @@ auto generateCellTypeList(const std::string_view cell_type_list_file,
           CellType{"unknown_cell_type_" + std::to_string(i)});
    }
    return cell_type_list;
-}
-
-auto convertToPercent(double num, int precision = 2) -> double {
-   const double percent_multiplier{100.0};
-   double percent{std::round(num * percent_multiplier * precision) /
-                  precision};
-   return percent > 0 ? percent : 0;
 }
 
 void writeToFile(const std::stringstream& buffer,
@@ -139,7 +133,7 @@ void writeMetrics(const CMD::HylordConfig& config,
    for (std::size_t i{}; i < cell_type_list.size(); ++i) {
       output_buffer
           << cell_type_list[i].cell_type << '\t'
-          << convertToPercent(
+          << Maths::convertToPercent(
                  deconvolver.cell_proportions()[static_cast<Eigen::Index>(i)])
           << '\n';
    }

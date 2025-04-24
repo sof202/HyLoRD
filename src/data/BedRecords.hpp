@@ -12,6 +12,7 @@
 #include <string_view>
 #include <vector>
 
+#include "maths/percentage.hpp"
 #include "types.hpp"
 
 /**
@@ -66,8 +67,8 @@ struct Bed4PlusX : public Bed {
       Bed4PlusX parsed_row{};
       parseCoreFields(parsed_row, fields);
       for (std::size_t i{4}; i < fields.size(); ++i) {
-         parsed_row.methylation_percentages.emplace_back(std::stod(fields[i]) /
-                                                         100);
+         parsed_row.methylation_percentages.emplace_back(
+             Maths::convertToProportion(std::stod(fields[i])));
       }
       return parsed_row;
    }
@@ -81,7 +82,8 @@ struct Bed9Plus9 : public Bed {
       validateFields(fields, 6);
       Bed9Plus9 parsed_row{};
       parseCoreFields(parsed_row, fields);
-      parsed_row.methylation_percentage = std::stod(fields[5]) / 100.0;
+      parsed_row.methylation_percentage =
+          Maths::convertToProportion(std::stod(fields[5]));
       return parsed_row;
    }
 };
