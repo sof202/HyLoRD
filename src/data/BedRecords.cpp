@@ -14,6 +14,9 @@
 namespace Hylord::BedRecords {
 auto parseChromosomeNumber(const std::string_view chr) -> int {
    size_t start_pos = 0;
+
+   // Handles cases where bed file has values in the chromosome column (column
+   // one) with 'chrXXX' or just 'XXX'.
    if (chr.size() >= 3 && std::tolower(chr[0]) == 'c' &&
        std::tolower(chr[1]) == 'h' && std::tolower(chr[2]) == 'r') {
       start_pos = 3;
