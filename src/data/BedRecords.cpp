@@ -12,7 +12,7 @@
 #include <string>
 
 namespace Hylord::BedRecords {
-int parseChromosomeNumber(const std::string_view chr) {
+auto parseChromosomeNumber(const std::string_view chr) -> int {
    size_t start_pos = 0;
    if (chr.size() >= 3 && std::tolower(chr[0]) == 'c' &&
        std::tolower(chr[1]) == 'h' && std::tolower(chr[2]) == 'r') {
@@ -22,7 +22,7 @@ int parseChromosomeNumber(const std::string_view chr) {
    std::string_view number_part = chr.substr(start_pos);
 
    if (number_part.size() == 1) {
-      const char c = std::tolower(number_part[0]);
+      const char c{static_cast<char>(std::tolower(number_part[0]))};
       if (c == 'x') return 23;
       if (c == 'y') return 24;
       if (c == 'm') return 25;
