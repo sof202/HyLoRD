@@ -29,6 +29,9 @@ build: configure
 install:
 	@cmake --install $(BUILD_DIR)
 
+docs:
+	@cmake --build $(BUILD_DIR) --target docs
+
 clean:
 	@cmake --build $(BUILD_DIR) --target clean
 
@@ -36,4 +39,4 @@ full-clean: clean
 	@rm -rf $(BUILD_DIR)
 
 
-.PHONY: all configure build clean install
+.PHONY: all configure build install docs clean full-clean 
