@@ -8,6 +8,8 @@
  * file in the repository root or https://mit-license.org)
  */
 
+#include <utility>
+
 #include "data/LinearAlgebra.hpp"
 #include "qpmad/solver.h"
 #include "types.hpp"
@@ -15,15 +17,17 @@
 namespace Hylord::Deconvolution {
 class Deconvolver {
   public:
-   Deconvolver(int num_cell_types, const Vector& bulk_profile) :
+   Deconvolver(int num_cell_types, Vector bulk_profile) :
        m_num_cell_types(num_cell_types),
-       m_bulk_profile{bulk_profile} {
+       m_bulk_profile{std::move(bulk_profile)} {
       initialise();
    }
 
-   qpmad::Solver::ReturnStatus runQpmad(const Matrix& reference);
-   Vector cell_proportions() const { return m_cell_proportions; }
-   double change_in_proportions() {
+   auto runQpmad(const Matrix& reference) -> qpmad::Solver::ReturnStatus;
+   [[nodiscard]] auto cell_proportions() const -> Vector {
+      return m_cell_proportions;
+   }
+   auto change_in_proportions() -> double {
       return LinearAlgebra::squaredDistance(m_cell_proportions,
                                             m_prev_cell_proportions);
    }

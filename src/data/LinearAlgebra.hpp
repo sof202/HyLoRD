@@ -26,7 +26,7 @@ namespace Hylord::LinearAlgebra {
  * expected that the columns are linearly independent (unless user inputs data
  * with duplicated columns). As such this should be positive definite.
  */
-Matrix gramMatrix(const Matrix& m);
+auto gramMatrix(const Matrix& matrix) -> Matrix;
 
 /**
  * @brief Generates coefficient vector for QPP solver
@@ -35,25 +35,27 @@ Matrix gramMatrix(const Matrix& m);
  * @return Coefficient vector for quadratic program
  * @throws DeconvolutionException If dimensions don't match
  */
-Vector generateCoefficientVector(const Matrix& reference_matrix,
-                                 const Vector& bulk_data);
+auto generateCoefficientVector(const Matrix& reference_matrix,
+                               const Vector& bulk_data) -> Vector;
 
 template <typename Derived>
-Eigen::RowVectorXd pseudoInverse(const Eigen::MatrixBase<Derived>& v) {
+auto pseudoInverse(const Eigen::MatrixBase<Derived>& vec)
+    -> Eigen::RowVectorXd {
    static_assert(Derived::ColsAtCompileTime == 1,
                  "Input must be a column vector");
-   const double squared_norm = v.squaredNorm();
-   if (squared_norm < 1e-10) {
+   const double squared_norm = vec.squaredNorm();
+   const double min_stable_norm{1e-10};
+   if (squared_norm < min_stable_norm) {
       throw std::invalid_argument(
           "Norm of vector is too small for numerical stability.");
    }
-   return v.transpose() / squared_norm;
+   return vec.transpose() / squared_norm;
 }
 
 /**
  * @brief Computes the squared distance between two dynamic vectors
  */
-double squaredDistance(const Vector& v1, const Vector& v2);
+auto squaredDistance(const Vector& vec1, const Vector& vec2) -> double;
 
 /**
  * @brief Update process for unknown reference profiles (see docs for more

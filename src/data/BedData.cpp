@@ -50,8 +50,9 @@ Matrix ReferenceMatrixData::getAsEigenMatrix() const {
    }
    Matrix reference_matrix(rows, cols);
    for (RowIndex i{}; i < rows; ++i) {
-      reference_matrix.row(i) = Eigen::Map<const Vector>(
-          m_records[i].methylation_percentages.data(), cols);
+      reference_matrix.row(i) =
+          Eigen::Map<const Vector>(m_records[i].methylation_percentages.data(),
+                                   static_cast<Eigen::Index>(cols));
    }
    return reference_matrix;
 }

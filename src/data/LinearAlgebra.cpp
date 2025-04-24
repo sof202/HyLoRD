@@ -11,29 +11,29 @@
 #include "types.hpp"
 
 namespace Hylord::LinearAlgebra {
-Matrix gramMatrix(const Matrix& m) {
-   Matrix gram_matrix{m.transpose() * m};
+auto gramMatrix(const Matrix& matrix) -> Matrix {
+   Matrix gram_matrix{matrix.transpose() * matrix};
    static constexpr double epsilon{1e-8};
    return gram_matrix +=
           epsilon * Matrix::Identity(gram_matrix.rows(), gram_matrix.cols());
 }
 
-Vector generateCoefficientVector(const Matrix& reference_matrix,
-                                 const Vector& bulk_data) {
+auto generateCoefficientVector(const Matrix& reference_matrix,
+                               const Vector& bulk_data) -> Vector {
    // Shouldn't happen under proper usage
    if (reference_matrix.rows() != bulk_data.rows()) {
       throw DeconvolutionException(
           "Coefficient Vector Generation",
           "CpGs in bulk_data must be equal to CpGs in reference data.");
    }
-   return bulk_data.transpose() * reference_matrix / 2.0;
+   return bulk_data.transpose() * reference_matrix * 0.5;
 }
 
-double squaredDistance(const Vector& v1, const Vector& v2) {
-   assert(v1.size() == v2.size() &&
+auto squaredDistance(const Vector& vec1, const Vector& vec2) -> double {
+   assert(vec1.size() == vec2.size() &&
           "Vectors must be of the same length to compute distance between the "
           "two of them.");
-   return (v1 - v2).squaredNorm();
+   return (vec1 - vec2).squaredNorm();
 }
 
 void update_reference_matrix(Eigen::Ref<Matrix> reference_matrix,
@@ -43,10 +43,10 @@ void update_reference_matrix(Eigen::Ref<Matrix> reference_matrix,
    assert(additional_cell_types > 0 &&
           "Reference matrix must be extended from original.");
    const int total_cell_types{static_cast<int>(reference_matrix.cols())};
-   const int k{total_cell_types - additional_cell_types};
+   const int num_base_cell_types{total_cell_types - additional_cell_types};
 
-   auto r_k = reference_matrix.leftCols(k);
-   auto p_k = cell_proportions.head(k);
+   auto r_k = reference_matrix.leftCols(num_base_cell_types);
+   auto p_k = cell_proportions.head(num_base_cell_types);
    const auto p_l = cell_proportions.tail(additional_cell_types);
 
    reference_matrix.rightCols(additional_cell_types) =

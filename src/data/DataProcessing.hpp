@@ -14,10 +14,10 @@
 
 namespace Hylord::Processing {
 template <typename BedFile, typename BedType>
-BedFile readFile(const std::string_view file_name,
-                 int threads,
-                 const IO::ColumnIndexes& fields_to_extract = {},
-                 IO::RowFilter rowFilter = nullptr) {
+auto readFile(const std::string_view file_name,
+              int threads,
+              const IO::ColumnIndexes& fields_to_extract = {},
+              IO::RowFilter rowFilter = nullptr) -> BedFile {
    if (file_name.empty()) return BedFile{};
 
    return BedFile{[&]() {

@@ -11,8 +11,8 @@
 #include "types.hpp"
 
 namespace Hylord::Deconvolution {
-qpmad::Solver::ReturnStatus Deconvolver::runQpmad(
-    const Matrix& reference_matrix) {
+auto Deconvolver::runQpmad(const Matrix& reference_matrix)
+    -> qpmad::Solver::ReturnStatus {
    Matrix Hessian{LinearAlgebra::gramMatrix(reference_matrix)};
    Vector linear_terms{LinearAlgebra::generateCoefficientVector(
        reference_matrix, m_bulk_profile)};

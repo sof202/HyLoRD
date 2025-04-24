@@ -24,7 +24,7 @@ namespace Hylord::BedRecords {
 /** Converts "chrX" format strings to numeric values (1-22=autosomes, 23=X,
  * 24=Y, 25=M)
  */
-int parseChromosomeNumber(const std::string_view chr);
+auto parseChromosomeNumber(std::string_view chr) -> int;
 
 /// Validates minimum field count and basic format requirements
 void validateFields(const Fields& fields, int min_expected_fields);
@@ -50,7 +50,7 @@ struct Bed {
 
 /// Standard BED4 format (chrom, start, end, name)
 struct Bed4 : public Bed {
-   static Bed4 fromFields(const Fields& fields) {
+   static auto fromFields(const Fields& fields) -> Bed4 {
       Bed4 parsed_row{};
       parseCoreFields(parsed_row, fields);
       return parsed_row;
@@ -59,9 +59,9 @@ struct Bed4 : public Bed {
 
 /// BED4+ with variable-length methylation percentages (reference matrix)
 struct Bed4PlusX : public Bed {
-   std::vector<double> methylation_percentages{};
+   std::vector<double> methylation_percentages;
 
-   static Bed4PlusX fromFields(const Fields& fields) {
+   static auto fromFields(const Fields& fields) -> Bed4PlusX {
       validateFields(fields, 5);
       Bed4PlusX parsed_row{};
       parseCoreFields(parsed_row, fields);
@@ -77,7 +77,7 @@ struct Bed4PlusX : public Bed {
 struct Bed9Plus9 : public Bed {
    double methylation_percentage{};
 
-   static Bed9Plus9 fromFields(const Fields& fields) {
+   static auto fromFields(const Fields& fields) -> Bed9Plus9 {
       validateFields(fields, 6);
       Bed9Plus9 parsed_row{};
       parseCoreFields(parsed_row, fields);

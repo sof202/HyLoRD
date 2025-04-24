@@ -173,7 +173,7 @@ class TSVFileReader {
    // error catching (thread safe)
    mutable std::mutex m_warning_mutex;
    mutable std::vector<std::string> m_warning_messages;
-   const int m_max_warning_messages{5};
+   int m_max_warning_messages{5};
 };
 
 template <Records::TSVRecord RecordType>
@@ -281,8 +281,9 @@ inline auto TSVFileReader<RecordType>::processChunk(const char* start,
       if (m_columns_to_include.empty()) {
          filtered_fields = std::move(fields);
       } else {
-         for (auto i : m_columns_to_include) {
-            if (i < fields.size()) filtered_fields.push_back(fields[i]);
+         for (auto column : m_columns_to_include) {
+            if (column < fields.size())
+               filtered_fields.push_back(fields[column]);
          }
       }
 

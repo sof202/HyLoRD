@@ -14,14 +14,14 @@
 #include "types.hpp"
 
 namespace Hylord::Filters {
-RowFilter FilterCombiner::combinedFilter() const {
+auto FilterCombiner::combinedFilter() const -> RowFilter {
    return {[filters = m_filters](const Fields& row) {
       return std::ranges::all_of(
           filters, [&](const auto& filter) { return filter(row); });
    }};
 }
 
-RowFilter makeLowReadFilter(int min_reads) {
+auto makeLowReadFilter(int min_reads) -> RowFilter {
    return [min_reads](const Fields& fields) -> bool {
       if (fields.size() < 5) {
          throw std::out_of_range(
@@ -31,7 +31,7 @@ RowFilter makeLowReadFilter(int min_reads) {
    };
 }
 
-RowFilter makeHighReadFilter(int max_reads) {
+auto makeHighReadFilter(int max_reads) -> RowFilter {
    return [max_reads](const Fields& fields) -> bool {
       if (fields.size() < 5) {
          throw std::out_of_range(
@@ -41,7 +41,7 @@ RowFilter makeHighReadFilter(int max_reads) {
    };
 }
 
-RowFilter isHydroxyRead{[](const Fields& fields) {
+const RowFilter isHydroxyRead{[](const Fields& fields) {
    if (fields.size() < 4) {
       throw std::out_of_range(
           "Could not apply row filter, not enough fields.");
@@ -49,7 +49,7 @@ RowFilter isHydroxyRead{[](const Fields& fields) {
    return fields[3][0] == 'h';
 }};
 
-RowFilter isMethylRead{[](const Fields& fields) {
+const RowFilter isMethylRead{[](const Fields& fields) {
    if (fields.size() < 4) {
       throw std::out_of_range(
           "Could not apply row filter, not enough fields.");
@@ -57,7 +57,7 @@ RowFilter isMethylRead{[](const Fields& fields) {
    return fields[3][0] == 'm';
 }};
 
-RowFilter generateNameFilter(const CMD::HylordConfig& config) {
+auto generateNameFilter(const CMD::HylordConfig& config) -> RowFilter {
    FilterCombiner combined_filters{};
    if (config.use_only_methylation_signal)
       combined_filters.addFilter(isMethylRead);
@@ -68,7 +68,7 @@ RowFilter generateNameFilter(const CMD::HylordConfig& config) {
                                    : combined_filters.combinedFilter();
 }
 
-RowFilter generateBedmethylRowFilter(const CMD::HylordConfig& config) {
+auto generateBedmethylRowFilter(const CMD::HylordConfig& config) -> RowFilter {
    FilterCombiner combined_filters{};
    if (config.min_read_depth != 0)
       combined_filters.addFilter(makeLowReadFilter(config.min_read_depth));

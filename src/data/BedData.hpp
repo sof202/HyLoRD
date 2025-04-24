@@ -26,9 +26,9 @@ void subset(Records::Collection<RecordType>& records, const RowIndexes& rows) {
    Records subset_records;
    subset_records.reserve(rows.size());
 
-   for (auto i : rows) {
-      if (i >= records.size()) throw std::out_of_range("Invalid row index.");
-      subset_records.push_back(std::move(records[i]));
+   for (auto row : rows) {
+      if (row >= records.size()) throw std::out_of_range("Invalid row index.");
+      subset_records.push_back(std::move(records[row]));
    }
    records = std::move(subset_records);
 }
@@ -39,12 +39,14 @@ class CpGData {
    CpGData(std::vector<BedRecords::Bed4> records) :
        m_records{std::move(records)} {}
 
-   const std::vector<BedRecords::Bed4>& records() const { return m_records; }
-   bool empty() const { return m_records.empty(); }
-   void subsetRows(RowIndexes rows) { subset(m_records, rows); };
+   auto records() const -> const std::vector<BedRecords::Bed4>& {
+      return m_records;
+   }
+   auto empty() const -> bool { return m_records.empty(); }
+   void subsetRows(const RowIndexes& rows) { subset(m_records, rows); };
 
   private:
-   std::vector<BedRecords::Bed4> m_records{};
+   std::vector<BedRecords::Bed4> m_records;
 };
 
 class BedMethylData {
@@ -53,15 +55,16 @@ class BedMethylData {
    BedMethylData(std::vector<BedRecords::Bed9Plus9> records) :
        m_records{std::move(records)} {}
 
-   const std::vector<BedRecords::Bed9Plus9>& records() const {
+   [[nodiscard]] auto records() const
+       -> const std::vector<BedRecords::Bed9Plus9>& {
       return m_records;
    }
-   bool empty() const { return m_records.empty(); }
-   void subsetRows(RowIndexes rows) { subset(m_records, rows); };
-   Vector getAsEigenVector() const;
+   [[nodiscard]] auto empty() const -> bool { return m_records.empty(); }
+   void subsetRows(const RowIndexes& rows) { subset(m_records, rows); };
+   [[nodiscard]] auto getAsEigenVector() const -> Vector;
 
   private:
-   std::vector<BedRecords::Bed9Plus9> m_records{};
+   std::vector<BedRecords::Bed9Plus9> m_records;
 };
 
 class ReferenceMatrixData {
@@ -76,25 +79,27 @@ class ReferenceMatrixData {
       }
    }
 
-   const std::vector<BedRecords::Bed4PlusX>& records() const {
+   [[nodiscard]] auto records() const
+       -> const std::vector<BedRecords::Bed4PlusX>& {
       return m_records;
    }
-   bool empty() const { return m_records.empty(); }
-   void subsetRows(RowIndexes rows) { subset(m_records, rows); };
+   [[nodiscard]] auto empty() const -> bool { return m_records.empty(); }
+   void subsetRows(const RowIndexes& rows) { subset(m_records, rows); };
    void addMoreCellTypes(int num_cell_types);
-   int numberOfCellTypes() const {
+   [[nodiscard]] auto numberOfCellTypes() const -> int {
       return static_cast<int>(
           std::ssize(m_records[0].methylation_percentages));
    }
-   Matrix getAsEigenMatrix() const;
+   [[nodiscard]] auto getAsEigenMatrix() const -> Matrix;
 
   private:
-   std::vector<BedRecords::Bed4PlusX> m_records{};
+   std::vector<BedRecords::Bed4PlusX> m_records;
 };
 
 template <typename BedTypeOne, typename BedTypeTwo>
-std::pair<RowIndexes, RowIndexes> findOverLappingIndexes(
-    const BedTypeOne& bed_one, const BedTypeTwo& bed_two) {
+auto findOverLappingIndexes(const BedTypeOne& bed_one,
+                            const BedTypeTwo& bed_two)
+    -> std::pair<RowIndexes, RowIndexes> {
    RowIndexes bed_one_overlapping_indexes{};
    RowIndexes bed_two_overlapping_indexes{};
 
