@@ -61,10 +61,10 @@ auto squaredDistance(const Vector& vec1, const Vector& vec2) -> double;
  * @brief Update process for unknown reference profiles (see docs for more
  * info).
  */
-void update_reference_matrix(Eigen::Ref<Matrix> reference_matrix,
-                             const Vector& cell_proportions,
-                             const Vector& bulk_profile,
-                             int additional_cell_types);
+void updateReferenceMatrix(Eigen::Ref<Matrix> reference_matrix,
+                           const Vector& cell_proportions,
+                           const Vector& bulk_profile,
+                           int additional_cell_types);
 
 }  // namespace Hylord::LinearAlgebra
 

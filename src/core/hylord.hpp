@@ -11,7 +11,7 @@
 #include "cli.hpp"
 
 namespace Hylord {
-int run(CMD::HylordConfig& config);
+auto run(CMD::HylordConfig& config) -> int;
 }  // namespace Hylord
 
 #endif

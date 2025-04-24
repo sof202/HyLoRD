@@ -24,10 +24,10 @@ class Deconvolver {
    }
 
    auto runQpmad(const Matrix& reference) -> qpmad::Solver::ReturnStatus;
-   [[nodiscard]] auto cell_proportions() const -> Vector {
+   [[nodiscard]] auto cellProportions() const -> Vector {
       return m_cell_proportions;
    }
-   auto change_in_proportions() -> double {
+   auto changeInProportions() -> double {
       return LinearAlgebra::squaredDistance(m_cell_proportions,
                                             m_prev_cell_proportions);
    }

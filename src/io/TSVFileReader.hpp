@@ -85,7 +85,7 @@ class TSVFileReader {
        int threads = static_cast<int>(std::thread::hardware_concurrency())) :
        m_file_path{file_path},
        m_columns_to_include{std::move(columns_to_include)},
-       m_rowFilter{std::move(rowFilter)},
+       m_row_filter{std::move(rowFilter)},
        m_num_threads{threads} {}
 
    TSVFileReader(const TSVFileReader&) = delete;
@@ -95,7 +95,7 @@ class TSVFileReader {
        m_file_path{std::move(other.m_file_path)},
        m_records{std::move(other.m_records)},
        m_columns_to_include{std::move(other.m_columns_to_include)},
-       m_rowFilter{std::move(other.m_rowFilter)},
+       m_row_filter{std::move(other.m_row_filter)},
        m_num_threads{other.m_num_threads},
        m_file_info{other.m_file_info},
        m_file_size{other.m_file_size},
@@ -109,7 +109,7 @@ class TSVFileReader {
          m_file_path = std::move(other.m_file_path);
          m_records = std::move(other.m_records);
          m_columns_to_include = std::move(other.m_columns_to_include);
-         m_rowFilter = std::move(other.m_rowFilter);
+         m_row_filter = std::move(other.m_row_filter);
          m_num_threads = other.m_num_threads;
          m_file_info = other.m_file_info;
          m_file_size = other.m_file_size;
@@ -145,7 +145,7 @@ class TSVFileReader {
    std::string m_file_path;
    Records m_records{};
    ColumnIndexes m_columns_to_include;
-   RowFilter m_rowFilter;
+   RowFilter m_row_filter;
    int m_num_threads{};
    bool m_loaded{false};
 
@@ -288,7 +288,7 @@ inline auto TSVFileReader<RecordType>::processChunk(const char* start,
       }
 
       try {
-         if (!m_rowFilter || m_rowFilter(filtered_fields)) {
+         if (!m_row_filter || m_row_filter(filtered_fields)) {
             chunk_records.push_back(RecordType::fromFields(filtered_fields));
          }
       } catch (const std::exception& e) {

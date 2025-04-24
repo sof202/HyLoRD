@@ -25,7 +25,7 @@
 
 namespace Hylord {
 
-int run(CMD::HylordConfig& config) {
+auto run(CMD::HylordConfig& config) -> int {
    try {
       // --------------- //
       // Data processing //
@@ -84,11 +84,10 @@ int run(CMD::HylordConfig& config) {
       while (iteration <= config.max_iterations) {
          deconvolver.runQpmad(reference_matrix);
          try {
-            LinearAlgebra::update_reference_matrix(
-                reference_matrix,
-                deconvolver.cell_proportions(),
-                bulk_profile,
-                config.additional_cell_types);
+            LinearAlgebra::updateReferenceMatrix(reference_matrix,
+                                                 deconvolver.cellProportions(),
+                                                 bulk_profile,
+                                                 config.additional_cell_types);
          } catch (const std::exception& e) {
             std::cerr << "Warning: " << e.what()
                       << " Reference matrix could not be updated as a result "
@@ -103,7 +102,7 @@ int run(CMD::HylordConfig& config) {
          }
          // On first iteration, there is no 'previous' cell proportions
          // yet and so the distance metric will fail.
-         if (iteration > 1 && deconvolver.change_in_proportions() <
+         if (iteration > 1 && deconvolver.changeInProportions() <
                                   config.convergence_threshold) {
             break;
          }

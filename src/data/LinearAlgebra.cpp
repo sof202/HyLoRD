@@ -36,10 +36,10 @@ auto squaredDistance(const Vector& vec1, const Vector& vec2) -> double {
    return (vec1 - vec2).squaredNorm();
 }
 
-void update_reference_matrix(Eigen::Ref<Matrix> reference_matrix,
-                             const Vector& cell_proportions,
-                             const Vector& bulk_profile,
-                             int additional_cell_types) {
+void updateReferenceMatrix(Eigen::Ref<Matrix> reference_matrix,
+                           const Vector& cell_proportions,
+                           const Vector& bulk_profile,
+                           int additional_cell_types) {
    assert(additional_cell_types > 0 &&
           "Reference matrix must be extended from original.");
    const int total_cell_types{static_cast<int>(reference_matrix.cols())};

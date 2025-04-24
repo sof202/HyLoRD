@@ -13,7 +13,7 @@
 #include "types.hpp"
 
 namespace Hylord::BedData {
-Vector BedMethylData::getAsEigenVector() const {
+auto BedMethylData::getAsEigenVector() const -> Vector {
    Vector methylation_proportions(m_records.size());
    for (RowIndex i{}; i < m_records.size(); ++i) {
       methylation_proportions(i) = m_records[i].methylation_proportion;
@@ -37,7 +37,7 @@ void ReferenceMatrixData::addMoreCellTypes(int num_cell_types) {
    }
 }
 
-Matrix ReferenceMatrixData::getAsEigenMatrix() const {
+auto ReferenceMatrixData::getAsEigenMatrix() const -> Matrix {
    const std::size_t rows = m_records.size();
    const std::size_t cols = m_records[0].methylation_proportions.size();
 

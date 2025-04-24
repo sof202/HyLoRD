@@ -45,7 +45,7 @@ auto generateCellTypeList(const std::string_view cell_type_list_file,
       cell_type_list = {reader.extractRecords()};
    }
    int num_remaining_cell_types{static_cast<int>(
-       deconvolver.cell_proportions().size() - cell_type_list.size())};
+       deconvolver.cellProportions().size() - cell_type_list.size())};
    for (int i{1}; i <= num_remaining_cell_types; ++i) {
       cell_type_list.emplace_back(
           CellType{"unknown_cell_type_" + std::to_string(i)});
@@ -126,7 +126,7 @@ void writeMetrics(const CMD::HylordConfig& config,
    std::vector<CellType> cell_type_list{
        generateCellTypeList(config.cell_type_list_file, deconvolver)};
    assert(
-       cell_type_list.size() == deconvolver.cell_proportions().size() &&
+       cell_type_list.size() == deconvolver.cellProportions().size() &&
        "Cell proportions vector and names of cell types must match in size.");
 
    std::stringstream output_buffer;
@@ -134,7 +134,7 @@ void writeMetrics(const CMD::HylordConfig& config,
       output_buffer
           << cell_type_list[i].cell_type << '\t'
           << Maths::convertToPercent(
-                 deconvolver.cell_proportions()[static_cast<Eigen::Index>(i)])
+                 deconvolver.cellProportions()[static_cast<Eigen::Index>(i)])
           << '\n';
    }
 

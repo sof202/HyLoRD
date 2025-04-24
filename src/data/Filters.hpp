@@ -19,15 +19,15 @@ using RowFilter = Hylord::IO::RowFilter;
 class FilterCombiner {
   public:
    void addFilter(RowFilter filter) { m_filters.push_back(std::move(filter)); }
-   RowFilter combinedFilter() const;
-   bool empty() { return m_filters.empty(); }
+   [[nodiscard]] auto combinedFilter() const -> RowFilter;
+   auto empty() -> bool { return m_filters.empty(); }
 
   private:
    std::vector<RowFilter> m_filters;
 };
 
-RowFilter generateNameFilter(const CMD::HylordConfig& config);
-RowFilter generateBedmethylRowFilter(const CMD::HylordConfig& config);
+auto generateNameFilter(const CMD::HylordConfig& config) -> RowFilter;
+auto generateBedmethylRowFilter(const CMD::HylordConfig& config) -> RowFilter;
 
 }  // namespace Hylord::Filters
 

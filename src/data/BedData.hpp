@@ -8,7 +8,6 @@
  * file in the repository root or https://mit-license.org)
  */
 
-#include <iostream>
 #include <numeric>
 #include <stdexcept>
 #include <tuple>
@@ -39,10 +38,10 @@ class CpGData {
    CpGData(std::vector<BedRecords::Bed4> records) :
        m_records{std::move(records)} {}
 
-   auto records() const -> const std::vector<BedRecords::Bed4>& {
+   [[nodiscard]] auto records() const -> const std::vector<BedRecords::Bed4>& {
       return m_records;
    }
-   auto empty() const -> bool { return m_records.empty(); }
+   [[nodiscard]] auto empty() const -> bool { return m_records.empty(); }
    void subsetRows(const RowIndexes& rows) { subset(m_records, rows); };
 
   private:
@@ -136,8 +135,8 @@ auto findOverLappingIndexes(const BedTypeOne& bed_one,
 }
 
 template <typename Records>
-RowIndexes findIndexesInCpGList(const BedData::CpGData& cpg_list,
-                                const Records& bed_entries) {
+auto findIndexesInCpGList(const BedData::CpGData& cpg_list,
+                          const Records& bed_entries) -> RowIndexes {
    const std::vector<BedRecords::Bed4>& cpgs{cpg_list.records()};
    RowIndexes bed_indexes_in_cpg_list{};
    bed_indexes_in_cpg_list.reserve(cpgs.size());
@@ -155,7 +154,8 @@ RowIndexes findIndexesInCpGList(const BedData::CpGData& cpg_list,
          if (row_key == cpg_key) {
             bed_indexes_in_cpg_list.push_back(mid);
             break;
-         } else if (row_key < cpg_key) {
+         }
+         if (row_key < cpg_key) {
             low = mid + 1;
          } else {
             high = mid - 1;

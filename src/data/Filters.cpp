@@ -41,7 +41,7 @@ auto makeHighReadFilter(int max_reads) -> RowFilter {
    };
 }
 
-const RowFilter isHydroxyRead{[](const Fields& fields) {
+const RowFilter is_hydroxy_read{[](const Fields& fields) {
    if (fields.size() < 4) {
       throw std::out_of_range(
           "Could not apply row filter, not enough fields.");
@@ -49,7 +49,7 @@ const RowFilter isHydroxyRead{[](const Fields& fields) {
    return fields[3][0] == 'h';
 }};
 
-const RowFilter isMethylRead{[](const Fields& fields) {
+const RowFilter is_methyl_read{[](const Fields& fields) {
    if (fields.size() < 4) {
       throw std::out_of_range(
           "Could not apply row filter, not enough fields.");
@@ -60,9 +60,9 @@ const RowFilter isMethylRead{[](const Fields& fields) {
 auto generateNameFilter(const CMD::HylordConfig& config) -> RowFilter {
    FilterCombiner combined_filters{};
    if (config.use_only_methylation_signal)
-      combined_filters.addFilter(isMethylRead);
+      combined_filters.addFilter(is_methyl_read);
    if (config.use_only_hydroxy_signal)
-      combined_filters.addFilter(isHydroxyRead);
+      combined_filters.addFilter(is_hydroxy_read);
 
    return combined_filters.empty() ? nullptr
                                    : combined_filters.combinedFilter();
@@ -75,9 +75,9 @@ auto generateBedmethylRowFilter(const CMD::HylordConfig& config) -> RowFilter {
    if (config.max_read_depth != std::numeric_limits<int>::max())
       combined_filters.addFilter(makeHighReadFilter(config.max_read_depth));
    if (config.use_only_methylation_signal)
-      combined_filters.addFilter(isMethylRead);
+      combined_filters.addFilter(is_methyl_read);
    if (config.use_only_hydroxy_signal)
-      combined_filters.addFilter(isHydroxyRead);
+      combined_filters.addFilter(is_hydroxy_read);
 
    return combined_filters.empty() ? nullptr
                                    : combined_filters.combinedFilter();
