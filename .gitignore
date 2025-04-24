@@ -1,3 +1,6 @@
 # doxygen generated files
 docs/latex
 docs/html
+
+# clangd files
+.cache
