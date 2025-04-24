@@ -17,6 +17,7 @@
 #include <string_view>
 #include <vector>
 
+#include "Eigen/src/Core/util/Meta.h"
 #include "HylordException.hpp"
 #include "cli.hpp"
 #include "core/Deconvolver.hpp"
@@ -25,7 +26,7 @@
 namespace Hylord::IO {
 struct CellType {
    std::string cell_type;
-   static CellType fromFields(const Fields& fields) {
+   static auto fromFields(const Fields& fields) -> CellType {
       if (fields[0].empty())
          throw std::runtime_error("Failed to parse fields (empty).");
 
@@ -33,9 +34,9 @@ struct CellType {
    }
 };
 
-std::vector<CellType> generateCellTypeList(
-    const std::string_view cell_type_list_file,
-    const Deconvolution::Deconvolver& deconvolver) {
+auto generateCellTypeList(const std::string_view cell_type_list_file,
+                          const Deconvolution::Deconvolver& deconvolver)
+    -> std::vector<CellType> {
    std::vector<CellType> cell_type_list{};
    if (!cell_type_list_file.empty()) {
       TSVFileReader<CellType> reader{cell_type_list_file};
@@ -51,8 +52,10 @@ std::vector<CellType> generateCellTypeList(
    return cell_type_list;
 }
 
-double convertToPercent(double d, int precision = 2) {
-   double percent{std::round(d * 100 * precision) / precision};
+auto convertToPercent(double num, int precision = 2) -> double {
+   const double percent_multiplier{100.0};
+   double percent{std::round(num * percent_multiplier * precision) /
+                  precision};
    return percent > 0 ? percent : 0;
 }
 
@@ -68,10 +71,11 @@ void writeToFile(const std::stringstream& buffer,
       std::filesystem::create_directories(out_path.parent_path());
    }
 
-   auto parent_dir = out_path.has_parent_path()
-                         ? out_path.parent_path()
-                         : std::filesystem::current_path();
-   auto permissions = std::filesystem::status(parent_dir).permissions();
+   auto parent_dir{out_path.has_parent_path()
+                       ? out_path.parent_path()
+                       : std::filesystem::current_path()};
+   auto permissions{std::filesystem::status(parent_dir).permissions()};
+
    if ((permissions & std::filesystem::perms::owner_write) ==
            std::filesystem::perms::none &&
        (permissions & std::filesystem::perms::group_write) ==
@@ -81,23 +85,23 @@ void writeToFile(const std::stringstream& buffer,
           "No write permissions in directory: " + parent_dir.string());
    }
 
-   std::filesystem::path final_path = out_path;
+   std::filesystem::path final_path{out_path};
 
    // Handle case where file already exists as we don't want to overwrite any
    // files
    if (std::filesystem::exists(out_path) &&
        std::filesystem::is_regular_file(out_path)) {
-      int counter = 1;
-      std::filesystem::path new_path;
+      int counter{1};
+      std::filesystem::path new_path{out_path};
       std::filesystem::path stem = out_path.stem();
       std::filesystem::path extension = out_path.extension();
 
-      do {
+      while (std::filesystem::exists(new_path)) {
          new_path = out_path.parent_path() /
                     (stem.string() + "_" + std::to_string(counter) +
                      extension.string());
          counter++;
-      } while (std::filesystem::exists(new_path));
+      }
 
       std::cerr << "Warning: File " << out_path.filename().string()
                 << " already exists. Writing to "
@@ -133,9 +137,11 @@ void writeMetrics(const CMD::HylordConfig& config,
 
    std::stringstream output_buffer;
    for (std::size_t i{}; i < cell_type_list.size(); ++i) {
-      output_buffer << cell_type_list[i].cell_type << '\t'
-                    << convertToPercent(deconvolver.cell_proportions()[i])
-                    << '\n';
+      output_buffer
+          << cell_type_list[i].cell_type << '\t'
+          << convertToPercent(
+                 deconvolver.cell_proportions()[static_cast<Eigen::Index>(i)])
+          << '\n';
    }
 
    if (config.out_file_path.empty()) {
