@@ -14,23 +14,23 @@
 
 namespace Hylord::BedData {
 Vector BedMethylData::getAsEigenVector() const {
-   Vector methylation_percentages(m_records.size());
+   Vector methylation_proportions(m_records.size());
    for (RowIndex i{}; i < m_records.size(); ++i) {
-      methylation_percentages(i) = m_records[i].methylation_percentage;
+      methylation_proportions(i) = m_records[i].methylation_proportion;
    }
-   return methylation_percentages;
+   return methylation_proportions;
 }
 
 void ReferenceMatrixData::addMoreCellTypes(int num_cell_types) {
    for (auto& row : m_records) {
       if (row.name == 'm') {
          for (int i{}; i < num_cell_types; ++i) {
-            row.methylation_percentages.emplace_back(
+            row.methylation_proportions.emplace_back(
                 RNG::getRandomMethylation());
          }
       } else {
          for (int i{}; i < num_cell_types; ++i) {
-            row.methylation_percentages.emplace_back(
+            row.methylation_proportions.emplace_back(
                 RNG::getRandomHydroxymethylation());
          }
       }
@@ -39,10 +39,10 @@ void ReferenceMatrixData::addMoreCellTypes(int num_cell_types) {
 
 Matrix ReferenceMatrixData::getAsEigenMatrix() const {
    const std::size_t rows = m_records.size();
-   const std::size_t cols = m_records[0].methylation_percentages.size();
+   const std::size_t cols = m_records[0].methylation_proportions.size();
 
    for (const auto& record : m_records) {
-      if (record.methylation_percentages.size() != cols) {
+      if (record.methylation_proportions.size() != cols) {
          throw PreprocessingException(
              "Eigen Matrix Conversion",
              "Inconsistent number of entries in reference matrix.");
@@ -51,7 +51,7 @@ Matrix ReferenceMatrixData::getAsEigenMatrix() const {
    Matrix reference_matrix(rows, cols);
    for (RowIndex i{}; i < rows; ++i) {
       reference_matrix.row(i) =
-          Eigen::Map<const Vector>(m_records[i].methylation_percentages.data(),
+          Eigen::Map<const Vector>(m_records[i].methylation_proportions.data(),
                                    static_cast<Eigen::Index>(cols));
    }
    return reference_matrix;

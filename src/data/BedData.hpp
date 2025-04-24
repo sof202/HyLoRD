@@ -88,7 +88,7 @@ class ReferenceMatrixData {
    void addMoreCellTypes(int num_cell_types);
    [[nodiscard]] auto numberOfCellTypes() const -> int {
       return static_cast<int>(
-          std::ssize(m_records[0].methylation_percentages));
+          std::ssize(m_records[0].methylation_proportions));
    }
    [[nodiscard]] auto getAsEigenMatrix() const -> Matrix;
 

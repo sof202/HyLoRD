@@ -60,14 +60,14 @@ struct Bed4 : public Bed {
 
 /// BED4+ with variable-length methylation percentages (reference matrix)
 struct Bed4PlusX : public Bed {
-   std::vector<double> methylation_percentages;
+   std::vector<double> methylation_proportions;
 
    static auto fromFields(const Fields& fields) -> Bed4PlusX {
       validateFields(fields, 5);
       Bed4PlusX parsed_row{};
       parseCoreFields(parsed_row, fields);
       for (std::size_t i{4}; i < fields.size(); ++i) {
-         parsed_row.methylation_percentages.emplace_back(
+         parsed_row.methylation_proportions.emplace_back(
              Maths::convertToProportion(std::stod(fields[i])));
       }
       return parsed_row;
@@ -76,13 +76,13 @@ struct Bed4PlusX : public Bed {
 
 /// BED9+9 format (uses first methylation value only)
 struct Bed9Plus9 : public Bed {
-   double methylation_percentage{};
+   double methylation_proportion{};
 
    static auto fromFields(const Fields& fields) -> Bed9Plus9 {
       validateFields(fields, 6);
       Bed9Plus9 parsed_row{};
       parseCoreFields(parsed_row, fields);
-      parsed_row.methylation_percentage =
+      parsed_row.methylation_proportion =
           Maths::convertToProportion(std::stod(fields[5]));
       return parsed_row;
    }
