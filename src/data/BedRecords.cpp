@@ -28,10 +28,11 @@ auto parseChromosomeNumber(const std::string_view chr) -> int {
       return std::stoi(std::string(number_part));
    }
    if (number_part.size() == 1) {
-      const char c{static_cast<char>(std::tolower(number_part[0]))};
-      if (c == 'x') return 23;
-      if (c == 'y') return 24;
-      if (c == 'm') return 25;
+      const char chromosome_letter{
+          static_cast<char>(std::tolower(number_part[0]))};
+      if (chromosome_letter == 'x') return 23;
+      if (chromosome_letter == 'y') return 24;
+      if (chromosome_letter == 'm') return 25;
    }
    throw std::runtime_error("Failed to glean chromosome number for: " +
                             std::string(chr));
