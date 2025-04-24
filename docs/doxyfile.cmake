@@ -155,7 +155,8 @@ HTML_FILE_EXTENSION    = .html
 HTML_HEADER            =
 HTML_FOOTER            =
 HTML_STYLESHEET        =
-HTML_EXTRA_STYLESHEET  = @AWESOME_CSS_DIR@/doxygen-awesome.css
+HTML_EXTRA_STYLESHEET  = @AWESOME_CSS_DIR@/doxygen-awesome.css \
+                         ${PROJECT_SOURCE_DIR}/docs/style.css
 HTML_EXTRA_FILES       = @AWESOME_CSS_DIR@/doxygen-awesome-darkmode-toggle.js \
                          @AWESOME_CSS_DIR@/doxygen-awesome-fragment-copy-button.js \
                          @AWESOME_CSS_DIR@/doxygen-awesome-paragraph-link.js \
