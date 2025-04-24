@@ -13,3 +13,15 @@ Diagnostics:
     Remove: [
       readability-braces-around-statements
     ]
+    CheckOptions:
+      readability-identifier-naming.ClassCase: CamelCase
+      readability-identifier-naming.StructCase: CamelCase
+      readability-identifier-naming.EnumCase: CamelCase
+      readability-identifier-naming.EnumConstantCase: camelBack
+      readability-identifier-naming.FunctionCase: camelBack
+      readability-identifier-naming.VariableCase: lower_case
+      readability-identifier-naming.NamespaceCase: CamelCase
+      readability-identifier-naming.TypedefCase: CamelCase
+      readability-identifier-naming.TypeAliasCase: CamelCase
+      readability-identifier-naming.PrivateMemberCase: lower_case
+      readability-identifier-naming.PrivateMemberPrefix: m_
