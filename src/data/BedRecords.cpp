@@ -21,14 +21,14 @@ auto parseChromosomeNumber(const std::string_view chr) -> int {
 
    std::string_view number_part = chr.substr(start_pos);
 
+   if (std::ranges::all_of(number_part, ::isdigit)) {
+      return std::stoi(std::string(number_part));
+   }
    if (number_part.size() == 1) {
       const char c{static_cast<char>(std::tolower(number_part[0]))};
       if (c == 'x') return 23;
       if (c == 'y') return 24;
       if (c == 'm') return 25;
-   }
-   if (std::all_of(number_part.begin(), number_part.end(), ::isdigit)) {
-      return std::stoi(std::string(number_part));
    }
    throw std::runtime_error("Failed to glean chromosome number for: " +
                             std::string(chr));
