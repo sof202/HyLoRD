@@ -96,6 +96,34 @@ ${CMAKE_CURRENT_SOURCE_DIR}/third_party/pcg/include
 )
 
 # ------------------
+# Doxygen
+# ------------------
+find_package( Doxygen QUIET )
+if(NOT DOXYGEN_FOUND)
+    message(STATUS "Doxygen not found, doc target not available")
+    return()
+endif()
+
+FetchContent_Declare(
+    doxygen-awesome-css
+    URL https://github.com/jothepro/doxygen-awesome-css/archive/refs/heads/main.zip
+)
+FetchContent_MakeAvailable(doxygen-awesome-css)
+
+FetchContent_GetProperties(doxygen-awesome-css SOURCE_DIR AWESOME_CSS_DIR)
+
+configure_file(
+  ${PROJECT_SOURCE_DIR}/docs/doxyfile.cmake 
+  ${PROJECT_BINARY_DIR}/docs/${PROJECT_NAME}.doxyfile
+)
+
+add_custom_target(
+  docs ${DOXYGEN} 
+  ${PROJECT_BINARY_DIR}/docs/${PROJECT_NAME}.doxyfile
+)
+
+
+# ------------------
 # Install
 # ------------------
 install(TARGETS hylord
