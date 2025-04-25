@@ -8,7 +8,7 @@
 4) `make CMAKE_BUILD_TYPE=Release`
   - By default, the installation directory is `/usr/bin`. To change this set
   `CMAKE_INSTALL_PREFIX` either by `export CMAKE_INSTALL_PREFIX=path/to/hylord`
-  or `cmake CMAKE_BUILD_TYPE=Release CMAKE_INSTALL_PREFIX=path/to/hylord`
+  or `make CMAKE_BUILD_TYPE=Release CMAKE_INSTALL_PREFIX=path/to/hylord`
 5) `sudo make install`
   - If you have permissions or the installation directory, `sudo` may be
   dropped
