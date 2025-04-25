@@ -150,7 +150,6 @@ void writeToFile(const std::stringstream& buffer,
  *    - stdout if no output file specified, or
  *    - specified output file path
  * @throws FileWriteException if file writing fails
- * @assert Cell type names and proportions vector must have matching sizes
  */
 void writeMetrics(const CMD::HylordConfig& config,
                   const Deconvolution::Deconvolver& deconvolver) {
