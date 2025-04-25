@@ -17,7 +17,9 @@ jobs:
           build-essential \
           cmake \
           clang \
-          libpthread-stubs0-dev
+          libpthread-stubs0-dev \
+          doxygen \
+          graphviz
 
     - name: Checkout repository
       uses: actions/checkout@v4
