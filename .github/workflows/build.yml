@@ -32,4 +32,4 @@ jobs:
         
     - name: Verify installation
       run: |
-        find ./install -name hylord -type f
+        $(find ./install -name hylord -type f) --help
