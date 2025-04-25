@@ -56,9 +56,11 @@ namespace Hylord::IO {
  *
  * Example usage:
  * @code
- * TSVFileReader<MyRecord> reader("data.tsv", {0, 2, 3}, [](const auto& fields)
- * { return !fields[0].empty(); // Filter out rows with empty first column
- * });
+ * TSVFileReader<MyRecord> reader{
+ *   "data.tsv",
+ *   {0, 2, 3},
+ *   [](const auto& fields) { return !fields[0].empty();}
+ * };
  * reader.load();
  * assert(reader.isLoaded())
  * const auto& records = reader.getRecords();
