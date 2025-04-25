@@ -39,5 +39,5 @@ jobs:
       with:
         name: hylord-build
         path: |
-          build/docs/
+          build/
         if-no-files-found: error
