@@ -18,7 +18,7 @@ namespace Hylord::Filters {
 using RowFilter = Hylord::IO::RowFilter;
 
 /**
- * Combines multiple row filters into single composite filter
+ * @brief Combines multiple row filters into single composite filter
  *
  * Provides functionality to combine multiple row filtering conditions.
  * The class maintains a collection of filters that can be applied

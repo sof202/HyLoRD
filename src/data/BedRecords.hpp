@@ -16,11 +16,7 @@
 #include "maths/percentage.hpp"
 #include "types.hpp"
 
-/**
- * Parsers for BED genomic data formats (BED4, BED4+, BED9+9)
- *
- * All record types implement fromFields() for TSVRecord compatibility.
- */
+/// Parsers for BED genomic data formats (BED4, BED4+, BED9+9)
 namespace Hylord::BedRecords {
 /// Parses a chromosome string into its numeric representation.
 auto parseChromosomeNumber(std::string_view chr) -> int;

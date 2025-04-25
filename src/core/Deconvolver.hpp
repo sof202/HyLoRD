@@ -16,6 +16,14 @@
 
 /// Handles main deconvolution process for HyLoRD
 namespace Hylord::Deconvolution {
+/**
+ * @brief Manages the deconvolution process to estimate cell type proportions
+ * from bulk methylation data.
+ *
+ * Maintains solver state including bounds, constraints,
+ * and previous/current proportion estimates. Provides methods to run
+ * deconvolution and access results.
+ */
 class Deconvolver {
   public:
    Deconvolver(int num_cell_types, Vector bulk_profile) :

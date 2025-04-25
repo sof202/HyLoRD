@@ -11,6 +11,7 @@
 #include <cmath>
 #include <cstdlib>
 
+/// Defines general mathematical utility functions for HyLoRD
 namespace Hylord::Maths {
 /**
  * Converts decimal to percentage with rounding.

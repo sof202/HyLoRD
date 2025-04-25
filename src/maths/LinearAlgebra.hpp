@@ -12,10 +12,7 @@
 
 #include "types.hpp"
 
-/**
- * @namespace LinearAlgebra
- * @brief Eigen utilities for main HyLoRD QPP solving
- */
+/// Eigen utilities for main HyLoRD QPP solving
 namespace Hylord::LinearAlgebra {
 /// Computes the Gram matrix of the input matrix with added regularization.
 auto gramMatrix(const Matrix& matrix) -> Matrix;

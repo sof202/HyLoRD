@@ -32,9 +32,10 @@
 #include "concepts.hpp"
 #include "types.hpp"
 
+/// Defines Input and Output methods for HyLoRD
 namespace Hylord::IO {
 /**
- * A thread-safe TSV (Tab-Separated Values) file reader with
+ * @brief A thread-safe TSV (Tab-Separated Values) file reader with
  * memory-mapped file support.
  *
  * @tparam RecordType The type of record to parse from the TSV file. Must be

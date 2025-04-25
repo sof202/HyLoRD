@@ -10,6 +10,7 @@
 
 #include "types.hpp"
 
+/// Holds concept and template for working with TSVRecords
 namespace Hylord::Records {
 
 template <typename T>
