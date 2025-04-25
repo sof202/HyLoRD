@@ -14,6 +14,7 @@
 #include "qpmad/solver.h"
 #include "types.hpp"
 
+/// Handles main deconvolution process for HyLoRD
 namespace Hylord::Deconvolution {
 class Deconvolver {
   public:
@@ -23,6 +24,7 @@ class Deconvolver {
       initialise();
    }
 
+   /// Performs quadratic programming deconvolution using qpmad solver.
    auto runQpmad(const Matrix& reference) -> qpmad::Solver::ReturnStatus;
    [[nodiscard]] auto cellProportions() const -> Vector {
       return m_cell_proportions;
@@ -33,6 +35,7 @@ class Deconvolver {
    }
 
   private:
+   /// Initialises standard inputs for qpmad solver (see docs for more details)
    void initialise() {
       m_proportions_lower_bound = Vector::Zero(m_num_cell_types);
       m_proportions_upper_bound = Vector::Ones(m_num_cell_types);

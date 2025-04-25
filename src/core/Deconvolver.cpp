@@ -11,6 +11,12 @@
 #include "types.hpp"
 
 namespace Hylord::Deconvolution {
+/**
+ * Solves the quadratic programming problem using qpmad for cell proportion
+ * estimation. Uses reference matrix to construct Hessian and linear terms for
+ * optimization. Applies bounds and constraints on cell proportions during
+ * optimization. Stores solution in m_cell_proportions.
+ */
 auto Deconvolver::runQpmad(const Matrix& reference_matrix)
     -> qpmad::Solver::ReturnStatus {
    Matrix hessian{LinearAlgebra::gramMatrix(reference_matrix)};
