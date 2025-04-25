@@ -111,7 +111,6 @@ if(NOT DOXYGEN_FOUND)
     return()
 endif()
 
-include(FetchContent)
 FetchContent_Declare(
     doxygen-awesome-css
     GIT_REPOSITORY https://github.com/jothepro/doxygen-awesome-css.git
