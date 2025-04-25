@@ -43,15 +43,12 @@ jobs:
         make docs || doxygen build/docs/HyLoRD.doxyfile
 
     - name: Upload artifact
-      uses: actions/upload-pages-artifact@v2
+      uses: actions/upload-pages-artifact@v3
       with:
-        path: ./build/docs/html
+        path: ./build/docs/html/
 
   deploy:
     needs: build-and-docs
-    permissions:
-      pages: write
-      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
