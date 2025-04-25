@@ -29,7 +29,20 @@ whilst still adding some debug info
 - Clang or GCC version 11.4.0+
 - CMake version 3.14+
 - libpthread (POSIX Threads)
-  - Likely already installed
+  - Likely already installed on modern systems
+
+## Building HyLoRD documentation locally
+
+After building HyLoRD with `make CMAKE_BUILD_TYPE=Release`, one can generate
+the documentation for HyLoRD via `make docs`. This will use doxygen
+(recommended version >1.9.0) to generate the documentation, ensure that doxygen
+can be found in `/usr/bin` else this step will fail. Alternatively, one can
+manually call doxygen (after running `make`) with 
+`doxygen build/docs/HyLoRD.doxyfile`.
+
+After generating the documentation a directory can be found at 
+`build/docs/html`. Within this directory is a file called `index.html`, opening
+this file in any modern browser will open the documentation.
 
 ## Dependenices
 
