@@ -1,0 +1,41 @@
+name: Bug Report
+description: File a bug report
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: dropdown
+    id: issue_type
+    attributes:
+      label: What type of issue are you facing?
+      options:
+        - Build issue
+        - Pipeline bug
+        - Unexpected outputs
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Also, what did you expect to happen?
+      placeholder: A bug happened when I...
+    validations:
+      required: true
+  - type: textarea
+    id: Reproduce
+    attributes:
+      label: How can the bug be reproduced?
+      placeholder: In order to repeat this bug you...
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
+      render: shell

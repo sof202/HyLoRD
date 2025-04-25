@@ -1,0 +1,4 @@
+contact_links:
+  - name: Question
+    url: https://github.com/sof202/HyLoRD/discussions/categories/q-a
+    about: If you have any questions that aren't strictly issues, head over to this page.
