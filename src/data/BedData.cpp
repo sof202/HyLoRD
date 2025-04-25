@@ -13,6 +13,11 @@
 #include "types.hpp"
 
 namespace Hylord::BedData {
+/**
+ * Extracts the methylation proportion values from all records and stores them
+ * in a dense Eigen vector. The resulting vector will have the same number of
+ * elements as there are records.
+ */
 auto BedMethylData::getAsEigenVector() const -> Vector {
    Vector methylation_proportions(m_records.size());
    for (RowIndex i{}; i < m_records.size(); ++i) {
@@ -21,6 +26,11 @@ auto BedMethylData::getAsEigenVector() const -> Vector {
    return methylation_proportions;
 }
 
+/**
+ * For each record in the matrix, appends new methylation proportion values
+ * based on record type. Records with name 'm' get values from methylation_cdf,
+ * others from hydroxymethylation_cdf.
+ */
 void ReferenceMatrixData::addMoreCellTypes(int num_cell_types) {
    for (auto& row : m_records) {
       if (row.name == 'm') {
@@ -37,6 +47,13 @@ void ReferenceMatrixData::addMoreCellTypes(int num_cell_types) {
    }
 }
 
+/**
+ * Constructs an Eigen matrix from the stored methylation proportions,
+ * validating column consistency. Each row in the matrix corresponds to a
+ * record's methylation proportions.
+ * @throws PreprocessingException if records have inconsistent numbers of
+ * methylation proportions.
+ */
 auto ReferenceMatrixData::getAsEigenMatrix() const -> Matrix {
    const std::size_t rows = m_records.size();
    const std::size_t cols = m_records[0].methylation_proportions.size();

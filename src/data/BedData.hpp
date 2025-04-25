@@ -18,7 +18,17 @@
 #include "data/BedRecords.hpp"
 #include "types.hpp"
 
+/// Defines containers for holding data from bed files
 namespace Hylord::BedData {
+/**
+ * Splits a TSV (Tab-Separated Values) or space-delimited line into individual
+ * fields.
+ *
+ * Parses a string containing tab or space delimited values, extracting each
+ * field into a vector. The function handles consecutive delimiters and
+ * includes the final field in the result. Both tabs and spaces are treated as
+ * valid delimiters.
+ */
 template <Records::TSVRecord RecordType>
 void subset(Records::Collection<RecordType>& records, const RowIndexes& rows) {
    using Records = Records::Collection<RecordType>;
@@ -32,6 +42,7 @@ void subset(Records::Collection<RecordType>& records, const RowIndexes& rows) {
    records = std::move(subset_records);
 }
 
+/// Container for CpG list data
 class CpGData {
   public:
    CpGData() = default;
@@ -48,6 +59,7 @@ class CpGData {
    std::vector<BedRecords::Bed4> m_records;
 };
 
+/// Container for bedmethyl data
 class BedMethylData {
   public:
    BedMethylData() = default;
@@ -60,12 +72,14 @@ class BedMethylData {
    }
    [[nodiscard]] auto empty() const -> bool { return m_records.empty(); }
    void subsetRows(const RowIndexes& rows) { subset(m_records, rows); };
+   /// Converts methylation proportions from BED records into an Eigen vector.
    [[nodiscard]] auto getAsEigenVector() const -> Vector;
 
   private:
    std::vector<BedRecords::Bed9Plus9> m_records;
 };
 
+/// Container for reference matrix data
 class ReferenceMatrixData {
   public:
    ReferenceMatrixData() = default;
@@ -84,17 +98,28 @@ class ReferenceMatrixData {
    }
    [[nodiscard]] auto empty() const -> bool { return m_records.empty(); }
    void subsetRows(const RowIndexes& rows) { subset(m_records, rows); };
+   /// Adds additional cell types to the reference matrix with randomized
+   /// methylation/hydroxymethylation values.
    void addMoreCellTypes(int num_cell_types);
    [[nodiscard]] auto numberOfCellTypes() const -> int {
       return static_cast<int>(
           std::ssize(m_records[0].methylation_proportions));
    }
+   /// Converts the reference matrix data into an Eigen matrix format.
    [[nodiscard]] auto getAsEigenMatrix() const -> Matrix;
 
   private:
    std::vector<BedRecords::Bed4PlusX> m_records;
 };
 
+/**
+ * Finds overlapping indexes between two BED files using a two-pointer
+ * approach.
+ *
+ * Compares two BED files (assumed to be sorted) and returns pairs of indexes
+ * where records match. Records are considered matching if their chromosome,
+ * start position, and name fields are equal.
+ */
 template <typename BedTypeOne, typename BedTypeTwo>
 auto findOverLappingIndexes(const BedTypeOne& bed_one,
                             const BedTypeTwo& bed_two)
@@ -134,6 +159,15 @@ auto findOverLappingIndexes(const BedTypeOne& bed_one,
    return {bed_one_overlapping_indexes, bed_two_overlapping_indexes};
 }
 
+/**
+ * Finds indexes of BED entries that match records in a CpG list using binary
+ * search.
+ *
+ * Searches for BED entries that match CpG records by chromosome, start
+ * position, and name.
+ * @throws std::runtime_error if no overlapping records are found between the
+ * CpG list and BED entries.
+ */
 template <typename Records>
 auto findIndexesInCpGList(const BedData::CpGData& cpg_list,
                           const Records& bed_entries) -> RowIndexes {
