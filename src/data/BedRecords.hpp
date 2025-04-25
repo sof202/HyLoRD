@@ -3,7 +3,7 @@
 
 /**
  * @file    BedRecords.hpp
- * @brief   Describes record structures of UCSC BED files
+ * @brief  Describes record structures of UCSC BED files
  * @copyright 2025 Sam Fletcher. Licensed under the MIT License. (See LICENSE
  * file in the repository root or https://mit-license.org)
  */
@@ -16,31 +16,34 @@
 #include "types.hpp"
 
 /**
- * @namespace BedRecords
- * @brief Parsers for BED genomic data formats (BED4, BED4+, BED9+9)
+ * Parsers for BED genomic data formats (BED4, BED4+, BED9+9)
  *
  * All record types implement fromFields() for TSVRecord compatibility.
  */
 namespace Hylord::BedRecords {
-/** Converts "chrX" format strings to numeric values (1-22=autosomes, 23=X,
- * 24=Y, 25=M)
- */
+/// Parses a chromosome string into its numeric representation.
 auto parseChromosomeNumber(std::string_view chr) -> int;
 
-/// Validates minimum field count and basic format requirements
+/// Validates that a Fields container meets minimum field count
+/// requirements.
 void validateFields(const Fields& fields, int min_expected_fields);
 
-/**
- * @brief Core BED fields shared by all variants
- * @details Chromosome, start position, and feature name.
- * parseCoreFields() handles common parsing logic for derived types.
- * End position is not accounted for because it is never used
- */
+/// Core BED fields shared by all variants
 struct Bed {
    int chromosome{1};
    int start{};
    char name{};  // expected m or h
 
+   /**
+    * Parses core BED fields (chromosome, start position, and name) from
+    * a given fields container.
+    *
+    * Requires at least 4 fields in the input container. Validates fields
+    * before parsing. Uses parseChromosomeNumber() for chromosome string
+    * conversion.
+    * @throws std::out_of_range if fields container has fewer than 4 elements.
+    * @throws std::runtime_error if chromosome parsing fails.
+    */
    static void parseCoreFields(Bed& core, const Fields& fields) {
       validateFields(fields, 4);
       core.chromosome = parseChromosomeNumber(fields[0]);
@@ -62,6 +65,17 @@ struct Bed4 : public Bed {
 struct Bed4PlusX : public Bed {
    std::vector<double> methylation_proportions;
 
+   /**
+    * Constructs a Bed4PlusX record from TSV fields containing methylation
+    * data.
+    *
+    * Parses and validates input fields to create a Bed4PlusX record with
+    * multiple methylation proportions. Processes all fields beyond the core 4
+    * as methylation proportions, converting each to a proportional value.
+    * @throws std::invalid_argument if field validation fails
+    * @throws std::out_of_range if string conversion fails for any methylation
+    * value
+    */
    static auto fromFields(const Fields& fields) -> Bed4PlusX {
       validateFields(fields, 5);
       Bed4PlusX parsed_row{};
@@ -78,6 +92,15 @@ struct Bed4PlusX : public Bed {
 struct Bed9Plus9 : public Bed {
    double methylation_proportion{};
 
+   /**
+    * Constructs a Bed9Plus9 record from TSV fields.
+    *
+    * Parses and validates the input fields to create a Bed9Plus9 record.
+    * Converts the methylation proportion field from string to a proportion
+    * value.
+    * @throws std::invalid_argument if field validation fails
+    * @throws std::out_of_range if string conversion fails
+    */
    static auto fromFields(const Fields& fields) -> Bed9Plus9 {
       validateFields(fields, 6);
       Bed9Plus9 parsed_row{};

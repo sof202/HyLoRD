@@ -12,6 +12,13 @@
 #include <string>
 
 namespace Hylord::BedRecords {
+/**
+ * Handles both numeric chromosome formats (e.g., "1", "22") and prefixed
+ * formats (e.g., "chr1"). Also supports special chromosomes (X, Y, M) by
+ * converting them to numeric values (23, 24, 25).
+ *
+ * @throws std::runtime_error if the chromosome string cannot be parsed.
+ */
 auto parseChromosomeNumber(const std::string_view chr) -> int {
    size_t start_pos = 0;
 
@@ -38,6 +45,12 @@ auto parseChromosomeNumber(const std::string_view chr) -> int {
                             std::string(chr));
 }
 
+/**
+ * Checks if the number of fields is at least the specified minimum expected.
+ *
+ * @throws std::out_of_range if the field count is less than the required
+ * minimum.
+ */
 void validateFields(const Fields& fields, int min_expected_fields) {
    if (static_cast<int>(std::ssize(fields)) < min_expected_fields) {
       throw std::out_of_range(
