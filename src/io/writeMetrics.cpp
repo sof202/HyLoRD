@@ -12,7 +12,6 @@
 #include <filesystem>
 #include <iostream>
 #include <sstream>
-#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -21,19 +20,11 @@
 #include "HylordException.hpp"
 #include "cli.hpp"
 #include "core/Deconvolver.hpp"
+#include "data/BedRecords.hpp"
 #include "io/TSVFileReader.hpp"
 #include "maths/percentage.hpp"
 
 namespace Hylord::IO {
-struct CellType {
-   std::string cell_type;
-   static auto fromFields(const Fields& fields) -> CellType {
-      if (fields[0].empty())
-         throw std::runtime_error("Failed to parse fields (empty).");
-
-      return CellType{fields[0]};
-   }
-};
 
 /**
  * Creates a complete cell type name list
@@ -47,10 +38,10 @@ struct CellType {
  */
 auto generateCellTypeList(const std::string_view cell_type_list_file,
                           const Deconvolution::Deconvolver& deconvolver)
-    -> std::vector<CellType> {
-   std::vector<CellType> cell_type_list{};
+    -> std::vector<BedRecords::CellType> {
+   std::vector<BedRecords::CellType> cell_type_list{};
    if (!cell_type_list_file.empty()) {
-      TSVFileReader<CellType> reader{cell_type_list_file};
+      TSVFileReader<BedRecords::CellType> reader{cell_type_list_file};
       reader.load();
       cell_type_list = {reader.extractRecords()};
    }
@@ -58,7 +49,7 @@ auto generateCellTypeList(const std::string_view cell_type_list_file,
        deconvolver.cellProportions().size() - cell_type_list.size())};
    for (int i{1}; i <= num_remaining_cell_types; ++i) {
       cell_type_list.emplace_back(
-          CellType{"unknown_cell_type_" + std::to_string(i)});
+          BedRecords::CellType{"unknown_cell_type_" + std::to_string(i)});
    }
    return cell_type_list;
 }
@@ -163,7 +154,7 @@ void writeToFile(const std::stringstream& buffer,
  */
 void writeMetrics(const CMD::HylordConfig& config,
                   const Deconvolution::Deconvolver& deconvolver) {
-   std::vector<CellType> cell_type_list{
+   std::vector<BedRecords::CellType> cell_type_list{
        generateCellTypeList(config.cell_type_list_file, deconvolver)};
    assert(
        cell_type_list.size() == deconvolver.cellProportions().size() &&

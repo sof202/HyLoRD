@@ -8,6 +8,7 @@
  * file in the repository root or https://mit-license.org)
  */
 #include <cctype>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -108,6 +109,17 @@ struct Bed9Plus9 : public Bed {
       parsed_row.methylation_proportion =
           Maths::convertToProportion(std::stod(fields[5]));
       return parsed_row;
+   }
+};
+
+/// Newline separated list of cell types
+struct CellType {
+   std::string cell_type;
+   static auto fromFields(const Fields& fields) -> CellType {
+      if (fields[0].empty())
+         throw std::runtime_error("Failed to parse fields (empty).");
+
+      return CellType{fields[0]};
    }
 };
 }  // namespace Hylord::BedRecords
