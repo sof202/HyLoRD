@@ -92,7 +92,7 @@ target_link_libraries(hylord PRIVATE CLI11::CLI11)
 target_link_libraries(hylord PRIVATE Eigen3::Eigen)
 target_link_libraries(hylord PRIVATE qpmad)
 target_include_directories(hylord PUBLIC 
-${CMAKE_CURRENT_SOURCE_DIR}/third_party/pcg/include
+${CMAKE_CURRENT_SOURCE_DIR}/third_party/pcg-cpp/include
 )
 
 # ------------------
