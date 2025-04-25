@@ -5,7 +5,7 @@
  * file in the repository root or https://mit-license.org)
  */
 
-#include "data/LinearAlgebra.hpp"
+#include "maths/LinearAlgebra.hpp"
 
 #include "HylordException.hpp"
 #include "types.hpp"

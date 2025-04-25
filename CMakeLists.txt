@@ -80,7 +80,7 @@ file(GLOB HyLoRD
   src/core/Deconvolver.cpp
   src/data/BedRecords.cpp
   src/data/BedData.cpp
-  src/data/LinearAlgebra.cpp
+  src/maths/LinearAlgebra.cpp
   src/io/writeMetrics.cpp
   src/data/DataProcessing.cpp
   src/data/Filters.cpp

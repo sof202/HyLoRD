@@ -19,8 +19,8 @@
 #include "data/BedRecords.hpp"
 #include "data/DataProcessing.hpp"
 #include "data/Filters.hpp"
-#include "data/LinearAlgebra.hpp"
 #include "io/writeMetrics.hpp"
+#include "maths/LinearAlgebra.hpp"
 #include "types.hpp"
 
 namespace Hylord {

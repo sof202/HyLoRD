@@ -10,7 +10,7 @@
 
 #include <utility>
 
-#include "data/LinearAlgebra.hpp"
+#include "maths/LinearAlgebra.hpp"
 #include "qpmad/solver.h"
 #include "types.hpp"
 
