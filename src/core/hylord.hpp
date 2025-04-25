@@ -11,6 +11,7 @@
 #include "cli.hpp"
 
 namespace Hylord {
+/// Executes the complete HyLoRD deconvolution pipeline.
 auto run(CMD::HylordConfig& config) -> int;
 }  // namespace Hylord
 

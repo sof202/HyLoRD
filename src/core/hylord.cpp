@@ -25,6 +25,17 @@
 
 namespace Hylord {
 
+/**
+ * Main workflow function that performs:
+ * 1. Data processing:
+ *    - Reads and filters CpG list, reference matrix, and bedmethyl data
+ *    - Preprocesses input data into numerical matrices
+ * 2. Deconvolution:
+ *    - Initializes deconvolution solver
+ *    - Runs iterative deconvolution with reference matrix updates
+ * 3. Output:
+ *    - Writes final metrics and proportions (possibly to a file)
+ */
 auto run(CMD::HylordConfig& config) -> int {
    try {
       // --------------- //
