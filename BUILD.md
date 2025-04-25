@@ -10,7 +10,7 @@
   `CMAKE_INSTALL_PREFIX` either by `export CMAKE_INSTALL_PREFIX=path/to/hylord`
   or `make CMAKE_BUILD_TYPE=Release CMAKE_INSTALL_PREFIX=path/to/hylord`
 5) `sudo make install`
-  - If you have permissions or the installation directory, `sudo` may be
+  - If you have permissions for the installation directory, `sudo` may be
   dropped
 
 ## Build types
