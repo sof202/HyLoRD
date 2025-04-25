@@ -1,6 +1,13 @@
 #ifndef HYLORD_PERCENTAGE_H_
 #define HYLORD_PERCENTAGE_H_
 
+/**
+ * @file    percentage.hpp
+ * @brief   Defines function to switch between proportions and percentages
+ * @copyright 2025 Sam Fletcher. Licensed under the MIT License. (See LICENSE
+ * file in the repository root or https://mit-license.org)
+ */
+
 #include <cmath>
 #include <cstdlib>
 
