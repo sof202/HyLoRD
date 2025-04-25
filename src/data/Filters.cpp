@@ -14,7 +14,15 @@
 #include "types.hpp"
 
 namespace Hylord::Filters {
-auto FilterCombiner::combinedFilter() const -> RowFilter {
+/**
+ * Creates a new RowFilter that applies all stored filters in sequence.
+ * The combined filter will:
+ * 1. Return true only if ALL constituent filters pass the input row
+ * 2. Short-circuit evaluation (stops after first failing filter)
+ * 3. Maintain the original filter application order
+ * @return A new RowFilter that performs logical AND of all component filters
+ */
+[[nodiscard]] auto FilterCombiner::combinedFilter() const -> RowFilter {
    return {[filters = m_filters](const Fields& row) {
       return std::ranges::all_of(
           filters, [&](const auto& filter) { return filter(row); });
