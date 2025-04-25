@@ -12,7 +12,17 @@
 #include "io/TSVFileReader.hpp"
 #include "types.hpp"
 
+/// Defines methods for processing ready for main deconvolution loop
 namespace Hylord::Processing {
+/**
+ * Reads and parses a BED file into a specified container type with optional
+ * filtering.
+ *
+ * Reads a BED-formatted file using multiple threads if specified,
+ * with options for column selection and row filtering. Returns an empty
+ * container if the filename is empty. Threads and field selection can be
+ * customized.
+ */
 template <typename BedFile, typename BedType>
 auto readFile(const std::string_view file_name,
               int threads,
@@ -28,10 +38,8 @@ auto readFile(const std::string_view file_name,
    }()};
 }
 
-/**
- * @brief Subsets input data to common CpGs and adds random additional cell
- * type data
- */
+/// Preprocesses input data by aligning and subsetting bedmethyl and reference
+/// matrix data.
 void preprocessInputData(BedData::BedMethylData& bedmethyl,
                          BedData::ReferenceMatrixData& reference_matrix,
                          const BedData::CpGData& cpg_list,

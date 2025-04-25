@@ -13,6 +13,14 @@
 #include "data/BedData.hpp"
 
 namespace Hylord::Processing {
+/**
+ * Processes input data, ensuring row consistency between bedmethyl data and
+ * reference matrix. Optionally subsets both datasets based on a CpG list and
+ * adds specified additional cell types if given by user.
+ *
+ * @throws PreprocessingException if subsetting fails or no overlapping indexes
+ * are found.
+ */
 void preprocessInputData(BedData::BedMethylData& bedmethyl,
                          BedData::ReferenceMatrixData& reference_matrix,
                          const BedData::CpGData& cpg_list,
