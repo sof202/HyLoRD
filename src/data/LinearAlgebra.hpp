@@ -13,31 +13,26 @@
 #include "types.hpp"
 
 /**
+ * @namespace LinearAlgebra
  * @brief Eigen utilities for main HyLoRD QPP solving
  */
 namespace Hylord::LinearAlgebra {
-
-/**
- * @brief Computes Gram matrix (AᵀA) which is positive semi-definite
- * @param m Input matrix (rows = features, cols = samples)
- * @return Positive semi-definite matrix of size cols×cols
- *
- * @note The expected matrix input has a huge number of rows and so it is
- * expected that the columns are linearly independent (unless user inputs data
- * with duplicated columns). As such this should be positive definite.
- */
+/// Computes the Gram matrix of the input matrix with added regularization.
 auto gramMatrix(const Matrix& matrix) -> Matrix;
 
-/**
- * @brief Generates coefficient vector for QPP solver
- * @param reference_matrix Reference data matrix
- * @param bulk_data Observation vector from bedmethyl file
- * @return Coefficient vector for quadratic program
- * @throws DeconvolutionException If dimensions don't match
- */
+/// Generates coefficient vector for QPP solver
 auto generateCoefficientVector(const Matrix& reference_matrix,
                                const Vector& bulk_data) -> Vector;
 
+/**
+ * Computes the pseudoinverse of a column vector.
+ *
+ * Calculates the pseudoinverse (v^T / (v^T v)) of a column vector for
+ * least-squares solutions. Enforces compile-time check for column vector input
+ * and minimum norm requirement.
+ * @throws std::invalid_argument if the norm of the given vector is below the
+ * stability threshold
+ */
 template <typename Derived>
 auto pseudoInverse(const Eigen::MatrixBase<Derived>& vec)
     -> Eigen::RowVectorXd {
@@ -52,15 +47,10 @@ auto pseudoInverse(const Eigen::MatrixBase<Derived>& vec)
    return vec.transpose() / squared_norm;
 }
 
-/**
- * @brief Computes the squared distance between two dynamic vectors
- */
+/// Computes the squared Euclidean distance between two vectors.
 auto squaredDistance(const Vector& vec1, const Vector& vec2) -> double;
 
-/**
- * @brief Update process for unknown reference profiles (see docs for more
- * info).
- */
+/// Update process for unknown reference profiles (see docs for more info).
 void updateReferenceMatrix(Eigen::Ref<Matrix> reference_matrix,
                            const Vector& cell_proportions,
                            const Vector& bulk_profile,
