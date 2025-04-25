@@ -3,7 +3,7 @@
 
 /**
  * @file    TSVFileReader.hpp
- * @brief   Parser Implementations for reading tsv files (BED files)
+ * @brief  Parser Implementations for reading tsv files (BED files)
  * @copyright 2025 Sam Fletcher. Licensed under the MIT License. (See LICENSE
  * file in the repository root or https://mit-license.org)
  */
@@ -34,8 +34,7 @@
 
 namespace Hylord::IO {
 /**
- * @class TSVFileReader
- * @brief A thread-safe TSV (Tab-Separated Values) file reader with
+ * A thread-safe TSV (Tab-Separated Values) file reader with
  * memory-mapped file support.
  *
  * @tparam RecordType The type of record to parse from the TSV file. Must be
@@ -58,7 +57,8 @@ namespace Hylord::IO {
  * Example usage:
  * @code
  * TSVFileReader<MyRecord> reader("data.tsv", {0, 2, 3}, [](const auto& fields)
- * { return !fields[0].empty(); // Filter out rows with empty first column });
+ * { return !fields[0].empty(); // Filter out rows with empty first column
+ * });
  * reader.load();
  * assert(reader.isLoaded())
  * const auto& records = reader.getRecords();
@@ -68,7 +68,7 @@ template <Records::TSVRecord RecordType>
 class TSVFileReader {
   public:
    /**
-    * @brief Constructs a TSVFileReader with the given parameters.
+    * Constructs a TSVFileReader with the given parameters.
     *
     * @param file_path Path to the TSV file to read.
     * @param columns_to_include Indices of columns to include (empty to include
@@ -119,21 +119,15 @@ class TSVFileReader {
       return *this;
    }
 
-   /**
-    * @brief Loads and processes the TSV file.
-    *
-    * This method:
-    * 1. Memory-maps the file
-    * 2. Divides it into chunks
-    * 3. Processes chunks in parallel
-    * 4. Combines results
-    *
-    * @throw std::runtime_error if the file cannot be loaded or parsed.
-    */
+   /// Loads and processes the TSV file.
    void load();
    auto isLoaded() const noexcept -> bool { return m_loaded; }
 
    using Records = Records::Collection<RecordType>;
+   /**
+    * Extracts and returns all loaded records
+    * @throws std::runtime_error if no data has been loaded
+    */
    auto extractRecords() -> Records {
       if (!isLoaded()) throw std::runtime_error("No data loaded.");
       return std::move(m_records);
@@ -154,7 +148,9 @@ class TSVFileReader {
    std::size_t m_file_size{};
    int m_file_descriptor{-1};
    char* m_mapped_data{nullptr};
+   /// Sets up memory mapping for the TSV file.
    void setupMemoryMap();
+   /// Cleans up memory-mapped file resources.
    void cleanupMemoryMap();
 
    // Reading
@@ -162,11 +158,15 @@ class TSVFileReader {
       std::size_t chunk_index{};
       Records records{};
    };
+   /// Splits a TSV line into individual fields.
    auto splitTSVLine(const std::string& line) const -> Fields;
+   /// Finds the end of a chunk for parallel processing.
    auto findChunkEnd(const char* start, int size) const -> const char*;
+   /// Processes a chunk of TSV data into records.
    auto processChunk(const char* start, const char* end) const -> Records;
 
    using ChunkResults = std::vector<ChunkResult>;
+   /// Processes TSV file in parallel chunks
    auto processFile(const char* file_start, const char* file_end)
        -> ChunkResults;
 
@@ -176,6 +176,12 @@ class TSVFileReader {
    int m_max_warning_messages{5};
 };
 
+/**
+ * Opens the file, checks its validity, and maps it into memory for efficient
+ * reading.
+ * @throws std::system_error If file opening, fstat, or mmap operations fail.
+ * @throws FileReadException If the file is not a regular file or is empty.
+ */
 template <Records::TSVRecord RecordType>
 inline void TSVFileReader<RecordType>::setupMemoryMap() {
    m_file_descriptor = open(m_file_path.c_str(), O_RDONLY);
@@ -213,6 +219,11 @@ inline void TSVFileReader<RecordType>::setupMemoryMap() {
    madvise(m_mapped_data, m_file_size, MADV_SEQUENTIAL | MADV_WILLNEED);
 }
 
+/**
+ * Unmaps the memory-mapped file and closes the file descriptor.
+ * Safely handles cases where either the mapped data or file descriptor might
+ * already be cleaned up.
+ */
 template <Records::TSVRecord RecordType>
 inline void TSVFileReader<RecordType>::cleanupMemoryMap() {
    if (m_mapped_data != nullptr) {
@@ -225,6 +236,11 @@ inline void TSVFileReader<RecordType>::cleanupMemoryMap() {
    }
 }
 
+/**
+ * Parses tab or space delimited fields from a line and returns them
+ * as a vector. Handles both tabs and spaces as delimiters and includes the
+ * final field. Spaces are required due to the silly format of bedmethyl files.
+ */
 template <Records::TSVRecord RecordType>
 inline auto TSVFileReader<RecordType>::splitTSVLine(
     const std::string& line) const -> Fields {
@@ -243,6 +259,11 @@ inline auto TSVFileReader<RecordType>::splitTSVLine(
    return fields;
 }
 
+/**
+ * Locates the nearest newline character after the approximate chunk
+ * end to ensure complete records in each chunk. Returns file end if no newline
+ * found.
+ */
 template <Records::TSVRecord RecordType>
 inline auto TSVFileReader<RecordType>::findChunkEnd(const char* start,
                                                     int size) const -> const
@@ -260,6 +281,12 @@ inline auto TSVFileReader<RecordType>::findChunkEnd(const char* start,
    return (end != nullptr) ? end : file_end;
 }
 
+/**
+ * Parses each line in the chunk, applies column filtering if
+ * specified, and converts valid lines into record objects. Invalid records
+ * generate warnings while valid ones are added to the result vector.
+ * Thread-safe warning collection is implemented due to parallel processing.
+ */
 template <Records::TSVRecord RecordType>
 inline auto TSVFileReader<RecordType>::processChunk(const char* start,
                                                     const char* end) const
@@ -307,6 +334,11 @@ inline auto TSVFileReader<RecordType>::processChunk(const char* start,
    return chunk_records;
 }
 
+/**
+ * Divides file into chunks by thread count, finds line boundaries,
+ * and processes concurrently. Manages threads, tasks and results
+ * while preserving order. Handles per-chunk exceptions gracefully.
+ */
 template <Records::TSVRecord RecordType>
 inline auto TSVFileReader<RecordType>::processFile(const char* file_start,
                                                    const char* file_end) ->
@@ -348,6 +380,16 @@ inline auto TSVFileReader<RecordType>::processFile(const char* file_start,
    return chunk_results;
 }
 
+/**
+ * This method:
+ * 1. Memory-maps the file
+ * 2. Divides it into chunks
+ * 3. Processes chunks in parallel
+ * 4. Combines results
+ *
+ * @throw HylordException if the file is already loaded.
+ * @throw FileReadException if the file cannot be loaded or parsed.
+ */
 template <Records::TSVRecord RecordType>
 void TSVFileReader<RecordType>::load() {
    if (m_loaded) {
