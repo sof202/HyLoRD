@@ -26,7 +26,7 @@ whilst still adding some debug info
 
 ## Build prerequisites
 
-- Clang or GCC version 11.4.0+
+- Clang or GCC version 11.4.0+ (C++20 features are used)
 - CMake version 3.14+
 - libpthread (POSIX Threads)
   - Likely already installed on modern systems
