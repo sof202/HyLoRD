@@ -14,6 +14,12 @@
 #include "CLI/CLI.hpp"
 
 namespace Hylord::CMD {
+/**
+ * Sets up CLI11 command-line interface with all configuration options for
+ * Hylord. Organizes parameters into logical groups (file paths, row filters,
+ * hyperparameters). Includes validation checks and default values for all
+ * optional parameters. Marks bedmethyl file path as required input.
+ */
 void setupCLI(CLI::App& app, HylordConfig& config) {
    app.description(
        "HyLoRD, A hybrid cell type deconvolution algorithm for long read "

@@ -12,7 +12,9 @@
 
 #include "CLI/App.hpp"
 
+/// CLI handling for HyLoRD
 namespace Hylord::CMD {
+/// Container for HyLoRD CLI options
 struct HylordConfig {
    int num_threads{0};
    std::string cpg_list_file;
@@ -28,6 +30,11 @@ struct HylordConfig {
    bool use_only_methylation_signal{false};
    bool use_only_hydroxy_signal{false};
 };
+
+/**
+ * Configures command-line interface options for Hylord DNA methylation
+ * deconvolution.
+ */
 void setupCLI(CLI::App& app, HylordConfig& config);
 }  // namespace Hylord::CMD
 
