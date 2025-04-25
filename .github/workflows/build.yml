@@ -1,8 +1,6 @@
 name: HyLoRD Build
 
 on:
-  push:
-    branches: [ main ]
   pull_request:
     branches: [ main ]
 
@@ -17,9 +15,7 @@ jobs:
           build-essential \
           cmake \
           clang \
-          libpthread-stubs0-dev \
-          doxygen \
-          graphviz
+          libpthread-stubs0-dev
 
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -36,10 +32,3 @@ jobs:
       run: |
         $(find ./install -name hylord -type f) --help
 
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: hylord-build
-        path: |
-          build/
-        if-no-files-found: error

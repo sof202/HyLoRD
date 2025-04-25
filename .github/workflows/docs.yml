@@ -1,32 +1,68 @@
-name: HyLoRD Documentation
+name: Build and Deploy documentation
 
 on:
-  workflow_run:
-    workflows: ["HyLoRD Build"]
-    types:
-      - completed
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
 
 jobs:
-  generate-docs:
-    if: github.event.workflow_run.conclusion == 'success'
+  build-and-docs:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        build-type: [Debug, Release, RelWithDebInfo]
+    steps:
+    - name: Install prerequisites
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          build-essential \
+          cmake \
+          clang \
+          libpthread-stubs0-dev \
+          git \
+          doxygen graphviz
+
+    - uses: actions/checkout@v4
+
+    - name: Build
+      run: |
+        make CMAKE_BUILD_TYPE=${{ matrix.build-type }} CMAKE_INSTALL_PREFIX=$PWD/install
+
+    - name: Install 
+      run: |
+        make install
+
+    - name: Verify installation
+      run: |
+        $(find ./install -name hylord -type f) --help
+
+    - name: Generate docs (Main branch only)
+      if: github.ref == 'refs/heads/main' && matrix.build-type == 'Release'
+      run: |
+        make docs || doxygen build/docs/HyLoRD.doxyfile
+
+    - name: Upload artifact
+      if: github.ref == 'refs/heads/main' && matrix.build-type == 'Release'
+      uses: actions/upload-pages-artifact@v2
+      with:
+        path: ./build/docs/html
+
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: build-and-docs
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: hylord-build
-          path: .
-          
-      - name: Install Doxygen
-        run: sudo apt-get install -y doxygen graphviz
-
-      - name: Generate documentation
-        run: |
-          make docs || doxygen build/docs/HyLoRD.doxyfile
-
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build/docs/html
-          keep_files: false
+        id: deployment
+        uses: actions/deploy-pages@v4
