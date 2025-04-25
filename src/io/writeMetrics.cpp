@@ -35,6 +35,16 @@ struct CellType {
    }
 };
 
+/**
+ * Creates a complete cell type name list
+ *
+ * 1. Reading known cell types from specified file (if provided)
+ * 2. Generating default names ("unknown_cell_type_N") for any remaining types
+ * 3. Ensuring output size matches deconvolution results dimension
+ * The function guarantees one-to-one correspondence between:
+ * - Cell type names in returned vector
+ * - Proportions in deconvolver's results
+ */
 auto generateCellTypeList(const std::string_view cell_type_list_file,
                           const Deconvolution::Deconvolver& deconvolver)
     -> std::vector<CellType> {
@@ -53,6 +63,23 @@ auto generateCellTypeList(const std::string_view cell_type_list_file,
    return cell_type_list;
 }
 
+/**
+ * Safely writes buffer contents to a file with comprehensive error checking.
+ *
+ * Handles file writing with multiple safety checks and features:
+ * 1. Path validation:
+ *    - Rejects directory paths
+ *    - Creates parent directories if needed
+ * 2. Permission verification:
+ *    - Checks write permissions in target directory
+ * 3. Collision handling:
+ *    - Appends numbered suffixes to prevent overwriting existing files
+ * 4. Atomic write operations:
+ *    - Verifies successful open/write/close operations
+ * 5. Error reporting:
+ *    - Provides detailed error messages for all failure cases
+ * @throws FileWriteException for any file system or I/O operation failure
+ */
 void writeToFile(const std::stringstream& buffer,
                  const std::filesystem::path& out_path) {
    if (std::filesystem::exists(out_path) &&
@@ -121,6 +148,19 @@ void writeToFile(const std::stringstream& buffer,
    }
 }
 
+/**
+ * Formats and outputs cell type proportions with the following logic:
+ * 1. Generates cell type names from either:
+ *    - Provided cell type list file, or
+ *    - Default naming scheme if no file provided (or not enough cell type
+ *      names given)
+ * 2. Formats proportions as percentages
+ * 3. Writes to either:
+ *    - stdout if no output file specified, or
+ *    - specified output file path
+ * @throws FileWriteException if file writing fails
+ * @assert Cell type names and proportions vector must have matching sizes
+ */
 void writeMetrics(const CMD::HylordConfig& config,
                   const Deconvolution::Deconvolver& deconvolver) {
    std::vector<CellType> cell_type_list{

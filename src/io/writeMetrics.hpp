@@ -13,6 +13,7 @@
 #include "core/Deconvolver.hpp"
 
 namespace Hylord::IO {
+/// Writes deconvolution results to stdout or file (given by user).
 void writeMetrics(const CMD::HylordConfig& config,
                   const Deconvolution::Deconvolver& deconvolver);
 }  // namespace Hylord::IO
