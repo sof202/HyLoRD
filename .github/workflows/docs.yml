@@ -1,8 +1,8 @@
-name: Documentation
+name: HyLoRD Documentation
 
 on:
   workflow_run:
-    workflows: ["Build"]
+    workflows: ["HyLoRD Build"]
     types:
       - completed
 
