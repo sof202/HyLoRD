@@ -168,7 +168,7 @@ We then use these new symbols to write equation
 \f}
 
 Objective function \f$\eqref{eq:final-objective-function}\f$ is now in the
-correct form laid out in \f$\eqref{qpp-form}\f$. Where the solution vector
+correct form laid out in \f$\eqref{eq:qpp-form}\f$. Where the solution vector
 \f$\mathbf{x}\f$ has been replaced by the cell proportions vector
 \f$\mathbf{p}\f$ (dummy variable change).
 
