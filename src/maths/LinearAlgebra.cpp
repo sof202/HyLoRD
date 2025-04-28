@@ -25,7 +25,7 @@ auto gramMatrix(const Matrix& matrix) -> Matrix {
 }
 
 /**
- * Computes coefficient vector (0.5 * bulk^T * reference) for deconvolution.
+ * Computes coefficient vector -(0.5 * bulk^T * reference) for deconvolution.
  * Requires matching dimensions between reference matrix rows and bulk data
  * size.
  * @throws DeconvolutionException if row dimensions don't match
@@ -38,7 +38,7 @@ auto generateCoefficientVector(const Matrix& reference_matrix,
           "Coefficient Vector Generation",
           "CpGs in bulk_data must be equal to CpGs in reference data.");
    }
-   return bulk_data.transpose() * reference_matrix * 0.5;
+   return -(bulk_data.transpose() * reference_matrix * 0.5);
 }
 
 /**
