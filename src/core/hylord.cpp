@@ -88,6 +88,7 @@ auto run(CMD::HylordConfig& config) -> int {
           reference_matrix_data.numberOfCellTypes(), bulk_profile};
       if (config.additional_cell_types == 0) {
          deconvolver.runQpmad(reference_matrix);
+         IO::writeMetrics(config, deconvolver);
          return 0;
       }
 
