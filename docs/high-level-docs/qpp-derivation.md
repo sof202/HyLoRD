@@ -77,9 +77,6 @@ Where:
 number of CpG sites
 - \f$\mathbf{R_k}\f$ is an \f$1 \times M\f$ column vector for each cell type k.
 
-We took transposes of these vectors to make some dimensions line up later. This
-can then be written as:
-
 \f{equation}{
     \mathbf{B}^T = \mathbf{p}^T\mathit{R}^T
     \label{eq:matrix-form}
@@ -119,12 +116,35 @@ quadratic programming problem. To create a QP from this equation, we need to
 generate some objective function (a value to minimise). In our case, this is
 actually very simple. We want to find some vector of cell proportions
 (\f$p_k\f$), such that multiplying it with the reference matrix and retrieves a
-vector as close as possible to the bulk profile. Mathematically, we write this
-as:
+vector as close as possible to the bulk profile.
+
+This may look very arbitrary (that's maths for you). But we want to write this
+as a least squares problem. The reason why is we need to write our problem as
+a minimisation problem. \f$\eqref{eq:bad-start-objective-function}\f$
+may seem like an obvious objective function to create. However, minimisation
+could result in a large negative number instead of a value close to 0 which
+isn't quite what we want. We could improve upon this by using the same
+objective function, but taking the modulus (so this is no longer a problem),
+but then we are stuck, unable to go any further in the derivation. The
+'correct' choice to go with is actually to frame the problem as a least squares
+problem like in \f$\eqref{eq:start-objective-function}\f$.
 
 \f{equation}{
     minimize \: \mathbf{p}^T\mathit{R}^T - \mathbf{B}^T
+    \label{eq:bad-start-objective-function}
+\f}
+
+\f{equation}{
+    minimize \: ||\mathbf{p}^T\mathit{R}^T - \mathbf{B}^T||^2_2
     \label{eq:start-objective-function}
+\f}
+
+We can remove the transposes off of each component of
+\f$\eqref{eq:start-objective-function}\f$ as it is equivalent. This yields:
+
+\f{equation}{
+    minimize \: ||\mathit{R}\mathbf{p} - \mathbf{B}||^2_2
+    \label{eq:least-squares}
 \f}
 
 Note that we still need some constraints and apply a few matrix operations for
@@ -133,44 +153,51 @@ this to completely match up with the desired form given by
 
 ### Retrieving the correct objective function form
 
-These steps will likely look very arbitrary. That's maths for you. The way we
-present these steps will be very matter of fact. However, the path to figuring
-it out involves lots of incorrect paths (which would be a waste of time to
-read). If you are interested, try deriving the QPP form yourself.
+First we need to expand the L2 norm used in
+\f$\eqref{eq:least-squares}\f$.
 
-The first step we take is multiplying objective function
-\f$\eqref{eq:start-objective-function}\f$ to the right by
-\f$\mathit{R}\mathbf{p}\f$, this yields equation:
 
-\f{equation*}{
-    minimize \: \mathbf{p}^T\mathit{R}^T\mathit{R}\mathbf{p} - \mathbf{B}^T\mathit{R}\mathbf{p}
+\f{aligned}{
+    ||\mathit{R}\mathbf{p} - \mathbf{B}||^2_2
+    &=(\mathit{R}\mathbf{p} - \mathbf{B})^T(\mathbf{p}\mathit{R} - \mathbf{B}) \\
+    &=(\mathbf{p}^T\mathit{R}^T - \mathbf{B}^T)(\mathit{R}\mathbf{p} - \mathbf{B}) \\
+    &=\mathbf{p}^T\mathit{R}^T\mathit{R}\mathbf{p} -\mathbf{B}^T\mathit{R}\mathbf{p} - \mathbf{p}^T\mathit{R}\mathbf{B} + \mathbf{B}^T\mathbf{B} \\
+    &=\mathbf{p}^T\mathit{R}^T\mathit{R}\mathbf{p} -\mathbf{B}^T\mathit{R}\mathbf{p} - (\mathbf{p}^T\mathit{R}\mathbf{B})^T + \mathbf{B}^T\mathbf{B} \\
+    &=\mathbf{p}^T\mathit{R}^T\mathit{R}\mathbf{p} -2\mathbf{B}^T\mathit{R}\mathbf{p} + \mathbf{B}^T\mathbf{B}
 \f}
 
-We can then multiply the objective function by 1/2 to get:
+
+Next we can define a few variables:
+
+- \f$\mathit{Q}:=\mathit{R}\mathit{R}^T\f$ 
+- \f$\mathbf{c}^T:=-\mathbf{B}^T\mathit{R}\f$
+
+Substituting these into our objective function \f$\eqref{eq:least-squares}\f$
+we get:
 
 \f{equation}{
-    minimize \: \frac{1}{2}\mathbf{p}^T\mathit{R}^T\mathit{R}\mathbf{p} - \frac{1}{2}\mathbf{B}^T\mathit{R}\mathbf{p}
-    \label{eq:after-multiplications}
+    minimize \: \mathbf{p}^T\mathit{Q}\mathbf{p} + 2\mathbf{c}^T\mathbf{p} + \mathbf{B}^T\mathbf{B}
+    \label{eq:substituted-Q-c}
 \f}
 
-From here we can define:
+This is close to the form required by \f$\eqref{eq:qpp-form}\f$, from here, we
+need to multiply by 0.5 to get:
 
-- \f$\mathbf{c}^T\f$ as \f$-\frac{1}{2}\mathbf{B}^T\mathit{R}\f$ (note the
-minus sign)
-- \f$\mathit{Q}\f$ as \f$\mathit{R}^T\mathit{R}\f$
+\f{equation*}{
+    minimize \: \frac{1}{2}\mathbf{p}^T\mathit{Q}\mathbf{p} + \mathbf{c}^T\mathbf{p} + \frac{1}{2}\mathbf{B}^T\mathbf{B}
+\f}
 
-We then use these new symbols to write equation
-\f$\eqref{eq:after-multiplications}\f$ as:
+And then notice that our objective function has a constant in it (namely
+\f$\frac{1}{2}\mathbf{B}^T\mathbf{B}\f$). Our choice of \f$\mathbf{p}\f$ has
+no effect on this term of the objective function. Considering we don't actually
+care what the value of the objective function is, just that it is minimised,
+we can just remove this term entirely. This then retrieves the expected form
+of the QPP (as seen in equation \f$\eqref{eq:objective-function}\f$).
 
 \f{equation}{
     minimize \: \frac{1}{2}\mathbf{p}^T\mathit{Q}\mathbf{p} + \mathbf{c}^T\mathbf{p}
-    \label{eq:final-objective-function}
+    \label{eq:objective-function}
 \f}
-
-Objective function \f$\eqref{eq:final-objective-function}\f$ is now in the
-correct form laid out in \f$\eqref{eq:qpp-form}\f$. Where the solution vector
-\f$\mathbf{x}\f$ has been replaced by the cell proportions vector
-\f$\mathbf{p}\f$ (dummy variable change).
 
 ### Constraints
 
