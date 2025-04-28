@@ -182,11 +182,11 @@ deconvolution algorithm, this can lead to nonsensical solutions where some cell
 type makes up a negative proportion of the bulk profile. Further, all of the
 proportions should add up to 1.
 
->[!info]
-> We could actually leave the second constraint (proportions add to 1) out and
-> just normalise the vector of proportions after. However, doing this opens up
-> the possibility of losing numerical stability (as the proportions could all
-> be very close to 0 or so big numerical overflow occurs).
+\note
+We could actually leave the second constraint (proportions add to 1) out and
+just normalise the vector of proportions after. However, doing this opens up
+the possibility of losing numerical stability (as the proportions could all
+be very close to 0 or so big numerical overflow occurs).
 
 HyLoRD uses [qpmad](https://github.com/asherikov/qpmad) to solve the QPP, and
 this software allows for constraints on both sides (less than constraint and
@@ -209,7 +209,7 @@ get:
 \f}
 
 Where:
-- \f$\mathit{A} is a \f$N \times 1\f$ matrix of 1s
+- \f$\mathit{A}\f$ is a \f$N \times 1\f$ matrix of 1s
 
 This might seem slightly different from the expected QPP form given in
 \f$\eqref{eq:qpp-form}\f$, but we can combine the two constraints into the form
@@ -227,7 +227,7 @@ problem is). Due to \f$\mathit{Q}\f$ being defined as
 important as the qpmad solver implements the 
 [Goldfarb&Idnani algorithm](https://link.springer.com/chapter/10.1007/BFb0121074).
 
-### On positive-definite
+### On positive-definiteness
 
 In order for our matrix \f$\mathit{Q}\f$ to actually be positive definite 
 (definition only locks in positive semi-definite-ness). We need to be confident
