@@ -117,6 +117,7 @@ auto run(CMD::HylordConfig& config) -> int {
                                   config.convergence_threshold) {
             break;
          }
+         iteration++;
       }
       std::cout << "Deconvolution loop finished after " << iteration
                 << " iteration" << (iteration == 1 ? ".\n" : "s.\n");
