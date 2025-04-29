@@ -157,9 +157,7 @@ HTML_EXTRA_STYLESHEET  = @AWESOME_CSS_DIR@/doxygen-awesome.css \
                          @AWESOME_CSS_DIR@/doxygen-awesome-sidebar-only.css \
                          ${PROJECT_SOURCE_DIR}/docs/hylord-doxygen-stylesheet.css
 HTML_EXTRA_FILES       = @AWESOME_CSS_DIR@/doxygen-awesome-darkmode-toggle.js \
-                         @AWESOME_CSS_DIR@/doxygen-awesome-paragraph-link.js \
-                         @AWESOME_CSS_DIR@/doxygen-custom/toggle-alternative-theme.js \
-                         @AWESOME_CSS_DIR@/doxygen-awesome-interactive-toc.js
+                         @AWESOME_CSS_DIR@/doxygen-awesome-paragraph-link.js
 DISABLE_INDEX          = NO
 FULL_SIDEBAR           = NO
 GENERATE_TREEVIEW      = YES
