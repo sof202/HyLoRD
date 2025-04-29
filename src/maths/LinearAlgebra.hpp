@@ -47,7 +47,10 @@ auto pseudoInverse(const Eigen::MatrixBase<Derived>& vec)
 /// Computes the squared Euclidean distance between two vectors.
 auto squaredDistance(const Vector& vec1, const Vector& vec2) -> double;
 
-/// Update process for unknown reference profiles (see docs for more info).
+/**
+ * @brief Update process for unknown reference profiles (see @ref
+ * reference-matrix-updating for more info).
+ */
 void updateReferenceMatrix(Eigen::Ref<Matrix> reference_matrix,
                            const Vector& cell_proportions,
                            const Vector& bulk_profile,

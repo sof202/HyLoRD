@@ -56,8 +56,8 @@ auto squaredDistance(const Vector& vec1, const Vector& vec2) -> double {
  * Extends the reference matrix by solving for additional cell type profiles
  * using bulk data. Requires the reference matrix to have space allocated for
  * additional cell types. Uses pseudoinverse to solve for new profiles based on
- * residual bulk signal. See documentation for mathematical explanation of
- * this.
+ * residual bulk signal. See @ref reference-matrix-updating  for mathematical
+ * explanation of this.
  * @throws std::invalid_argument if additional_cell_types is not positive
  */
 void updateReferenceMatrix(Eigen::Ref<Matrix> reference_matrix,
