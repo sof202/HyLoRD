@@ -1,4 +1,5 @@
 # Inputs and Outputs of HyLoRD
+\tableofcontents
 
 ## Inputs
 

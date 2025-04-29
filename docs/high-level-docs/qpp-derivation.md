@@ -1,4 +1,5 @@
 # Derivation for quadratic programming problem {#derivation}
+\tableofcontents
 
 ## Introduction to problem
 

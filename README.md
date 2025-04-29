@@ -1,4 +1,5 @@
 # Hybrid Long Read Deconvolution (HyLoRD) 
+\tableofcontents
 
 ## Description
 

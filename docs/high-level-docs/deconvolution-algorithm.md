@@ -1,4 +1,5 @@
 # Deconvoluiton algorithm {#algorithm}
+\tableofcontents
 
 ## High level explanation of main pipeline
 
