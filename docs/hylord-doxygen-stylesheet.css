@@ -20,8 +20,7 @@ body,
 }
 
 div.contents {
-    max-width: 600px !important;
-    margin: 0 auto !important;
+    width: 80%;
 }
 
 div.fragment {
