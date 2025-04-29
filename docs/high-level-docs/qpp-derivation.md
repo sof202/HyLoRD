@@ -60,7 +60,7 @@ known and \f$\mathbf{x}\f$ is the (solution) vector being solved for.
 
 ## Derivation
 
-### Matrix form
+### Matrix form {#matrix-form}
 
 First, we will rewrite equation \f$\eqref{eq:startingPoint}\f$ in matrix form:
 
