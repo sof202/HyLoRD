@@ -154,6 +154,7 @@ HTML_HEADER            = ${PROJECT_SOURCE_DIR}/docs/header.html
 HTML_FOOTER            =
 HTML_STYLESHEET        =
 HTML_EXTRA_STYLESHEET  = @AWESOME_CSS_DIR@/doxygen-awesome.css \
+                         @AWESOME_CSS_DIR@/doxygen-awesome-sidebar-only.css \
                          ${PROJECT_SOURCE_DIR}/docs/style.css
 HTML_EXTRA_FILES       = @AWESOME_CSS_DIR@/doxygen-awesome-darkmode-toggle.js \
                          @AWESOME_CSS_DIR@/doxygen-awesome-paragraph-link.js \
@@ -161,7 +162,7 @@ HTML_EXTRA_FILES       = @AWESOME_CSS_DIR@/doxygen-awesome-darkmode-toggle.js \
                          @AWESOME_CSS_DIR@/doxygen-awesome-interactive-toc.js
 DISABLE_INDEX          = NO
 FULL_SIDEBAR           = NO
-GENERATE_TREEVIEW      = NO
+GENERATE_TREEVIEW      = YES
 HTML_COLORSTYLE        = LIGHT
 HTML_COLORSTYLE_HUE    = 220
 HTML_COLORSTYLE_SAT    = 100
