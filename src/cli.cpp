@@ -114,7 +114,7 @@ void setupCLI(CLI::App& app, HylordConfig& config) {
        ->group("File paths")
        ->check(CLI::ExistingFile);
 
-   app.add_option("-o,--outdir",
+   app.add_option("-o,--outpath",
                   config.out_file_path,
                   "A file path to write the determined cell proportions to "
                   "(e.g. .../proportions.txt). By default, this information "
