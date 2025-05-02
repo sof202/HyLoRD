@@ -55,7 +55,7 @@ cell types absent in the user provided reference methylation matrix.
 ### Methodological Approach
 
 HyLoRD 
-[formulates deconvolution as a quadratic programming problem (QPP)](https://sof202.github.io/HyLoRD/md__hy_lo_r_d_2docs_2high-level-docs_2qpp-derivation.html)
+[formulates deconvolution as a quadratic programming problem (QPP)](https://sof202.github.io/HyLoRD/algorithm.html)
 optimizing cell proportions under biological constraints (e.g., non-negativity,
 sum-to-one). Key features include:
 
@@ -139,7 +139,7 @@ See `BUILD.md` for further details, including dependencies.
 ## Running
 
 To get started with HyLoRD, you will need the 
-[required input files](https://sof202.github.io/HyLoRD/md__2home_2sof202_2_tools__and___repositories_2_hy_lo_r_d_2docs_2high-level-docs_2inputs-outputs.html).
+[required input files](https://sof202.github.io/HyLoRD/md__hy_lo_r_d_2docs_2high-level-docs_2inputs-outputs.html).
 
 After this you can run HyLoRD with:
 
