@@ -15,6 +15,7 @@ jobs:
           build-essential \
           cmake \
           clang \
+          git \
           libpthread-stubs0-dev
 
     - name: Checkout repository
