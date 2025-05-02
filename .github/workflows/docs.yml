@@ -36,7 +36,7 @@ jobs:
 
     - name: Verify installation
       run: |
-        $(find ./install -name hylord -type f) --help
+        $(find ./install -name hylord -type f) --version
 
     - name: Add TOC to doxygen main page
       run: |
