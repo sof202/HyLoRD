@@ -7,7 +7,9 @@
 
 #include "cli.hpp"
 
+#include <cstdlib>
 #include <limits>
+#include <sstream>
 #include <string>
 #include <thread>
 
@@ -21,9 +23,21 @@ namespace Hylord::CMD {
  * optional parameters. Marks bedmethyl file path as required input.
  */
 void setupCLI(CLI::App& app, HylordConfig& config) {
-   app.description(
-       "HyLoRD, A hybrid cell type deconvolution algorithm for long read "
-       "(ONT) data.");
+   std::stringstream hylord_description;
+   hylord_description
+       << "HyLoRD (" << GIT_TAG
+       << ")\nA hybrid cell type deconvolution algorithm for long read "
+          "(ONT) data.";
+
+   app.description(hylord_description.str());
+
+   auto print_version{[](std::size_t) {
+      std::cout << "HyLoRD " << GIT_TAG << '\n';
+      std::cout << "Commit hash: " << GIT_HASH << '\n';
+      std::cout << "Build type: " << BUILD_TYPE << '\n';
+      std::exit(0);
+   }};
+   app.add_flag("--version", print_version, "Print HyLoRD version");
 
    app.add_option("-t,--threads",
                   config.num_threads,

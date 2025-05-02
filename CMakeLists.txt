@@ -12,6 +12,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type" FORCE)
+endif()
+
+add_compile_definitions(BUILD_TYPE="${CMAKE_BUILD_TYPE}")
+
 # ------------------
 # Git
 # ------------------
@@ -29,14 +35,25 @@ if(GIT_FOUND)
         OUTPUT_STRIP_TRAILING_WHITESPACE
         ERROR_QUIET
     )
+    execute_process(
+        COMMAND ${GIT_EXECUTABLE} rev-parse HEAD
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE GIT_HASH
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+    )
 endif()
 
 # Fallback
 if(NOT GIT_TAG)
     set(GIT_TAG "v0.0.0")
 endif()
+if(NOT GIT_HASH)
+  set(GIT_HASH "Not found")
+endif()
 
 add_compile_definitions(GIT_TAG="${GIT_TAG}")
+add_compile_definitions(GIT_HASH="${GIT_HASH}")
 
 # ------------------
 # External Libraries
