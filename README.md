@@ -126,6 +126,12 @@ After completing this process make sure that `path/to/hylord` is on your
 environment variable (details of which can be found
 [here](https://www.digitalocean.com/community/tutorials/how-to-view-and-update-the-linux-path-environment-variable)).
 
+You can verify that the installation completed by running:
+
+```sh
+hylord --version
+```
+
 See `BUILD.md` for further details, including dependencies.
 
 ## Running
