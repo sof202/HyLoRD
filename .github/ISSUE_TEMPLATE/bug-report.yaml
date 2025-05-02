@@ -19,6 +19,14 @@ body:
     validations:
       required: true
   - type: textarea
+    id: version
+    attributes:
+      label: HyLoRD Version
+      description: What version of HyLoRD are you using (use `hylord --version` if possible and paste here)?
+      render: shell
+    validations:
+      required: true
+  - type: textarea
     id: what-happened
     attributes:
       label: What happened?
