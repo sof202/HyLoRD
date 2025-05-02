@@ -19,6 +19,9 @@ jobs:
 
     - name: Checkout repository
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        fetch-tags: true
 
     - name: Build with Make
       run: |
@@ -27,8 +30,8 @@ jobs:
     - name: Install 
       run: |
         make install
-        
+
     - name: Verify installation
       run: |
-        $(find ./install -name hylord -type f) --help
+        $(find ./install -name hylord -type f) --version
 
