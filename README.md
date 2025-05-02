@@ -1,4 +1,18 @@
-# Hybrid Long Read Deconvolution (HyLoRD) 
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/b2d6eb3b-e34f-4961-9199-3b5070b567d3" />
+</p>
+
+
+</p>
+<p align="center">
+    <a href="https://github.com/sof202/HyLoRD/actions/workflows/docs.yml" alt="Build status">
+      <img src="https://img.shields.io/github/actions/workflow/status/sof202/HyLoRD/docs.yml?style=for-the-badge&color=orange" /></a>
+    <a href="https://github.com/sof202/HyLoRD/commits/main/" alt="Commit activity">
+        <img src="https://img.shields.io/github/commit-activity/m/sof202/HyLoRD?style=for-the-badge&color=orange" /></a>
+    <a href="https://github.com/sof202/HyLoRD/blob/main/LICENSE" alt="License">
+        <img src="https://img.shields.io/github/license/sof202/HyLoRD?style=for-the-badge&color=orange" /></a>
+
+</p>
 
 ## Table of contents
 
@@ -13,6 +27,10 @@
 * [Documentation](#documentation)
 
 ## Description
+
+HyLoRD (Hybrid Long Read Deconvolution) is a cell type deconvolution
+tool. It utilitises a hybrid (rather than reference-based/free) approach
+to deconvoluting ONT long read sequencing data.
 
 ### Introduction
 
