@@ -38,6 +38,10 @@ jobs:
       run: |
         $(find ./install -name hylord -type f) --help
 
+    - name: Add TOC to doxygen main page
+      run: |
+        sed -i '2i\\\tableofcontents' README.md
+
     - name: Generate docs 
       run: |
         make docs || doxygen build/docs/HyLoRD.doxyfile
