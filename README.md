@@ -1,5 +1,7 @@
 # Hybrid Long Read Deconvolution (HyLoRD) 
 
+## Table of contents
+
 * [Description](#description)
   * [Introduction](#introduction)
   * [Methodological Approach](#methodological-approach)
