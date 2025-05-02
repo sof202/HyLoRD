@@ -40,7 +40,8 @@ obtained from [modkit](https://github.com/nanoporetech/modkit). This could
 be accomplished with a mixture of `bedtools` and `awk` for example. The fields
 you want to keep from the bedmethyl files are:
 
-- 1 - Chromosome field
+- 1 - Chromosome field 
+    - UCSC format, can also just be the chromosome number (no "chr" prefix)
 - 2 - Start field
 - 3 - End field
 - 4 - Mark name field
