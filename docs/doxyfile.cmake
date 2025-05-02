@@ -6,8 +6,8 @@
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = HyLoRD
 PROJECT_NUMBER         = 
-PROJECT_BRIEF          = "A Hybrid Cell Type Deconvolution algorithm for long read data"
-PROJECT_LOGO           =
+PROJECT_BRIEF          = "A Hybrid Cell Type Deconvolution Algorithm"
+PROJECT_LOGO           = "${PROJECT_SOURCE_DIR}/docs/hylord-logo.svg"
 OUTPUT_DIRECTORY       = "${PROJECT_BINARY_DIR}/docs/"
 CREATE_SUBDIRS         = NO
 OUTPUT_LANGUAGE        = English
