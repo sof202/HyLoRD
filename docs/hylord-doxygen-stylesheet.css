@@ -13,6 +13,18 @@ body,
     #MSearchBox {
         width: calc(var(--side-nav-fixed-width) - calc(2* var(--spacing-medium)) - var(--searchbar-height) - 1px);
     }
+
+    .github-corner svg {
+        width: 50px;
+        height: 50px;
+    }
+}
+
+.github-corner svg {
+    fill: var(--primary-light-color);
+    color: var(--page-background-color);
+    width: 72px;
+    height: 72px;
 }
 
 #nav-tree a {
