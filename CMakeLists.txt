@@ -20,6 +20,24 @@ if(NOT PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
   file(GENERATE OUTPUT .gitignore CONTENT "*")
 endif()
 
+find_package(Git)
+if(GIT_FOUND)
+    execute_process(
+        COMMAND ${GIT_EXECUTABLE} describe --tags --abbrev=0
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE GIT_TAG
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+    )
+endif()
+
+# Fallback
+if(NOT GIT_TAG)
+    set(GIT_TAG "v0.0.0")
+endif()
+
+add_compile_definitions(GIT_TAG="${GIT_TAG}")
+
 # ------------------
 # External Libraries
 # ------------------
