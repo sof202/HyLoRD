@@ -27,6 +27,13 @@ void preprocessInputData(BedData::BedMethylData& bedmethyl,
                          int additional_cell_types) {
    if (reference_matrix.empty())
       reference_matrix = BedData::ReferenceMatrixData{bedmethyl};
+   if (bedmethyl.empty()) {
+      throw PreprocessingException(
+          "bedmethyl file is empty",
+          "This could be due to the file being empty, no rows being gleaned "
+          "or no rows passing the filters set");
+   }
+
    if (!cpg_list.empty()) {
       try {
          reference_matrix.subsetRows(BedData::findIndexesInCpGList(
