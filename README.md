@@ -32,7 +32,7 @@
 
 HyLoRD (Hybrid Long Read Deconvolution) is a cell type deconvolution
 tool. It utilitises a hybrid (rather than reference-based/free) approach
-to deconvoluting ONT long read sequencing data.
+to deconvolving ONT long read sequencing data.
 
 ### Introduction
 
@@ -69,7 +69,7 @@ sum-to-one). Key features include:
 
 - Multi-Signature Support
   - Optional integration of 5hmC signals, improving resolution in cell types
-  with differential hydroxymethylation (particularly useful when deconvoluting
+  with differential hydroxymethylation (particularly useful when deconvolving
   bulk data from brain tissue for example)
 
 ### Advantages Over Existing Methods
@@ -90,7 +90,7 @@ HyLoRD is particularly suited for:
 - Validating cell sorting efficiency in single-cell experiments.
 - Deconvolving neuronal tissues, where 5hmC signals provide discriminative
 power.
-- Analyzing archival or low-input samples where long-read sequencing is
+- Analysing archival or low-input samples where long-read sequencing is
 advantageous.
 
 ## Installation

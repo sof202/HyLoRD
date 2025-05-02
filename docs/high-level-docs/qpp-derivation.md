@@ -3,7 +3,7 @@
 
 ## Introduction to problem
 
-HyLoRD's purpose is to take some bulk methylation profile and deconvolute this
+HyLoRD's purpose is to take some bulk methylation profile and deconvolve this
 by estimating the proportions of known/unknown cell types that make up the bulk 
 profile. For the purpose of this page, we will assume that the reference matrix
 (the amalgamation of methylation profiles for individual cell types) has been

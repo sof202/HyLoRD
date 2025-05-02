@@ -1,4 +1,4 @@
-# Deconvoluiton algorithm {#algorithm}
+# Deconvolution algorithm {#algorithm}
 \tableofcontents
 
 ## High level explanation of main pipeline
@@ -92,7 +92,7 @@ methylation proportions across the epigenome.
 
 ##### Step 2 - Obtain CDF
 
-To obtain the CDF, the following python code was utiltised:
+To obtain the CDF, the following python code was utilised:
 
 ```python
 import numpy as np
