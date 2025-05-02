@@ -1,32 +1,16 @@
 # Hybrid Long Read Deconvolution (HyLoRD) 
-\tableofcontents
+
+* [Description](#description)
+  * [Introduction](#introduction)
+  * [Methodological Approach](#methodological-approach)
+  * [Advantages Over Existing Methods](#advantages-over-existing-methods)
+  * [Applications](#applications)
+* [Install from source](#install-from-source)
+* [Running](#running)
+  * [Further details](#further-details)
+* [Documentation](#documentation)
 
 ## Description
-
-### Abstract
-
-Cell type deconvolution is a critical tool in epigenome-wide association
-studies (EWAS), enabling the estimation of cellular heterogeneity in bulk
-tissue samples. While existing methods primarily focus on microarray or
-whole-genome bisulfite sequencing (WGBS) data, the emergence of long-read
-sequencing technologies-such as Oxford Nanopore Technologies (ONT)-presents new
-opportunities for improved deconvolution. ONT allows for direct detection of
-5-methylcytosine (5mC) and 5-hydroxymethylcytosine (5hmC) without bisulfite
-conversion, enhancing the accuracy of epigenetic signal quantification.
-
-Here, we present HyLoRD (Hybrid Long Read Deconvolution), a novel hybrid
-deconvolution algorithm designed for long-read methylation data. HyLoRD
-leverages a quadratic programming framework to estimate cell type proportions,
-accommodating both reference-based and reference-free scenarios—enabling
-prediction of both known and novel cell types. This flexibility addresses the
-current scarcity of publicly available cell-sorted ONT methylation datasets.
-
-Unlike neural network-based approaches, HyLoRD employs an efficient quadratic
-programming solver (Goldfarb-Idnani), ensuring computational scalability
-without requiring large training datasets. Additionally, HyLoRD uniquely
-supports multi-signature deconvolution, incorporating both 5mC and 5hmC
-modifications, which may enhance resolution in cell types with distinct
-hydroxymethylation patterns (*e.g.*, neuronal populations).
 
 ### Introduction
 
@@ -48,7 +32,8 @@ cell types absent in the user provided reference methylation matrix.
 
 ### Methodological Approach
 
-HyLoRD formulates deconvolution as a quadratic programming problem (QPP),
+HyLoRD 
+[formulates deconvolution as a quadratic programming problem (QPP)](https://sof202.github.io/HyLoRD/md__hy_lo_r_d_2docs_2high-level-docs_2qpp-derivation.html)
 optimizing cell proportions under biological constraints (e.g., non-negativity,
 sum-to-one). Key features include:
 
@@ -62,7 +47,8 @@ sum-to-one). Key features include:
 
 - Multi-Signature Support
   - Optional integration of 5hmC signals, improving resolution in cell types
-  with differential hydroxymethylation
+  with differential hydroxymethylation (particularly useful when deconvoluting
+  bulk data from brain tissue for example)
 
 ### Advantages Over Existing Methods
 
@@ -85,12 +71,6 @@ power.
 - Analyzing archival or low-input samples where long-read sequencing is
 advantageous.
 
-### Future Directions
-As ONT basecallers (e.g., Dorado) improve in accuracy, HyLoRD’s performance
-will further benefit from higher-fidelity 5mC/5hmC calls. We also anticipate
-extending HyLoRD to other long-read epigenetic modifications (e.g., 6mA) as
-detection methods mature.
-
 ## Install from source
 
 The build process for HyLoRD is carried out via CMake, however the process is
@@ -109,5 +89,45 @@ make CMAKE_BUILD_TYPE=Release CMAKE_INSTALL_PREFIX=path/to/hylord
 sudo make install
 ```
 
+After completing this process make sure that `path/to/hylord` is on your
+`$PATH` with `which hylord`. If not found, you will need to update your `PATH`
+environment variable (details of which can be found
+[here](https://www.digitalocean.com/community/tutorials/how-to-view-and-update-the-linux-path-environment-variable)).
+
 See `BUILD.md` for further details, including dependencies.
 
+## Running
+
+To get started with HyLoRD, you will need the 
+[required input files](https://sof202.github.io/HyLoRD/md__2home_2sof202_2_tools__and___repositories_2_hy_lo_r_d_2docs_2high-level-docs_2inputs-outputs.html).
+
+After this you can run HyLoRD with:
+
+```bash
+hylord -r path/to/reference_matrix.bed path/to/bedmethyl.bed
+```
+
+### Further details
+
+Generally when using HyLoRD, the command would look something like:
+
+```bash
+hylord \
+  -r path/to/reference_matrix.bed \
+  -l path/to/cell_list.txt \
+  -c path/to/cpg_list.bed \
+  --additional-cell-types 3 \
+  path/to/bedmethyl.bed
+```
+
+Further command line options are explained by running:
+
+```bash
+hylord -h
+```
+
+## Documentation
+
+Full documentation for HyLoRD can be found
+[here](https://sof202.github.io/HyLoRD). You can also head over to `BUILD.md`
+for details on how to build these pages locally with `doxygen`.
