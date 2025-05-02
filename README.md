@@ -91,7 +91,19 @@ power.
 - Analyzing archival or low-input samples where long-read sequencing is
 advantageous.
 
-## Install from source
+## Installation
+
+### Prebuilt binary
+
+Download the latest release from the 
+[releases page](https://github.com/sof202/HyLoRD/releases/) and run:
+
+```sh
+# Extract binary
+tar -xzvf hylord-[version]-[distribution].tar.gz
+```
+
+### Install from source
 
 The build process for HyLoRD is carried out via CMake, however the process is
 made easier via a Makefile wrapper. To install:
