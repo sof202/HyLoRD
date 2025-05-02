@@ -1,4 +1,4 @@
-# Inputs and Outputs of HyLoRD
+# Inputs and Outputs of HyLoRD {#inputs-outputs}
 \tableofcontents
 
 ## Inputs

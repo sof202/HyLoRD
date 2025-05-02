@@ -139,7 +139,7 @@ See `BUILD.md` for further details, including dependencies.
 ## Running
 
 To get started with HyLoRD, you will need the 
-[required input files](https://sof202.github.io/HyLoRD/md__hy_lo_r_d_2docs_2high-level-docs_2inputs-outputs.html).
+[required input files](https://sof202.github.io/HyLoRD/inputs-outputs.html).
 
 After this you can run HyLoRD with:
 
