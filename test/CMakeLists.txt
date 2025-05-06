@@ -17,6 +17,7 @@ if(HYLORD_BUILD_TESTS)
   )
   target_link_libraries(
     hylord_test
+    hylord_lib
     GTest::gtest_main
   )
 

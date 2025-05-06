@@ -28,7 +28,7 @@ build: configure
 
 test: CMAKE_EXTRA_FLAGS += -DHYLORD_BUILD_TESTS=ON
 test: build
-	@cd $(BUILD_DIR) && ctest -R "Factorial.*"
+	@cd $(BUILD_DIR) && ctest
 
 install:
 	@cmake --install $(BUILD_DIR)
