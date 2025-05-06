@@ -71,6 +71,13 @@ FetchContent_MakeAvailable(cli11_proj)
 # Eigen3 has a bunch of unecessary build steps that aren't needed for HyLoRD
 # Like building tests, .pc file generation and documentation building. Skipping
 # these saves on build time
+set(original_BUILD_TESTING ${BUILD_TESTING})
+set(BUILD_TESTING OFF CACHE BOOL "Disable tests for Eigen" FORCE)
+set(EIGEN_TEST_NOQT ON CACHE BOOL "Disable Qt-dependent tests" FORCE)
+set(EIGEN_BUILD_TESTING OFF CACHE BOOL "Disable Eigen tests" FORCE)
+set(EIGEN_MPL2_ONLY ON)
+set(EIGEN_BUILD_PKGCONFIG OFF)
+set(EIGEN_BUILD_DOC OFF)
 FetchContent_Declare(
   Eigen
   GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
@@ -78,14 +85,10 @@ FetchContent_Declare(
   GIT_SHALLOW TRUE
   GIT_PROGRESS TRUE
 )
-set(original_BUILD_TESTING ${BUILD_TESTING})
-set(BUILD_TESTING OFF)
-set(EIGEN_BUILD_TESTING OFF)
-set(EIGEN_MPL2_ONLY ON)
-set(EIGEN_BUILD_PKGCONFIG OFF)
-set(EIGEN_BUILD_DOC OFF)
 FetchContent_MakeAvailable(Eigen)
-set(BUILD_TESTING ${original_BUILD_TESTING})
+set(BUILD_TESTING 
+  ${original_BUILD_TESTING} CACHE BOOL "Restore global test setting" FORCE
+)
 
 # qpmad's CMakeLists.txt contains 'find_package(Eigen3)'. We just retrieved
 # this above, so we just ensure that qpmad knows it exists and can find it.
