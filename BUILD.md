@@ -31,6 +31,10 @@ whilst still adding some debug info
 - libpthread (POSIX Threads)
   - Likely already installed on modern systems
 
+### Tests
+
+- ctest (should come with cmake)
+
 ## Building HyLoRD documentation locally
 
 After building HyLoRD with `make CMAKE_BUILD_TYPE=Release`, one can generate
@@ -60,3 +64,8 @@ for Vector and Matrix interfaces. Licensed under MPL2.
 generation. Licensed under MIT and Apache2.0.
 - [qpmad](https://github.com/asherikov/qpmad/) (v1.4.0): Used for solving main
 quadratic programming problem. Licensed under Apache2.0.
+
+### Tests
+
+- [GoogleTest](https://github.com/google/googletest/) (v1.17.0): Used for test
+framework. Licensed under BSD-3-Clause. 
