@@ -1,8 +1,11 @@
 #include <gtest/gtest.h>
+#include <sys/stat.h>
 
+#include <fstream>
 #include <string>
 #include <vector>
 
+#include "HylordException.hpp"
 #include "io/TSVFileReader.hpp"
 #include "types.hpp"
 
@@ -41,6 +44,15 @@ TEST_F(TSVReaderIntegrationTest, ExtractsDesiredFields) {
    std::vector<TwoNumbers> rows{reader.extractRecords()};
    EXPECT_EQ(rows[0].num1, 1);
    EXPECT_EQ(rows[1].num2, 6);
+}
+
+TEST_F(TSVReaderIntegrationTest, ThrowsOnInvalidPermissions) {
+   std::string data_path{getTestPath("invalid_permissions.tsv")};
+   std::ofstream(data_path) << "test\n";
+   chmod(data_path.c_str(), 0000);
+
+   IO::TSVFileReader<TwoNumbers> reader{data_path};
+   EXPECT_THROW(reader.load(), FileReadException);
 }
 
 }  // namespace Hylord
