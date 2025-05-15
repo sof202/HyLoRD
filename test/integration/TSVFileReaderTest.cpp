@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 
-#include <iostream>
 #include <string>
 #include <vector>
 
@@ -27,12 +26,21 @@ class TSVReaderIntegrationTest : public ::testing::Test {
    };
 };
 
-TEST_F(TSVReaderIntegrationTest, ReadsSimpleFile) {
+TEST_F(TSVReaderIntegrationTest, ReadsSimpleFiles) {
    IO::TSVFileReader<TwoNumbers> reader{getTestPath("valid/two_numbers.tsv")};
    reader.load();
    std::vector<TwoNumbers> rows{reader.extractRecords()};
    EXPECT_EQ(rows[0].num1, 1);
    EXPECT_EQ(rows[1].num2, 4);
+}
+
+TEST_F(TSVReaderIntegrationTest, ExtractsDesiredFields) {
+   IO::TSVFileReader<TwoNumbers> reader{getTestPath("valid/three_numbers.tsv"),
+                                        {0, 2}};
+   reader.load();
+   std::vector<TwoNumbers> rows{reader.extractRecords()};
+   EXPECT_EQ(rows[0].num1, 1);
+   EXPECT_EQ(rows[1].num2, 6);
 }
 
 }  // namespace Hylord
