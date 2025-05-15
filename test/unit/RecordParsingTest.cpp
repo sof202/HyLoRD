@@ -74,4 +74,30 @@ TEST(ReferenceMatrixRowParsingTest, ThrowsOnTooFewFields) {
    EXPECT_THROW(BedRecords::Bed4PlusX::fromFields(input_fields),
                 std::out_of_range);
 }
+
+TEST(BedMethylRowParsing, BasicFunctionality) {
+   const BedRecords::Bed9Plus9 expected_parsed_fields{1, 1000, 'h', 0.1};
+   const Fields input_fields{"chr1", "1000", "1001", "h", "100", "10"};
+   BedRecords::Bed9Plus9 actual_parsed_fields{
+       BedRecords::Bed9Plus9::fromFields(input_fields)};
+   EXPECT_EQ(actual_parsed_fields.name, expected_parsed_fields.name);
+   EXPECT_EQ(actual_parsed_fields.start, expected_parsed_fields.start);
+   EXPECT_EQ(actual_parsed_fields.name, expected_parsed_fields.name);
+   EXPECT_EQ(actual_parsed_fields.methylation_proportion,
+             expected_parsed_fields.methylation_proportion);
+}
+
+TEST(BedMethylRowParsing, ThrowsOnIncorrectFields) {
+   const Fields input_fields{
+       "chr1", "1000", "1001", "h", "100", "not a number"};
+   EXPECT_THROW(BedRecords::Bed9Plus9::fromFields(input_fields),
+                std::exception);
+}
+
+TEST(BedMethylRowParsing, ThrowsOnTooFewFields) {
+   const Fields input_fields{"chr1", "1000", "1001", "h", "100"};
+   EXPECT_THROW(BedRecords::Bed9Plus9::fromFields(input_fields),
+                std::out_of_range);
+}
+
 }  // namespace Hylord
