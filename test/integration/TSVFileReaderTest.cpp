@@ -3,6 +3,7 @@
 
 #include <chrono>
 #include <fstream>
+#include <iostream>
 #include <ratio>
 #include <string>
 #include <vector>
@@ -113,6 +114,10 @@ TEST_F(TSVReaderIntegrationTest, PerformanceCheck) {
    Timer timer;
    reader.load();
    // With extrapolation, 1GB should take less than 100s to parse
-   EXPECT_LE(timer.elpased(), 0.1);
+   const auto time_taken_seconds{timer.elpased()};
+   constexpr double max_acceptable_time_seconds{0.1};
+   EXPECT_LE(time_taken_seconds, max_acceptable_time_seconds);
+   std::cout << "Reading in 1MB file took: " << time_taken_seconds
+             << "seconds\n";
 }
 }  // namespace Hylord
