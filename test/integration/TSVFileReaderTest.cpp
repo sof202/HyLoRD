@@ -65,4 +65,11 @@ TEST_F(TSVReaderIntegrationTest, ThowsOnEmptyFile) {
    EXPECT_THROW(reader.load(), FileReadException);
 }
 
+TEST_F(TSVReaderIntegrationTest, SkipsEmptyLines) {
+   IO::TSVFileReader<TwoNumbers> reader{getTestPath("valid/empty_lines.tsv")};
+   reader.load();
+   std::vector<TwoNumbers> rows{reader.extractRecords()};
+   EXPECT_EQ(rows[0].num1, 1);
+   EXPECT_EQ(rows[1].num2, 4);
+}
 }  // namespace Hylord
