@@ -11,14 +11,21 @@ if(HYLORD_BUILD_TESTS)
   set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
   FetchContent_MakeAvailable(googletest)
 
+  file(COPY integration/test_data/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
   add_executable(
     hylord_test
     unit/PercentageProportionConversionTest.cpp
+    integration/TSVFileReaderTest.cpp
   )
   target_link_libraries(
     hylord_test
     hylord_lib
     GTest::gtest_main
+  )
+
+  target_compile_definitions(
+    hylord_test
+    PRIVATE TEST_DATA_DIR="${CMAKE_CURRENT_BINARY_DIR}"
   )
 
   include(GoogleTest)
