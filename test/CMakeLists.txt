@@ -13,7 +13,7 @@ if(HYLORD_BUILD_TESTS)
 
   add_executable(
     hylord_test
-    PercentageProportionConversionTest.cpp
+    unit/PercentageProportionConversionTest.cpp
   )
   target_link_libraries(
     hylord_test
