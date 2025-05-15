@@ -70,6 +70,12 @@ TEST_F(TSVReaderIntegrationTest, RecordAccessThrowsIfNotLoaded) {
    EXPECT_THROW(reader.extractRecords(), std::runtime_error);
 }
 
+TEST_F(TSVReaderIntegrationTest, ThrowsIfFileLoadedTwice) {
+   IO::TSVFileReader<TwoNumbers> reader{getTestPath("valid/two_numbers.tsv")};
+   reader.load();
+   EXPECT_THROW(reader.load(), HylordException);
+}
+
 TEST_F(TSVReaderIntegrationTest, ThrowsOnInvalidPermissions) {
    std::string data_path{getTestPath("invalid/invalid_permissions.tsv")};
    std::ofstream(data_path) << "test\n";
