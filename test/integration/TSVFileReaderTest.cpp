@@ -1,7 +1,9 @@
 #include <gtest/gtest.h>
 #include <sys/stat.h>
 
+#include <chrono>
 #include <fstream>
+#include <ratio>
 #include <string>
 #include <vector>
 
@@ -26,6 +28,21 @@ class TSVReaderIntegrationTest : public ::testing::Test {
          parsed_row.num2 = std::stoi(fields[1]);
          return parsed_row;
       }
+   };
+   class Timer {
+     private:
+      using Clock = std::chrono::steady_clock;
+      using Second = std::chrono::duration<double, std::ratio<1>>;
+
+     public:
+      void reset() { m_begin = Clock::now(); }
+      [[nodiscard]] auto elpased() const -> double {
+         return std::chrono::duration_cast<Second>(Clock::now() - m_begin)
+             .count();
+      }
+
+     private:
+      std::chrono::time_point<Clock> m_begin{Clock::now()};
    };
 };
 
@@ -80,5 +97,22 @@ TEST_F(TSVReaderIntegrationTest, SkipsMalformedLines) {
    std::vector<TwoNumbers> rows{reader.extractRecords()};
    EXPECT_EQ(rows[0].num1, 1);
    EXPECT_EQ(rows[1].num2, 4);
+}
+
+TEST_F(TSVReaderIntegrationTest, PerformanceCheck) {
+   std::string data_path{getTestPath("valid/long_file.tsv")};
+   constexpr int n_rows{250000};
+   {
+      std::ofstream long_file(data_path);
+      for (int i{}; i < n_rows; ++i) {
+         long_file << "1\t2\n";
+      }
+   }  // About 1MB
+
+   IO::TSVFileReader<TwoNumbers> reader{data_path};
+   Timer timer;
+   reader.load();
+   // With extrapolation, 1GB should take less than 100s to parse
+   EXPECT_LE(timer.elpased(), 0.1);
 }
 }  // namespace Hylord
