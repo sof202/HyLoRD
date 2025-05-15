@@ -15,6 +15,7 @@ if(HYLORD_BUILD_TESTS)
   add_executable(
     hylord_test
     unit/PercentageProportionConversionTest.cpp
+    unit/RecordParsingTest.cpp
     integration/TSVFileReaderTest.cpp
   )
   target_link_libraries(
