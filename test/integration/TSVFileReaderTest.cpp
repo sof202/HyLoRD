@@ -55,4 +55,9 @@ TEST_F(TSVReaderIntegrationTest, ThrowsOnInvalidPermissions) {
    EXPECT_THROW(reader.load(), FileReadException);
 }
 
+TEST_F(TSVReaderIntegrationTest, ThowsOnNonExistantFile) {
+   IO::TSVFileReader<TwoNumbers> reader{"this_file_does_not_exist.tsv"};
+   EXPECT_THROW(reader.load(), FileReadException);
+}
+
 }  // namespace Hylord
