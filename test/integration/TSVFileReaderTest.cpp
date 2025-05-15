@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <ratio>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -62,6 +63,11 @@ TEST_F(TSVReaderIntegrationTest, ExtractsDesiredFields) {
    std::vector<TwoNumbers> rows{reader.extractRecords()};
    EXPECT_EQ(rows[0].num1, 1);
    EXPECT_EQ(rows[1].num2, 6);
+}
+
+TEST_F(TSVReaderIntegrationTest, RecordAccessThrowsIfNotLoaded) {
+   IO::TSVFileReader<TwoNumbers> reader{getTestPath("valid/two_numbers.tsv")};
+   EXPECT_THROW(reader.extractRecords(), std::runtime_error);
 }
 
 TEST_F(TSVReaderIntegrationTest, ThrowsOnInvalidPermissions) {
