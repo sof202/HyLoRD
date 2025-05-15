@@ -65,6 +65,18 @@ TEST_F(TSVReaderIntegrationTest, ExtractsDesiredFields) {
    EXPECT_EQ(rows[1].num2, 6);
 }
 
+TEST_F(TSVReaderIntegrationTest, CorrectlyAppliesRowFilter) {
+   // File contains many rows, only 2 of which don't contain a '2' in first
+   // field
+   IO::TSVFileReader<TwoNumbers> reader{
+       getTestPath("valid/row_filter.tsv"),
+       {0, 1},
+       [](const Fields& fields) -> bool { return std::stoi(fields[0]) != 2; }};
+   reader.load();
+   std::vector<TwoNumbers> rows{reader.extractRecords()};
+   EXPECT_EQ(rows.size(), 2);
+}
+
 TEST_F(TSVReaderIntegrationTest, RecordAccessThrowsIfNotLoaded) {
    IO::TSVFileReader<TwoNumbers> reader{getTestPath("valid/two_numbers.tsv")};
    EXPECT_THROW(reader.extractRecords(), std::runtime_error);
