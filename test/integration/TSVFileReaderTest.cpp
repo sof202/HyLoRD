@@ -72,4 +72,13 @@ TEST_F(TSVReaderIntegrationTest, SkipsEmptyLines) {
    EXPECT_EQ(rows[0].num1, 1);
    EXPECT_EQ(rows[1].num2, 4);
 }
+
+TEST_F(TSVReaderIntegrationTest, SkipsMalformedLines) {
+   IO::TSVFileReader<TwoNumbers> reader{
+       getTestPath("valid/malformed_lines.tsv")};
+   reader.load();
+   std::vector<TwoNumbers> rows{reader.extractRecords()};
+   EXPECT_EQ(rows[0].num1, 1);
+   EXPECT_EQ(rows[1].num2, 4);
+}
 }  // namespace Hylord
