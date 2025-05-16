@@ -5,6 +5,7 @@
 #include <iterator>
 #include <sstream>
 
+#include "HylordException.hpp"
 #include "io/writeMetrics.hpp"
 
 namespace Hylord {
@@ -33,5 +34,24 @@ TEST_F(FileWritingTest, BasicFunctionality) {
    std::string test_file_contents((std::istreambuf_iterator<char>(test_file)),
                                   std::istreambuf_iterator<char>());
    EXPECT_EQ(test_file_contents, "test string");
+}
+
+TEST_F(FileWritingTest, CreatesParentDirectories) {
+   m_test_buffer << "test string";
+   std::filesystem::path nested_file_path{m_test_dir / "subdir1" / "subdir2" /
+                                          "nested_file.txt"};
+   IO::writeToFile(m_test_buffer, nested_file_path);
+
+   ASSERT_TRUE(std::filesystem::exists(nested_file_path));
+
+   std::ifstream test_file(nested_file_path);
+   std::string test_file_contents((std::istreambuf_iterator<char>(test_file)),
+                                  std::istreambuf_iterator<char>());
+   EXPECT_EQ(test_file_contents, "test string");
+}
+
+TEST_F(FileWritingTest, FailOnPathBeingDirectory) {
+   EXPECT_THROW(IO::writeToFile(m_test_buffer, m_test_dir),
+                FileWriteException);
 }
 }  // namespace Hylord
