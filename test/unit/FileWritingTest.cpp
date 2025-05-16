@@ -83,6 +83,22 @@ TEST_F(FileWritingTest, HandleExistingFileNames) {
    EXPECT_EQ(test_file_copy2_contents, "test string");
 }
 
+TEST_F(FileWritingTest, ThrowsOnNoWritePermissions) {
+   m_test_buffer << "test string";
+   std::filesystem::path no_write_dir{m_test_dir / "no_write_dir"};
+   std::filesystem::create_directories(no_write_dir);
+   std::filesystem::permissions(no_write_dir,
+                                std::filesystem::perms::owner_write,
+                                std::filesystem::perm_options::remove);
+   std::filesystem::path file_path{no_write_dir / "test_file.txt"};
+   EXPECT_THROW(IO::writeToFile(m_test_buffer, file_path), FileWriteException);
+
+   // Need to restore permissions to allow cleanup of files
+   std::filesystem::permissions(no_write_dir,
+                                std::filesystem::perms::owner_write,
+                                std::filesystem::perm_options::add);
+}
+
 TEST_F(FileWritingTest, FailOnPathBeingDirectory) {
    EXPECT_THROW(IO::writeToFile(m_test_buffer, m_test_dir),
                 FileWriteException);
