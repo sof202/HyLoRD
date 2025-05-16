@@ -26,6 +26,10 @@ configure:
 build: configure
 	@cmake --build $(BUILD_DIR) --parallel $(NPROC)
 
+test: CMAKE_EXTRA_FLAGS += -DHYLORD_BUILD_TESTS=ON
+test: build
+	@cd $(BUILD_DIR) && ctest
+
 install:
 	@cmake --install $(BUILD_DIR)
 
@@ -39,4 +43,4 @@ full-clean: clean
 	@rm -rf $(BUILD_DIR)
 
 
-.PHONY: all configure build install docs clean full-clean 
+.PHONY: all configure build install docs clean full-clean

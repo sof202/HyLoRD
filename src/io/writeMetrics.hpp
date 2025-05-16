@@ -16,6 +16,9 @@ namespace Hylord::IO {
 /// Writes deconvolution results to stdout or file (given by user).
 void writeMetrics(const CMD::HylordConfig& config,
                   const Deconvolution::Deconvolver& deconvolver);
+
+void writeToFile(const std::stringstream& buffer,
+                 const std::filesystem::path& out_path);
 }  // namespace Hylord::IO
 
 #endif
