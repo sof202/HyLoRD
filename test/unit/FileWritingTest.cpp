@@ -50,8 +50,42 @@ TEST_F(FileWritingTest, CreatesParentDirectories) {
    EXPECT_EQ(test_file_contents, "test string");
 }
 
+TEST_F(FileWritingTest, HandleExistingFileNames) {
+   std::filesystem::path file_path{m_test_dir / "existing_file.txt"};
+   m_test_buffer << "test string";
+   IO::writeToFile(m_test_buffer, file_path);
+   m_test_buffer << "test string";
+   IO::writeToFile(m_test_buffer, file_path);
+   m_test_buffer << "test string";
+   IO::writeToFile(m_test_buffer, file_path);
+
+   std::filesystem::path file_path_copy1{m_test_dir / "existing_file_1.txt"};
+   std::filesystem::path file_path_copy2{m_test_dir / "existing_file_2.txt"};
+   ASSERT_TRUE(std::filesystem::exists(file_path));
+   ASSERT_TRUE(std::filesystem::exists(file_path_copy1));
+   ASSERT_TRUE(std::filesystem::exists(file_path_copy2));
+
+   std::ifstream test_file(file_path);
+   std::string test_file_contents((std::istreambuf_iterator<char>(test_file)),
+                                  std::istreambuf_iterator<char>());
+   EXPECT_EQ(test_file_contents, "test string");
+
+   std::ifstream test_file_copy1(file_path_copy1);
+   std::string test_file_copy1_contents(
+       (std::istreambuf_iterator<char>(test_file_copy1)),
+       std::istreambuf_iterator<char>());
+   EXPECT_EQ(test_file_copy1_contents, "test string");
+
+   std::ifstream test_file_copy2(file_path_copy2);
+   std::string test_file_copy2_contents(
+       (std::istreambuf_iterator<char>(test_file_copy2)),
+       std::istreambuf_iterator<char>());
+   EXPECT_EQ(test_file_copy2_contents, "test string");
+}
+
 TEST_F(FileWritingTest, FailOnPathBeingDirectory) {
    EXPECT_THROW(IO::writeToFile(m_test_buffer, m_test_dir),
                 FileWriteException);
 }
+
 }  // namespace Hylord
