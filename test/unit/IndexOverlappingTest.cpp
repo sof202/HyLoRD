@@ -63,4 +63,14 @@ TEST_F(IndexOverlappingTest, BinarySearchTest) {
        createCpGTestData(), createBedmethylTestData().records())};
    EXPECT_EQ(expected_indexes, actual_indexes);
 }
+
+TEST_F(IndexOverlappingTest, TwoPointerSearchTest) {
+   RowIndexes expected_indexes_first{0, 1, 3, 4, 5, 6};
+   RowIndexes expected_indexes_second{0, 1, 4, 5, 6, 7};
+   std::pair<RowIndexes, RowIndexes> actual_indexes_pair{
+       BedData::findOverLappingIndexes(createCpGTestData().records(),
+                                       createBedmethylTestData().records())};
+   EXPECT_EQ(expected_indexes_first, actual_indexes_pair.first);
+   EXPECT_EQ(expected_indexes_second, actual_indexes_pair.second);
+}
 }  // namespace Hylord
