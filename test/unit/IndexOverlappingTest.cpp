@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <cstddef>
 #include <stdexcept>
 
 #include "data/BedData.hpp"
@@ -76,6 +77,25 @@ TEST_F(IndexOverlappingTest, TwoPointerSearchTest) {
    EXPECT_EQ(expected_indexes_second, actual_indexes_pair.second);
 }
 
+TEST_F(IndexOverlappingTest, SubsetTest) {
+   RowIndexes indexes{0, 2, 4};
+   BedData::BedMethylData bedmethyl{createBedmethylTestData()};
+   ASSERT_NO_THROW(bedmethyl.subsetRows(indexes));
+   BedData::BedMethylData expected_output{{createBed9Plus9(1, 100, 'm', 0.1),
+                                           createBed9Plus9(1, 201, 'h', 0.2),
+                                           createBed9Plus9(2, 150, 'h', 0.3)}};
+   for (std::size_t i{}; i < bedmethyl.records().size(); ++i) {
+      EXPECT_EQ(bedmethyl.records()[i].chromosome,
+                expected_output.records()[i].chromosome);
+      EXPECT_EQ(bedmethyl.records()[i].start,
+                expected_output.records()[i].start);
+      EXPECT_EQ(bedmethyl.records()[i].name,
+                expected_output.records()[i].name);
+      EXPECT_EQ(bedmethyl.records()[i].methylation_proportion,
+                expected_output.records()[i].methylation_proportion);
+   }
+}
+
 TEST_F(IndexOverlappingTest, ThrowOnNoCpGOverlap) {
    BedData::BedMethylData empty_bedmethyl;
    BedData::CpGData empty_cpg_list;
@@ -90,4 +110,5 @@ TEST_F(IndexOverlappingTest, ThrowOnNoCpGOverlap) {
                     createBedmethylTestData().records()),
                 std::runtime_error);
 }
+
 }  // namespace Hylord
