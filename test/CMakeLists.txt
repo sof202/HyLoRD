@@ -18,6 +18,7 @@ if(HYLORD_BUILD_TESTS)
     unit/RecordParsingTest.cpp
     unit/FilterCombinerTest.cpp
     unit/FileWritingTest.cpp
+    unit/IndexOverlappingTest.cpp
     integration/TSVFileReaderTest.cpp
   )
   target_link_libraries(
