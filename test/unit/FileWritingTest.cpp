@@ -99,6 +99,11 @@ TEST_F(FileWritingTest, ThrowsOnNoWritePermissions) {
                                 std::filesystem::perm_options::add);
 }
 
+TEST_F(FileWritingTest, ThrowsOnEmptyStringBuffer) {
+   std::filesystem::path file_path{m_test_dir / "test_file.txt"};
+   EXPECT_THROW(IO::writeToFile(m_test_buffer, file_path), FileWriteException);
+}
+
 TEST_F(FileWritingTest, FailOnPathBeingDirectory) {
    EXPECT_THROW(IO::writeToFile(m_test_buffer, m_test_dir),
                 FileWriteException);
