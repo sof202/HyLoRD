@@ -96,6 +96,13 @@ TEST_F(IndexOverlappingTest, SubsetTest) {
    }
 }
 
+TEST_F(IndexOverlappingTest, ThrowOnNonExistantIndexes) {
+   // bedmethyl has less than 30 entries
+   RowIndexes indexes{30, 31, 32};
+   BedData::BedMethylData bedmethyl{createBedmethylTestData()};
+   EXPECT_THROW(bedmethyl.subsetRows(indexes), std::out_of_range);
+}
+
 TEST_F(IndexOverlappingTest, ThrowOnNoCpGOverlap) {
    BedData::BedMethylData empty_bedmethyl;
    BedData::CpGData empty_cpg_list;
