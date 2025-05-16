@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <stdexcept>
+
 #include "data/BedData.hpp"
 #include "data/BedRecords.hpp"
 #include "types.hpp"
@@ -72,5 +74,20 @@ TEST_F(IndexOverlappingTest, TwoPointerSearchTest) {
                                        createBedmethylTestData().records())};
    EXPECT_EQ(expected_indexes_first, actual_indexes_pair.first);
    EXPECT_EQ(expected_indexes_second, actual_indexes_pair.second);
+}
+
+TEST_F(IndexOverlappingTest, ThrowOnNoCpGOverlap) {
+   BedData::BedMethylData empty_bedmethyl;
+   BedData::CpGData empty_cpg_list;
+
+   EXPECT_THROW(BedData::findIndexesInCpGList(  //
+                    createCpGTestData(),        //
+                    empty_bedmethyl.records()),
+                std::runtime_error);
+
+   EXPECT_THROW(BedData::findIndexesInCpGList(  //
+                    empty_cpg_list,             //
+                    createBedmethylTestData().records()),
+                std::runtime_error);
 }
 }  // namespace Hylord
