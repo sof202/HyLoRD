@@ -17,6 +17,7 @@ if(HYLORD_BUILD_TESTS)
     unit/PercentageProportionConversionTest.cpp
     unit/RecordParsingTest.cpp
     unit/FilterCombinerTest.cpp
+    unit/FileWritingTest.cpp
     integration/TSVFileReaderTest.cpp
   )
   target_link_libraries(
