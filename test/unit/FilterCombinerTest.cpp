@@ -52,4 +52,17 @@ TEST_F(FilterCombinerTest, NameFiltering) {
    EXPECT_FALSE(hydroxymethylation_filter(methylated_row));
 }
 
+TEST_F(FilterCombinerTest, BedMethylFiltering) {
+   IO::RowFilter methylation_filter{
+       Filters::generateBedmethylRowFilter(test_config_methylation)};
+   const Fields methylated_row{"chr1", "1000", "1001", "m", "50"};
+   const Fields hydroxymethylated_row{"chr1", "1000", "1001", "h", "50"};
+   const Fields high_read_depth{"chr1", "1000", "1001", "h", "500"};
+   const Fields low_read_depth{"chr1", "1000", "1001", "h", "1"};
+   EXPECT_TRUE(methylation_filter(methylated_row));
+   EXPECT_FALSE(methylation_filter(hydroxymethylated_row));
+   EXPECT_FALSE(methylation_filter(high_read_depth));
+   EXPECT_FALSE(methylation_filter(low_read_depth));
+}
+
 }  // namespace Hylord
