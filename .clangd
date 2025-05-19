@@ -11,7 +11,7 @@ Diagnostics:
       readability-*
     ]
     Remove: [
-      readability-braces-around-statements
+      readability-braces-around-statements,
       bugprone-easily-swappable-parameters
     ]
     CheckOptions:
