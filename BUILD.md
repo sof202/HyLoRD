@@ -31,7 +31,12 @@ whilst still adding some debug info
 - libpthread (POSIX Threads)
   - Likely already installed on modern systems
 
-### Tests
+## Running tests
+
+See
+[test/README.md](https://github.com/sof202/HyLoRD/blob/main/test/README.md).
+
+### Test dependencies
 
 - ctest (should come with cmake)
 
