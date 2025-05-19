@@ -7,11 +7,12 @@
 <p align="center">
     <a href="https://github.com/sof202/HyLoRD/actions/workflows/docs.yml" alt="Build status">
       <img src="https://img.shields.io/github/actions/workflow/status/sof202/HyLoRD/docs.yml?style=for-the-badge&color=orange" /></a>
+    <a href="https://github.com/sof202/HyLoRD/actions/workflows/test.yml" alt="Test status">
+      <img src="https://img.shields.io/github/actions/workflow/status/sof202/HyLoRD/test.yml?style=for-the-badge&label=tests&color=orange" /></a>
     <a href="https://github.com/sof202/HyLoRD/commits/main/" alt="Commit activity">
         <img src="https://img.shields.io/github/commit-activity/m/sof202/HyLoRD?style=for-the-badge&color=orange" /></a>
     <a href="https://github.com/sof202/HyLoRD/blob/main/LICENSE" alt="License">
         <img src="https://img.shields.io/github/license/sof202/HyLoRD?style=for-the-badge&color=orange" /></a>
-
 </p>
 
 ## Table of contents
