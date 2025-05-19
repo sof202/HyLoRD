@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.17)
 project(HyLoRD)
 
 include(FetchContent)
@@ -71,21 +71,32 @@ FetchContent_MakeAvailable(cli11_proj)
 # Eigen3 has a bunch of unecessary build steps that aren't needed for HyLoRD
 # Like building tests, .pc file generation and documentation building. Skipping
 # these saves on build time
+set(original_BUILD_TESTING ${BUILD_TESTING})
+set(BUILD_TESTING OFF CACHE BOOL "Disable tests for Eigen" FORCE)
+set(EIGEN_TEST_NOQT ON CACHE BOOL "Disable Qt-dependent tests" FORCE)
+set(EIGEN_BUILD_TESTING OFF CACHE BOOL "Disable Eigen tests" FORCE)
+set(EIGEN_TEST_NOQT ON CACHE BOOL "Disable QT unit tests" FORCE)
+set(EIGEN_MPL2_ONLY ON CACHE BOOL "Use only MPL2 code" FORCE)
+set(EIGEN_BUILD_PKGCONFIG OFF CACHE BOOL "" FORCE)
+set(EIGEN_BUILD_DOC OFF CACHE BOOL "Disable documentation building" FORCE)
+
+# There's also a lot of messages that Eigen3 outputs, which we would like to
+# suppress (to avoid user confusion).
+set(original_LOG_LEVEL ${CMAKE_MESSAGE_LOG_LEVEL})
+set(CMAKE_MESSAGE_LOG_LEVEL ERROR)
 FetchContent_Declare(
   Eigen
+  QUIET
   GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
   GIT_TAG 3147391d946bb4b6c68edd901f2add6ac1f31f8c # v3.4.0
   GIT_SHALLOW TRUE
   GIT_PROGRESS TRUE
 )
-set(original_BUILD_TESTING ${BUILD_TESTING})
-set(BUILD_TESTING OFF)
-set(EIGEN_BUILD_TESTING OFF)
-set(EIGEN_MPL2_ONLY ON)
-set(EIGEN_BUILD_PKGCONFIG OFF)
-set(EIGEN_BUILD_DOC OFF)
 FetchContent_MakeAvailable(Eigen)
-set(BUILD_TESTING ${original_BUILD_TESTING})
+set(BUILD_TESTING 
+  ${original_BUILD_TESTING} CACHE BOOL "Restore global test setting" FORCE
+)
+set(CMAKE_MESSAGE_LOG_LEVEL ${original_LOG_LEVEL})
 
 # qpmad's CMakeLists.txt contains 'find_package(Eigen3)'. We just retrieved
 # this above, so we just ensure that qpmad knows it exists and can find it.
@@ -108,8 +119,7 @@ FetchContent_MakeAvailable(qpmad)
 # ------------------
 # Build
 # ------------------
-file(GLOB HyLoRD
-  src/main.cpp
+file(GLOB HyLoRD_SOURCES
   src/cli.cpp
   src/core/hylord.cpp
   src/core/Deconvolver.cpp
@@ -120,15 +130,24 @@ file(GLOB HyLoRD
   src/data/DataProcessing.cpp
   src/data/Filters.cpp
 )
-add_executable(hylord ${HyLoRD})
-target_include_directories(hylord PRIVATE src)
-target_link_libraries(hylord PRIVATE Threads::Threads)
-target_link_libraries(hylord PRIVATE CLI11::CLI11)
-target_link_libraries(hylord PRIVATE Eigen3::Eigen)
-target_link_libraries(hylord PRIVATE qpmad)
-target_include_directories(hylord PUBLIC 
-${CMAKE_CURRENT_SOURCE_DIR}/third_party/pcg-cpp/include
+add_library(hylord_lib STATIC ${HyLoRD_SOURCES})
+target_include_directories(hylord_lib 
+  PUBLIC 
+    src
+  PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/third_party/pcg-cpp/include
 )
+target_link_libraries(hylord_lib 
+  PUBLIC
+    CLI11::CLI11
+    Eigen3::Eigen
+    qpmad
+  PRIVATE
+    Threads::Threads
+)
+
+add_executable(hylord src/main.cpp)
+target_link_libraries(hylord PRIVATE hylord_lib CLI11::CLI11)
 
 # ------------------
 # Install
@@ -136,6 +155,14 @@ ${CMAKE_CURRENT_SOURCE_DIR}/third_party/pcg-cpp/include
 install(TARGETS hylord
 RUNTIME DESTINATION bin
 )
+
+# ------------------
+# Tests
+# ------------------
+if(HYLORD_BUILD_TESTS)
+  enable_testing()
+  add_subdirectory(test)
+endif()
 
 # ------------------
 # Doxygen

@@ -27,9 +27,18 @@ whilst still adding some debug info
 ## Build prerequisites
 
 - Clang or GCC version 11.4.0+ (C++20 features are used)
-- CMake version 3.14+
+- CMake version 3.17+
 - libpthread (POSIX Threads)
   - Likely already installed on modern systems
+
+## Running tests
+
+See
+[test/README.md](https://github.com/sof202/HyLoRD/blob/main/test/README.md).
+
+### Test dependencies
+
+- ctest (should come with cmake)
 
 ## Building HyLoRD documentation locally
 
@@ -60,3 +69,8 @@ for Vector and Matrix interfaces. Licensed under MPL2.
 generation. Licensed under MIT and Apache2.0.
 - [qpmad](https://github.com/asherikov/qpmad/) (v1.4.0): Used for solving main
 quadratic programming problem. Licensed under Apache2.0.
+
+### Tests
+
+- [GoogleTest](https://github.com/google/googletest/) (v1.17.0): Used for test
+framework. Licensed under BSD-3-Clause. 
