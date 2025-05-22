@@ -47,6 +47,14 @@ you want to keep from the bedmethyl files are:
 - 4 - Mark name field
 - 11 - Fraction modified field (percent methylated)
 
+\remark
+The reference matrix and CpG list inputs (listed below) can be made easily
+with [SQUIRE](https://github.com/sof202/SQUIRE). This is a python-based
+CLI made by the same author that speeds up the process considerably (no need
+to write your own scripts). If you aren't working with bedmethyl data for
+the reference matrix, SQUIRE will not immediately help, but the ideas present
+within the source code might.
+
 ### CpG list (optional)
 
 Providing a CpG list will greatly improve computational performance with
