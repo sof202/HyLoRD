@@ -149,7 +149,7 @@ class TSVFileReader {
    // error catching (thread safe)
    mutable std::mutex m_warning_mutex;
    mutable std::vector<std::string> m_warning_messages;
-   int m_max_warning_messages{5};
+   static constexpr int m_max_warning_messages{5};
    int m_number_of_warning_messages{};
 };
 
