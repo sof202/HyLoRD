@@ -254,12 +254,12 @@ inline auto TSVFileReader<RecordType>::splitTSVLine(
    std::size_t end{line.find_first_of("\t ")};
 
    while (end != std::string::npos) {
-      fields.push_back(line.substr(start, end - start));
+      fields.emplace_back(line.substr(start, end - start));
       start = end + 1;
       end = line.find_first_of("\t ", start);
    }
    // Final field
-   fields.push_back(line.substr(start));
+   fields.emplace_back(line.substr(start));
 
    return fields;
 }
@@ -321,7 +321,8 @@ inline auto TSVFileReader<RecordType>::processChunk(const char* start,
 
       try {
          if (!m_row_filter || m_row_filter(filtered_fields)) {
-            chunk_records.push_back(RecordType::fromFields(filtered_fields));
+            chunk_records.emplace_back(
+                RecordType::fromFields(filtered_fields));
          }
       } catch (const std::exception& e) {
          if (std::ssize(m_warning_messages) < m_max_warning_messages) {
