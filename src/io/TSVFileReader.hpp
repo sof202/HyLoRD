@@ -138,7 +138,8 @@ class TSVFileReader {
    /// Splits a TSV line into individual fields.
    auto splitTSVLine(const std::string& line) const -> Fields;
    /// Finds the end of a chunk for parallel processing.
-   auto findChunkEnd(const char* start, int size) const -> const char*;
+   auto findChunkEnd(const char* start, std::ptrdiff_t size) const -> const
+       char*;
    /// Processes a chunk of TSV data into records.
    auto processChunk(MapRange map_range) -> Records;
 
@@ -191,8 +192,8 @@ inline auto TSVFileReader<RecordType>::splitTSVLine(
  */
 template <Records::TSVRecord RecordType>
 inline auto TSVFileReader<RecordType>::findChunkEnd(const char* start,
-                                                    int size) const -> const
-    char* {
+                                                    std::ptrdiff_t size) const
+    -> const char* {
    const char* approximate_end{start + size};
    const char* file_end{m_memory_map.data() + m_file_descriptor.fileSize()};
 
@@ -273,8 +274,8 @@ template <Records::TSVRecord RecordType>
 inline auto TSVFileReader<RecordType>::processFile(MapRange map_range) ->
     typename TSVFileReader<RecordType>::ChunkResults {
    std::vector<std::pair<const char*, const char*>> chunk_ranges{};
-   int chunk_size{static_cast<int>(m_file_descriptor.fileSize()) /
-                  m_num_threads};
+   auto chunk_size{static_cast<std::ptrdiff_t>(m_file_descriptor.fileSize()) /
+                   m_num_threads};
    const char* chunk_start{map_range.start};
    const char* file_end{map_range.end};
 
