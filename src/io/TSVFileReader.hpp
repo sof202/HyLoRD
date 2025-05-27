@@ -127,6 +127,8 @@ class TSVFileReader {
    // Memory mapping
    FileDescriptor m_file_descriptor{m_file_path};
    MemoryMap m_memory_map{m_file_descriptor};
+   /// Get the start and end pointers of the file
+   auto mappedRange() const -> MapRange;
 
    // Reading
    struct ChunkResult {
@@ -138,12 +140,11 @@ class TSVFileReader {
    /// Finds the end of a chunk for parallel processing.
    auto findChunkEnd(const char* start, int size) const -> const char*;
    /// Processes a chunk of TSV data into records.
-   auto processChunk(const char* start, const char* end) -> Records;
+   auto processChunk(MapRange map_range) -> Records;
 
    using ChunkResults = std::vector<ChunkResult>;
    /// Processes TSV file in parallel chunks
-   auto processFile(const char* file_start, const char* file_end)
-       -> ChunkResults;
+   auto processFile(MapRange map_range) -> ChunkResults;
 
    // error catching (thread safe)
    mutable std::mutex m_warning_mutex;
@@ -151,6 +152,14 @@ class TSVFileReader {
    int m_max_warning_messages{5};
    int m_number_of_warning_messages{};
 };
+
+template <Records::TSVRecord RecordType>
+auto TSVFileReader<RecordType>::mappedRange() const -> MapRange {
+   if (!m_memory_map.valid())
+      throw FileReadException(m_file_path, "No valid memory mapping.");
+   return {m_memory_map.data(),
+           m_memory_map.data() + m_file_descriptor.fileSize()};
+}
 
 /**
  * Parses tab or space delimited fields from a line and returns them
@@ -204,11 +213,11 @@ inline auto TSVFileReader<RecordType>::findChunkEnd(const char* start,
  * Thread-safe warning collection is implemented due to parallel processing.
  */
 template <Records::TSVRecord RecordType>
-inline auto TSVFileReader<RecordType>::processChunk(const char* start,
-                                                    const char* end)
+inline auto TSVFileReader<RecordType>::processChunk(MapRange map_range)
     -> std::vector<RecordType> {
    Records chunk_records;
-   const char* line_start{start};
+   const char* line_start{map_range.first};
+   const char* end{map_range.second};
 
    while (line_start < end) {
       const char* line_end{static_cast<const char*>(memchr(
@@ -260,13 +269,13 @@ inline auto TSVFileReader<RecordType>::processChunk(const char* start,
  * while preserving order. Handles per-chunk exceptions gracefully.
  */
 template <Records::TSVRecord RecordType>
-inline auto TSVFileReader<RecordType>::processFile(const char* file_start,
-                                                   const char* file_end) ->
+inline auto TSVFileReader<RecordType>::processFile(MapRange map_range) ->
     typename TSVFileReader<RecordType>::ChunkResults {
    std::vector<std::pair<const char*, const char*>> chunk_ranges{};
    int chunk_size{static_cast<int>(m_file_descriptor.fileSize()) /
                   m_num_threads};
-   const char* chunk_start{file_start};
+   const char* chunk_start{map_range.first};
+   const char* file_end{map_range.second};
 
    for (int i{0}; i < m_num_threads; ++i) {
       const char* chunk_end{(i == m_num_threads - 1)
@@ -281,8 +290,8 @@ inline auto TSVFileReader<RecordType>::processFile(const char* file_start,
    for (std::size_t i{}; i < chunk_ranges.size(); ++i) {
       futures.push_back(
           std::async(std::launch::async, [this, i, &chunk_ranges]() {
-             std::vector<RecordType> records{
-                 processChunk(chunk_ranges[i].first, chunk_ranges[i].second)};
+             std::vector<RecordType> records{processChunk(
+                 {chunk_ranges[i].first, chunk_ranges[i].second})};
              return ChunkResult{i, std::move(records)};
           }));
    }
@@ -317,10 +326,7 @@ void TSVFileReader<RecordType>::load() {
       throw HylordException("File is already loaded.");
    }
    try {
-      const char* file_start{m_memory_map.data()};
-      const char* file_end{m_memory_map.data() + m_file_descriptor.fileSize()};
-
-      auto chunk_results{processFile(file_start, file_end)};
+      auto chunk_results{processFile(mappedRange())};
 
       // Performance enhancement, we don't know how long a line is going to
       // be, but this is a nice conservative estimate that isn't too large.

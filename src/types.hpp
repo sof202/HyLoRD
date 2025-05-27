@@ -11,6 +11,7 @@
 #include <cstddef>
 #include <functional>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "Eigen/Dense"
@@ -25,6 +26,7 @@ using Matrix = Eigen::MatrixXd;
 namespace IO {
 using RowFilter = std::function<bool(const Fields&)>;
 using ColumnIndexes = std::vector<std::size_t>;
+using MapRange = std::pair<const char*, const char*>;
 }  // namespace IO
 
 namespace RNG {
