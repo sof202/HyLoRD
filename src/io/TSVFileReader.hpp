@@ -351,8 +351,8 @@ inline auto TSVFileReader<RecordType>::processFile(const char* file_start,
                                                    const char* file_end) ->
     typename TSVFileReader<RecordType>::ChunkResults {
    std::vector<std::pair<const char*, const char*>> chunk_ranges{};
-   int chunk_size = static_cast<int>(m_file_size) / m_num_threads;
-   const char* chunk_start = file_start;
+   int chunk_size{static_cast<int>(m_file_size) / m_num_threads};
+   const char* chunk_start{file_start};
 
    for (int i{0}; i < m_num_threads; ++i) {
       const char* chunk_end{(i == m_num_threads - 1)
@@ -364,11 +364,11 @@ inline auto TSVFileReader<RecordType>::processFile(const char* file_start,
 
    // Parallel processing of chunks
    std::vector<std::future<ChunkResult>> futures;
-   for (std::size_t i = 0; i < chunk_ranges.size(); ++i) {
+   for (std::size_t i{}; i < chunk_ranges.size(); ++i) {
       futures.push_back(
           std::async(std::launch::async, [this, i, &chunk_ranges]() {
-             auto records =
-                 processChunk(chunk_ranges[i].first, chunk_ranges[i].second);
+             std::vector<RecordType> records{
+                 processChunk(chunk_ranges[i].first, chunk_ranges[i].second)};
              return ChunkResult{i, std::move(records)};
           }));
    }
@@ -376,7 +376,7 @@ inline auto TSVFileReader<RecordType>::processFile(const char* file_start,
    ChunkResults chunk_results(chunk_ranges.size());
    for (auto& future : futures) {
       try {
-         auto result = future.get();
+         auto result{future.get()};
          chunk_results[result.chunk_index] = std::move(result);
       } catch (const std::exception& e) {
          std::cerr << "Some chunk could not be processed: " << e.what()
