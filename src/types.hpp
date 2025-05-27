@@ -11,7 +11,6 @@
 #include <cstddef>
 #include <functional>
 #include <string>
-#include <utility>
 #include <vector>
 
 #include "Eigen/Dense"
