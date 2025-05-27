@@ -16,6 +16,7 @@
 #include <cerrno>
 #include <cstddef>
 #include <cstring>
+#include <filesystem>
 #include <future>
 #include <iostream>
 #include <iterator>
@@ -82,11 +83,11 @@ class TSVFileReader {
     * hardware concurrency).
     */
    TSVFileReader(
-       const std::string_view file_path,
+       std::filesystem::path file_path,
        ColumnIndexes columns_to_include = {},
        RowFilter rowFilter = nullptr,
        int threads = static_cast<int>(std::thread::hardware_concurrency())) :
-       m_file_path{file_path},
+       m_file_path{std::move(file_path)},
        m_columns_to_include{std::move(columns_to_include)},
        m_row_filter{std::move(rowFilter)},
        m_num_threads{threads} {}
@@ -139,7 +140,7 @@ class TSVFileReader {
    ~TSVFileReader() { cleanupMemoryMap(); }
 
   private:
-   std::string m_file_path;
+   std::filesystem::path m_file_path;
    Records m_records{};
    ColumnIndexes m_columns_to_include;
    RowFilter m_row_filter;
