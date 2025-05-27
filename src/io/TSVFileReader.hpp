@@ -31,6 +31,8 @@
 
 #include "HylordException.hpp"
 #include "concepts.hpp"
+#include "io/FileDescriptor.hpp"
+#include "io/MemoryMap.hpp"
 #include "types.hpp"
 
 /// Defines Input and Output methods for HyLoRD
@@ -95,33 +97,8 @@ class TSVFileReader {
    TSVFileReader(const TSVFileReader&) = delete;
    auto operator=(const TSVFileReader&) -> TSVFileReader& = delete;
 
-   TSVFileReader(TSVFileReader&& other) noexcept :
-       m_file_path{std::move(other.m_file_path)},
-       m_records{std::move(other.m_records)},
-       m_columns_to_include{std::move(other.m_columns_to_include)},
-       m_row_filter{std::move(other.m_row_filter)},
-       m_num_threads{other.m_num_threads},
-       m_file_info{other.m_file_info},
-       m_file_size{other.m_file_size},
-       m_file_descriptor{std::exchange(other.m_file_descriptor, -1)},
-       m_mapped_data{std::exchange(other.m_mapped_data, nullptr)} {}
-
-   auto operator=(TSVFileReader&& other) noexcept -> TSVFileReader& {
-      if (this != &other) {
-         cleanupMemoryMap();
-
-         m_file_path = std::move(other.m_file_path);
-         m_records = std::move(other.m_records);
-         m_columns_to_include = std::move(other.m_columns_to_include);
-         m_row_filter = std::move(other.m_row_filter);
-         m_num_threads = other.m_num_threads;
-         m_file_info = other.m_file_info;
-         m_file_size = other.m_file_size;
-         m_file_descriptor = std::exchange(other.m_file_descriptor, -1);
-         m_mapped_data = std::exchange(other.m_mapped_data, nullptr);
-      }
-      return *this;
-   }
+   TSVFileReader(TSVFileReader&& other) noexcept = default;
+   auto operator=(TSVFileReader&& other) noexcept -> TSVFileReader& = default;
 
    /// Loads and processes the TSV file.
    void load();
@@ -137,7 +114,7 @@ class TSVFileReader {
       return std::move(m_records);
    }
 
-   ~TSVFileReader() { cleanupMemoryMap(); }
+   ~TSVFileReader() = default;
 
   private:
    std::filesystem::path m_file_path;
@@ -148,14 +125,8 @@ class TSVFileReader {
    bool m_loaded{false};
 
    // Memory mapping
-   struct stat m_file_info{};
-   std::size_t m_file_size{};
-   int m_file_descriptor{-1};
-   char* m_mapped_data{nullptr};
-   /// Sets up memory mapping for the TSV file.
-   void setupMemoryMap();
-   /// Cleans up memory-mapped file resources.
-   void cleanupMemoryMap();
+   FileDescriptor m_file_descriptor{m_file_path};
+   MemoryMap m_memory_map{m_file_descriptor};
 
    // Reading
    struct ChunkResult {
@@ -180,66 +151,6 @@ class TSVFileReader {
    int m_max_warning_messages{5};
    int m_number_of_warning_messages{};
 };
-
-/**
- * Opens the file, checks its validity, and maps it into memory for efficient
- * reading.
- * @throws std::system_error If file opening, fstat, or mmap operations fail.
- * @throws FileReadException If the file is not a regular file or is empty.
- */
-template <Records::TSVRecord RecordType>
-inline void TSVFileReader<RecordType>::setupMemoryMap() {
-   m_file_descriptor = open(m_file_path.c_str(), O_RDONLY);
-   if (m_file_descriptor == -1) {
-      throw std::system_error(
-          errno, std::system_category(), "Failed to open file");
-   }
-   if (fstat(m_file_descriptor, &m_file_info) == -1) {
-      int fstat_error_number = errno;
-      close(m_file_descriptor);
-      throw std::system_error(
-          fstat_error_number, std::system_category(), "fstat failed for file");
-   }
-   if (!S_ISREG(m_file_info.st_mode)) {
-      close(m_file_descriptor);
-      throw FileReadException(m_file_path, "Not a regular file");
-   }
-
-   m_file_size = static_cast<std::size_t>(m_file_info.st_size);
-   if (m_file_size == 0) {
-      close(m_file_descriptor);
-      throw FileReadException(m_file_path, "File is empty.");
-   }
-
-   m_mapped_data = static_cast<char*>(mmap(
-       nullptr, m_file_size, PROT_READ, MAP_PRIVATE, m_file_descriptor, 0));
-
-   if (m_mapped_data == MAP_FAILED) {
-      int mmap_error_number = errno;
-      close(m_file_descriptor);
-      throw std::system_error(
-          mmap_error_number, std::system_category(), "Memory mapping failed");
-   }
-
-   madvise(m_mapped_data, m_file_size, MADV_SEQUENTIAL | MADV_WILLNEED);
-}
-
-/**
- * Unmaps the memory-mapped file and closes the file descriptor.
- * Safely handles cases where either the mapped data or file descriptor might
- * already be cleaned up.
- */
-template <Records::TSVRecord RecordType>
-inline void TSVFileReader<RecordType>::cleanupMemoryMap() {
-   if (m_mapped_data != nullptr) {
-      munmap(m_mapped_data, m_file_size);
-      m_mapped_data = nullptr;
-   }
-   if (m_file_descriptor != -1) {
-      close(m_file_descriptor);
-      m_file_descriptor = -1;
-   }
-}
 
 /**
  * Parses tab or space delimited fields from a line and returns them
@@ -274,7 +185,7 @@ inline auto TSVFileReader<RecordType>::findChunkEnd(const char* start,
                                                     int size) const -> const
     char* {
    const char* approximate_end{start + size};
-   const char* file_end{m_mapped_data + m_file_size};
+   const char* file_end{m_memory_map.data() + m_file_descriptor.fileSize()};
 
    if (approximate_end >= file_end) return file_end;
 
@@ -353,7 +264,8 @@ inline auto TSVFileReader<RecordType>::processFile(const char* file_start,
                                                    const char* file_end) ->
     typename TSVFileReader<RecordType>::ChunkResults {
    std::vector<std::pair<const char*, const char*>> chunk_ranges{};
-   int chunk_size{static_cast<int>(m_file_size) / m_num_threads};
+   int chunk_size{static_cast<int>(m_file_descriptor.fileSize()) /
+                  m_num_threads};
    const char* chunk_start{file_start};
 
    for (int i{0}; i < m_num_threads; ++i) {
@@ -405,9 +317,8 @@ void TSVFileReader<RecordType>::load() {
       throw HylordException("File is already loaded.");
    }
    try {
-      setupMemoryMap();
-      const char* file_start{m_mapped_data};
-      const char* file_end{m_mapped_data + m_file_size};
+      const char* file_start{m_memory_map.data()};
+      const char* file_end{m_memory_map.data() + m_file_descriptor.fileSize()};
 
       auto chunk_results{processFile(file_start, file_end)};
 
@@ -415,7 +326,8 @@ void TSVFileReader<RecordType>::load() {
       // be, but this is a nice conservative estimate that isn't too large.
       // (based off of BED9+9)
       const std::size_t approximate_line_length{50};
-      m_records.reserve(m_file_size / approximate_line_length);
+      m_records.reserve(m_file_descriptor.fileSize() /
+                        approximate_line_length);
 
       // Insert chunks in the correct order
       for (auto& result : chunk_results) {
@@ -447,16 +359,11 @@ void TSVFileReader<RecordType>::load() {
          }
       }
    } catch (const std::system_error& e) {
-      cleanupMemoryMap();
       throw FileReadException(m_file_path,
                               "Caught system_error with code " +
                                   std::to_string(e.code().value()) + " [" +
                                   e.what() + "].");
-   } catch (...) {
-      cleanupMemoryMap();
-      throw;
    }
-   cleanupMemoryMap();
 }
 }  // namespace Hylord::IO
 
