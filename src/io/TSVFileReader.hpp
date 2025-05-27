@@ -313,10 +313,9 @@ inline auto TSVFileReader<RecordType>::processFile(MapRange map_range) ->
 
 /**
  * This method:
- * 1. Memory-maps the file
- * 2. Divides it into chunks
- * 3. Processes chunks in parallel
- * 4. Combines results
+ * 1. Divides memory map into chunks
+ * 2. Processes chunks in parallel
+ * 3. Combines results
  *
  * @throw HylordException if the file is already loaded.
  * @throw FileReadException if the file cannot be loaded or parsed.
