@@ -129,6 +129,8 @@ file(GLOB HyLoRD_SOURCES
   src/io/writeMetrics.cpp
   src/data/DataProcessing.cpp
   src/data/Filters.cpp
+  src/io/FileDescriptor.cpp
+  src/io/MemoryMap.cpp
 )
 add_library(hylord_lib STATIC ${HyLoRD_SOURCES})
 target_include_directories(hylord_lib 

@@ -10,6 +10,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <system_error>
 
 namespace Hylord {
 class HylordException : public std::runtime_error {
@@ -20,6 +21,12 @@ class HylordException : public std::runtime_error {
 
 class FileReadException : public HylordException {
   public:
+   explicit FileReadException(const std::string& file_name,
+                              int error_number,
+                              const std::string& details) :
+       HylordException{"Failed to read file '" + file_name + "' (" +
+                       std::system_category().message(error_number) +
+                       "): " + details} {}
    explicit FileReadException(const std::string& file_name,
                               const std::string& details) :
        HylordException{"Failed to read file '" + file_name + "': " + details} {

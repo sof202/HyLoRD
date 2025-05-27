@@ -16,6 +16,7 @@
 #include <cerrno>
 #include <cstddef>
 #include <cstring>
+#include <filesystem>
 #include <future>
 #include <iostream>
 #include <iterator>
@@ -30,6 +31,8 @@
 
 #include "HylordException.hpp"
 #include "concepts.hpp"
+#include "io/FileDescriptor.hpp"
+#include "io/MemoryMap.hpp"
 #include "types.hpp"
 
 /// Defines Input and Output methods for HyLoRD
@@ -82,45 +85,20 @@ class TSVFileReader {
     * hardware concurrency).
     */
    TSVFileReader(
-       const std::string_view file_path,
+       std::filesystem::path file_path,
        ColumnIndexes columns_to_include = {},
        RowFilter rowFilter = nullptr,
        int threads = static_cast<int>(std::thread::hardware_concurrency())) :
-       m_file_path{file_path},
+       m_file_path{std::move(file_path)},
        m_columns_to_include{std::move(columns_to_include)},
        m_row_filter{std::move(rowFilter)},
-       m_num_threads{threads} {}
+       m_num_threads{std::max(1, threads)} {}
 
    TSVFileReader(const TSVFileReader&) = delete;
    auto operator=(const TSVFileReader&) -> TSVFileReader& = delete;
 
-   TSVFileReader(TSVFileReader&& other) noexcept :
-       m_file_path{std::move(other.m_file_path)},
-       m_records{std::move(other.m_records)},
-       m_columns_to_include{std::move(other.m_columns_to_include)},
-       m_row_filter{std::move(other.m_row_filter)},
-       m_num_threads{other.m_num_threads},
-       m_file_info{other.m_file_info},
-       m_file_size{other.m_file_size},
-       m_file_descriptor{std::exchange(other.m_file_descriptor, -1)},
-       m_mapped_data{std::exchange(other.m_mapped_data, nullptr)} {}
-
-   auto operator=(TSVFileReader&& other) noexcept -> TSVFileReader& {
-      if (this != &other) {
-         cleanupMemoryMap();
-
-         m_file_path = std::move(other.m_file_path);
-         m_records = std::move(other.m_records);
-         m_columns_to_include = std::move(other.m_columns_to_include);
-         m_row_filter = std::move(other.m_row_filter);
-         m_num_threads = other.m_num_threads;
-         m_file_info = other.m_file_info;
-         m_file_size = other.m_file_size;
-         m_file_descriptor = std::exchange(other.m_file_descriptor, -1);
-         m_mapped_data = std::exchange(other.m_mapped_data, nullptr);
-      }
-      return *this;
-   }
+   TSVFileReader(TSVFileReader&& other) noexcept = default;
+   auto operator=(TSVFileReader&& other) noexcept -> TSVFileReader& = default;
 
    /// Loads and processes the TSV file.
    void load();
@@ -136,10 +114,10 @@ class TSVFileReader {
       return std::move(m_records);
    }
 
-   ~TSVFileReader() { cleanupMemoryMap(); }
+   ~TSVFileReader() = default;
 
   private:
-   std::string m_file_path;
+   std::filesystem::path m_file_path;
    Records m_records{};
    ColumnIndexes m_columns_to_include;
    RowFilter m_row_filter;
@@ -147,14 +125,10 @@ class TSVFileReader {
    bool m_loaded{false};
 
    // Memory mapping
-   struct stat m_file_info{};
-   std::size_t m_file_size{};
-   int m_file_descriptor{-1};
-   char* m_mapped_data{nullptr};
-   /// Sets up memory mapping for the TSV file.
-   void setupMemoryMap();
-   /// Cleans up memory-mapped file resources.
-   void cleanupMemoryMap();
+   FileDescriptor m_file_descriptor{m_file_path};
+   MemoryMap m_memory_map{m_file_descriptor};
+   /// Get the start and end pointers of the file
+   auto mappedRange() const -> MapRange;
 
    // Reading
    struct ChunkResult {
@@ -166,77 +140,25 @@ class TSVFileReader {
    /// Finds the end of a chunk for parallel processing.
    auto findChunkEnd(const char* start, int size) const -> const char*;
    /// Processes a chunk of TSV data into records.
-   auto processChunk(const char* start, const char* end) const -> Records;
+   auto processChunk(MapRange map_range) -> Records;
 
    using ChunkResults = std::vector<ChunkResult>;
    /// Processes TSV file in parallel chunks
-   auto processFile(const char* file_start, const char* file_end)
-       -> ChunkResults;
+   auto processFile(MapRange map_range) -> ChunkResults;
 
    // error catching (thread safe)
    mutable std::mutex m_warning_mutex;
    mutable std::vector<std::string> m_warning_messages;
-   int m_max_warning_messages{5};
+   static constexpr int m_max_warning_messages{5};
+   int m_number_of_warning_messages{};
 };
 
-/**
- * Opens the file, checks its validity, and maps it into memory for efficient
- * reading.
- * @throws std::system_error If file opening, fstat, or mmap operations fail.
- * @throws FileReadException If the file is not a regular file or is empty.
- */
 template <Records::TSVRecord RecordType>
-inline void TSVFileReader<RecordType>::setupMemoryMap() {
-   m_file_descriptor = open(m_file_path.c_str(), O_RDONLY);
-   if (m_file_descriptor == -1) {
-      throw std::system_error(
-          errno, std::system_category(), "Failed to open file");
-   }
-   if (fstat(m_file_descriptor, &m_file_info) == -1) {
-      int fstat_error_number = errno;
-      close(m_file_descriptor);
-      throw std::system_error(
-          fstat_error_number, std::system_category(), "fstat failed for file");
-   }
-   if (!S_ISREG(m_file_info.st_mode)) {
-      close(m_file_descriptor);
-      throw FileReadException(m_file_path, "Not a regular file");
-   }
-
-   m_file_size = static_cast<std::size_t>(m_file_info.st_size);
-   if (m_file_size == 0) {
-      close(m_file_descriptor);
-      throw FileReadException(m_file_path, "File is empty.");
-   }
-
-   m_mapped_data = static_cast<char*>(mmap(
-       nullptr, m_file_size, PROT_READ, MAP_PRIVATE, m_file_descriptor, 0));
-
-   if (m_mapped_data == MAP_FAILED) {
-      int mmap_error_number = errno;
-      close(m_file_descriptor);
-      throw std::system_error(
-          mmap_error_number, std::system_category(), "Memory mapping failed");
-   }
-
-   madvise(m_mapped_data, m_file_size, MADV_SEQUENTIAL | MADV_WILLNEED);
-}
-
-/**
- * Unmaps the memory-mapped file and closes the file descriptor.
- * Safely handles cases where either the mapped data or file descriptor might
- * already be cleaned up.
- */
-template <Records::TSVRecord RecordType>
-inline void TSVFileReader<RecordType>::cleanupMemoryMap() {
-   if (m_mapped_data != nullptr) {
-      munmap(m_mapped_data, m_file_size);
-      m_mapped_data = nullptr;
-   }
-   if (m_file_descriptor != -1) {
-      close(m_file_descriptor);
-      m_file_descriptor = -1;
-   }
+auto TSVFileReader<RecordType>::mappedRange() const -> MapRange {
+   if (!m_memory_map.valid())
+      throw FileReadException(m_file_path, "No valid memory mapping.");
+   return {.start = m_memory_map.data(),
+           .end = m_memory_map.data() + m_file_descriptor.fileSize()};
 }
 
 /**
@@ -252,12 +174,12 @@ inline auto TSVFileReader<RecordType>::splitTSVLine(
    std::size_t end{line.find_first_of("\t ")};
 
    while (end != std::string::npos) {
-      fields.push_back(line.substr(start, end - start));
+      fields.emplace_back(line.substr(start, end - start));
       start = end + 1;
       end = line.find_first_of("\t ", start);
    }
    // Final field
-   fields.push_back(line.substr(start));
+   fields.emplace_back(line.substr(start));
 
    return fields;
 }
@@ -272,7 +194,7 @@ inline auto TSVFileReader<RecordType>::findChunkEnd(const char* start,
                                                     int size) const -> const
     char* {
    const char* approximate_end{start + size};
-   const char* file_end{m_mapped_data + m_file_size};
+   const char* file_end{m_memory_map.data() + m_file_descriptor.fileSize()};
 
    if (approximate_end >= file_end) return file_end;
 
@@ -291,16 +213,17 @@ inline auto TSVFileReader<RecordType>::findChunkEnd(const char* start,
  * Thread-safe warning collection is implemented due to parallel processing.
  */
 template <Records::TSVRecord RecordType>
-inline auto TSVFileReader<RecordType>::processChunk(const char* start,
-                                                    const char* end) const
+inline auto TSVFileReader<RecordType>::processChunk(MapRange map_range)
     -> std::vector<RecordType> {
    Records chunk_records;
-   const char* line_start{start};
+   const char* line_start{map_range.start};
 
-   while (line_start < end) {
-      const char* line_end{static_cast<const char*>(memchr(
-          line_start, '\n', static_cast<std::size_t>(end - line_start)))};
-      if (line_end == nullptr) line_end = end;
+   while (line_start < map_range.end) {
+      const char* line_end{static_cast<const char*>(
+          memchr(line_start,
+                 '\n',
+                 static_cast<std::size_t>(map_range.end - line_start)))};
+      if (line_end == nullptr) line_end = map_range.end;
 
       std::string line(line_start,
                        static_cast<std::size_t>(line_end - line_start));
@@ -319,18 +242,22 @@ inline auto TSVFileReader<RecordType>::processChunk(const char* start,
 
       try {
          if (!m_row_filter || m_row_filter(filtered_fields)) {
-            chunk_records.push_back(RecordType::fromFields(filtered_fields));
+            chunk_records.emplace_back(
+                RecordType::fromFields(filtered_fields));
          }
       } catch (const std::exception& e) {
-         std::lock_guard<std::mutex> lock(m_warning_mutex);
-         std::ostringstream oss;
-         oss << "Record conversion warning: " << e.what() << '\n';
-         if (line.empty()) {
-            oss << "Line was empty.\n";
-         } else {
-            oss << line << '\n';
+         if (std::ssize(m_warning_messages) < m_max_warning_messages) {
+            std::lock_guard<std::mutex> lock(m_warning_mutex);
+            std::ostringstream oss;
+            oss << "Record conversion warning: " << e.what() << '\n';
+            if (line.empty()) {
+               oss << "Line was empty.\n";
+            } else {
+               oss << line << '\n';
+            }
+            m_warning_messages.emplace_back(oss.str());
          }
-         m_warning_messages.emplace_back(oss.str());
+         m_number_of_warning_messages++;
       }
       line_start = line_end + 1;
    }
@@ -343,12 +270,13 @@ inline auto TSVFileReader<RecordType>::processChunk(const char* start,
  * while preserving order. Handles per-chunk exceptions gracefully.
  */
 template <Records::TSVRecord RecordType>
-inline auto TSVFileReader<RecordType>::processFile(const char* file_start,
-                                                   const char* file_end) ->
+inline auto TSVFileReader<RecordType>::processFile(MapRange map_range) ->
     typename TSVFileReader<RecordType>::ChunkResults {
    std::vector<std::pair<const char*, const char*>> chunk_ranges{};
-   int chunk_size = static_cast<int>(m_file_size) / m_num_threads;
-   const char* chunk_start = file_start;
+   int chunk_size{static_cast<int>(m_file_descriptor.fileSize()) /
+                  m_num_threads};
+   const char* chunk_start{map_range.start};
+   const char* file_end{map_range.end};
 
    for (int i{0}; i < m_num_threads; ++i) {
       const char* chunk_end{(i == m_num_threads - 1)
@@ -360,11 +288,11 @@ inline auto TSVFileReader<RecordType>::processFile(const char* file_start,
 
    // Parallel processing of chunks
    std::vector<std::future<ChunkResult>> futures;
-   for (std::size_t i = 0; i < chunk_ranges.size(); ++i) {
+   for (std::size_t i{}; i < chunk_ranges.size(); ++i) {
       futures.push_back(
           std::async(std::launch::async, [this, i, &chunk_ranges]() {
-             auto records =
-                 processChunk(chunk_ranges[i].first, chunk_ranges[i].second);
+             std::vector<RecordType> records{processChunk(
+                 {chunk_ranges[i].first, chunk_ranges[i].second})};
              return ChunkResult{i, std::move(records)};
           }));
    }
@@ -372,7 +300,7 @@ inline auto TSVFileReader<RecordType>::processFile(const char* file_start,
    ChunkResults chunk_results(chunk_ranges.size());
    for (auto& future : futures) {
       try {
-         auto result = future.get();
+         auto result{future.get()};
          chunk_results[result.chunk_index] = std::move(result);
       } catch (const std::exception& e) {
          std::cerr << "Some chunk could not be processed: " << e.what()
@@ -385,10 +313,9 @@ inline auto TSVFileReader<RecordType>::processFile(const char* file_start,
 
 /**
  * This method:
- * 1. Memory-maps the file
- * 2. Divides it into chunks
- * 3. Processes chunks in parallel
- * 4. Combines results
+ * 1. Divides memory map into chunks
+ * 2. Processes chunks in parallel
+ * 3. Combines results
  *
  * @throw HylordException if the file is already loaded.
  * @throw FileReadException if the file cannot be loaded or parsed.
@@ -399,17 +326,14 @@ void TSVFileReader<RecordType>::load() {
       throw HylordException("File is already loaded.");
    }
    try {
-      setupMemoryMap();
-      const char* file_start{m_mapped_data};
-      const char* file_end{m_mapped_data + m_file_size};
-
-      auto chunk_results{processFile(file_start, file_end)};
+      auto chunk_results{processFile(mappedRange())};
 
       // Performance enhancement, we don't know how long a line is going to
       // be, but this is a nice conservative estimate that isn't too large.
       // (based off of BED9+9)
       const std::size_t approximate_line_length{50};
-      m_records.reserve(m_file_size / approximate_line_length);
+      m_records.reserve(m_file_descriptor.fileSize() /
+                        approximate_line_length);
 
       // Insert chunks in the correct order
       for (auto& result : chunk_results) {
@@ -419,20 +343,20 @@ void TSVFileReader<RecordType>::load() {
       }
       m_loaded = true;
 
-      if (!m_warning_messages.empty()) {
-         int num_warning_messages{static_cast<int>(m_warning_messages.size())};
+      if (m_number_of_warning_messages != 0) {
          std::cerr << "===\n"
-                   << num_warning_messages << " warning"
-                   << (num_warning_messages > 1 ? "s" : "")
+                   << m_number_of_warning_messages << " warning"
+                   << (m_number_of_warning_messages > 1 ? "s" : "")
                    << " occurred whilst processing '" << m_file_path << "'.\n";
-         for (int i{};
-              i < std::min(m_max_warning_messages, num_warning_messages);
+         for (int i{}; i < std::min(m_max_warning_messages,
+                                    m_number_of_warning_messages);
               ++i) {
             std::cerr << m_warning_messages[static_cast<std::size_t>(i)]
                       << '\n';
          }
          std::cerr << "These lines will be skipped.\n";
-         int remaining_messages{num_warning_messages - m_max_warning_messages};
+         int remaining_messages{m_number_of_warning_messages -
+                                m_max_warning_messages};
          if (remaining_messages > 0) {
             std::cerr << remaining_messages << " warning message"
                       << (remaining_messages > 1 ? "s were" : " was")
@@ -441,16 +365,11 @@ void TSVFileReader<RecordType>::load() {
          }
       }
    } catch (const std::system_error& e) {
-      cleanupMemoryMap();
       throw FileReadException(m_file_path,
                               "Caught system_error with code " +
                                   std::to_string(e.code().value()) + " [" +
                                   e.what() + "].");
-   } catch (...) {
-      cleanupMemoryMap();
-      throw;
    }
-   cleanupMemoryMap();
 }
 }  // namespace Hylord::IO
 

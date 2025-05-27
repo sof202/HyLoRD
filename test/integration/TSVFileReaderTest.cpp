@@ -93,18 +93,19 @@ TEST_F(TSVReaderIntegrationTest, ThrowsOnInvalidPermissions) {
    std::ofstream(data_path) << "test\n";
    chmod(data_path.c_str(), 0000);
 
-   IO::TSVFileReader<TwoNumbers> reader{data_path};
-   EXPECT_THROW(reader.load(), FileReadException);
+   EXPECT_THROW(IO::TSVFileReader<TwoNumbers> reader{data_path};
+                , FileReadException);
 }
 
 TEST_F(TSVReaderIntegrationTest, ThowsOnNonExistantFile) {
-   IO::TSVFileReader<TwoNumbers> reader{"this_file_does_not_exist.tsv"};
-   EXPECT_THROW(reader.load(), FileReadException);
+   EXPECT_THROW(
+       IO::TSVFileReader<TwoNumbers> reader{"this_file_does_not_exist.tsv"};
+       , FileReadException);
 }
 
 TEST_F(TSVReaderIntegrationTest, ThowsOnEmptyFile) {
-   IO::TSVFileReader<TwoNumbers> reader{"invalid/empty.tsv"};
-   EXPECT_THROW(reader.load(), FileReadException);
+   EXPECT_THROW(IO::TSVFileReader<TwoNumbers> reader{"invalid/empty.tsv"};
+                , FileReadException);
 }
 
 TEST_F(TSVReaderIntegrationTest, SkipsEmptyLines) {
