@@ -26,7 +26,10 @@ using Matrix = Eigen::MatrixXd;
 namespace IO {
 using RowFilter = std::function<bool(const Fields&)>;
 using ColumnIndexes = std::vector<std::size_t>;
-using MapRange = std::pair<const char*, const char*>;
+struct MapRange {
+   const char* start;
+   const char* end;
+};
 }  // namespace IO
 
 namespace RNG {

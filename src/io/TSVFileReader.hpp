@@ -92,7 +92,7 @@ class TSVFileReader {
        m_file_path{std::move(file_path)},
        m_columns_to_include{std::move(columns_to_include)},
        m_row_filter{std::move(rowFilter)},
-       m_num_threads{threads} {}
+       m_num_threads{std::max(1, threads)} {}
 
    TSVFileReader(const TSVFileReader&) = delete;
    auto operator=(const TSVFileReader&) -> TSVFileReader& = delete;
@@ -157,8 +157,8 @@ template <Records::TSVRecord RecordType>
 auto TSVFileReader<RecordType>::mappedRange() const -> MapRange {
    if (!m_memory_map.valid())
       throw FileReadException(m_file_path, "No valid memory mapping.");
-   return {m_memory_map.data(),
-           m_memory_map.data() + m_file_descriptor.fileSize()};
+   return {.start = m_memory_map.data(),
+           .end = m_memory_map.data() + m_file_descriptor.fileSize()};
 }
 
 /**
@@ -216,13 +216,14 @@ template <Records::TSVRecord RecordType>
 inline auto TSVFileReader<RecordType>::processChunk(MapRange map_range)
     -> std::vector<RecordType> {
    Records chunk_records;
-   const char* line_start{map_range.first};
-   const char* end{map_range.second};
+   const char* line_start{map_range.start};
 
-   while (line_start < end) {
-      const char* line_end{static_cast<const char*>(memchr(
-          line_start, '\n', static_cast<std::size_t>(end - line_start)))};
-      if (line_end == nullptr) line_end = end;
+   while (line_start < map_range.end) {
+      const char* line_end{static_cast<const char*>(
+          memchr(line_start,
+                 '\n',
+                 static_cast<std::size_t>(map_range.end - line_start)))};
+      if (line_end == nullptr) line_end = map_range.end;
 
       std::string line(line_start,
                        static_cast<std::size_t>(line_end - line_start));
@@ -274,8 +275,8 @@ inline auto TSVFileReader<RecordType>::processFile(MapRange map_range) ->
    std::vector<std::pair<const char*, const char*>> chunk_ranges{};
    int chunk_size{static_cast<int>(m_file_descriptor.fileSize()) /
                   m_num_threads};
-   const char* chunk_start{map_range.first};
-   const char* file_end{map_range.second};
+   const char* chunk_start{map_range.start};
+   const char* file_end{map_range.end};
 
    for (int i{0}; i < m_num_threads; ++i) {
       const char* chunk_end{(i == m_num_threads - 1)
