@@ -166,7 +166,7 @@ class TSVFileReader {
    /// Finds the end of a chunk for parallel processing.
    auto findChunkEnd(const char* start, int size) const -> const char*;
    /// Processes a chunk of TSV data into records.
-   auto processChunk(const char* start, const char* end) const -> Records;
+   auto processChunk(const char* start, const char* end) -> Records;
 
    using ChunkResults = std::vector<ChunkResult>;
    /// Processes TSV file in parallel chunks
@@ -177,6 +177,7 @@ class TSVFileReader {
    mutable std::mutex m_warning_mutex;
    mutable std::vector<std::string> m_warning_messages;
    int m_max_warning_messages{5};
+   int m_number_of_warning_messages{};
 };
 
 /**
@@ -292,7 +293,7 @@ inline auto TSVFileReader<RecordType>::findChunkEnd(const char* start,
  */
 template <Records::TSVRecord RecordType>
 inline auto TSVFileReader<RecordType>::processChunk(const char* start,
-                                                    const char* end) const
+                                                    const char* end)
     -> std::vector<RecordType> {
    Records chunk_records;
    const char* line_start{start};
@@ -322,15 +323,18 @@ inline auto TSVFileReader<RecordType>::processChunk(const char* start,
             chunk_records.push_back(RecordType::fromFields(filtered_fields));
          }
       } catch (const std::exception& e) {
-         std::lock_guard<std::mutex> lock(m_warning_mutex);
-         std::ostringstream oss;
-         oss << "Record conversion warning: " << e.what() << '\n';
-         if (line.empty()) {
-            oss << "Line was empty.\n";
-         } else {
-            oss << line << '\n';
+         if (std::ssize(m_warning_messages) < m_max_warning_messages) {
+            std::lock_guard<std::mutex> lock(m_warning_mutex);
+            std::ostringstream oss;
+            oss << "Record conversion warning: " << e.what() << '\n';
+            if (line.empty()) {
+               oss << "Line was empty.\n";
+            } else {
+               oss << line << '\n';
+            }
+            m_warning_messages.emplace_back(oss.str());
          }
-         m_warning_messages.emplace_back(oss.str());
+         m_number_of_warning_messages++;
       }
       line_start = line_end + 1;
    }
@@ -419,20 +423,20 @@ void TSVFileReader<RecordType>::load() {
       }
       m_loaded = true;
 
-      if (!m_warning_messages.empty()) {
-         int num_warning_messages{static_cast<int>(m_warning_messages.size())};
+      if (m_number_of_warning_messages != 0) {
          std::cerr << "===\n"
-                   << num_warning_messages << " warning"
-                   << (num_warning_messages > 1 ? "s" : "")
+                   << m_number_of_warning_messages << " warning"
+                   << (m_number_of_warning_messages > 1 ? "s" : "")
                    << " occurred whilst processing '" << m_file_path << "'.\n";
-         for (int i{};
-              i < std::min(m_max_warning_messages, num_warning_messages);
+         for (int i{}; i < std::min(m_max_warning_messages,
+                                    m_number_of_warning_messages);
               ++i) {
             std::cerr << m_warning_messages[static_cast<std::size_t>(i)]
                       << '\n';
          }
          std::cerr << "These lines will be skipped.\n";
-         int remaining_messages{num_warning_messages - m_max_warning_messages};
+         int remaining_messages{m_number_of_warning_messages -
+                                m_max_warning_messages};
          if (remaining_messages > 0) {
             std::cerr << remaining_messages << " warning message"
                       << (remaining_messages > 1 ? "s were" : " was")
