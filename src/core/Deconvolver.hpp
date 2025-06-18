@@ -36,7 +36,7 @@ class Deconvolver {
    [[nodiscard]] auto cellProportions() const -> Vector {
       return m_cell_proportions;
    }
-   auto evaluateObjectiveFunction(const Matrix& reference) -> double;
+   auto evaluateObjectiveFunctionL2Norm(const Matrix& reference) -> double;
 
   private:
    /// Initialises standard inputs for qpmad solver (see docs for more details)

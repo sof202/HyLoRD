@@ -89,7 +89,8 @@ auto run(CMD::HylordConfig& config) -> int {
       if (config.additional_cell_types == 0) {
          deconvolver.runQpmad(reference_matrix);
          std::cout << "Deconvolution resulted in an objective function of: "
-                   << deconvolver.evaluateObjectiveFunction(reference_matrix)
+                   << deconvolver.evaluateObjectiveFunctionL2Norm(
+                          reference_matrix)
                    << '\n';
          IO::writeMetrics(config, deconvolver);
          return 0;
@@ -115,7 +116,7 @@ auto run(CMD::HylordConfig& config) -> int {
                          "https://github.com/sof202/HyLoRD/issues.\n";
             break;
          }
-         if (deconvolver.evaluateObjectiveFunction(reference_matrix) <
+         if (deconvolver.evaluateObjectiveFunctionL2Norm(reference_matrix) <
              config.convergence_threshold) {
             break;
          }
@@ -124,7 +125,8 @@ auto run(CMD::HylordConfig& config) -> int {
       std::cout << "Deconvolution loop finished after " << iteration
                 << " iteration" << (iteration == 1 ? ".\n" : "s.\n");
       std::cout << "Deconvolution resulted in an objective function of: "
-                << deconvolver.evaluateObjectiveFunction(reference_matrix)
+                << deconvolver.evaluateObjectiveFunctionL2Norm(
+                       reference_matrix)
                 << '\n';
 
       // ------- //
