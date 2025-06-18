@@ -96,8 +96,9 @@ auto run(CMD::HylordConfig& config) -> int {
          return 0;
       }
 
-      int iteration{1};
+      int iteration{0};
       while (iteration <= config.max_iterations) {
+         iteration++;
          deconvolver.runQpmad(reference_matrix);
          try {
             LinearAlgebra::updateReferenceMatrix(reference_matrix,
@@ -120,7 +121,6 @@ auto run(CMD::HylordConfig& config) -> int {
              config.convergence_threshold) {
             break;
          }
-         iteration++;
       }
       std::cout << "Deconvolution loop finished after " << iteration
                 << " iteration" << (iteration == 1 ? ".\n" : "s.\n");
