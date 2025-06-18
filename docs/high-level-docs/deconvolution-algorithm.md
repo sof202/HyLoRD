@@ -50,8 +50,9 @@ These two steps repeat until at least one of the following criteria are met:
 1) The maximum number of iterations is exceeded (can be user specified with
 `--max-iterations`)
 
-2) The change in cell type proportions between iterations is below the
-convergence threshold (can be user specified with `--convergence-threshold`).
+2) The L2 norm of the objective function (`bulk data - (reference matrix *
+predicted cell proportions)`) is below the convergence threshold (can be user
+specified with `--convergence-threshold`).
 
 #### How novel cell methylation profiles are created {#novel-cell-profiles}
 
