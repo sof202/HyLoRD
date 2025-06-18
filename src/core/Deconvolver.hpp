@@ -37,6 +37,7 @@ class Deconvolver {
    [[nodiscard]] auto cellProportions() const -> Vector {
       return m_cell_proportions;
    }
+   auto evaluateObjectiveFunction(const Matrix& reference) -> double;
    auto changeInProportions() -> double {
       return LinearAlgebra::squaredDistance(m_cell_proportions,
                                             m_prev_cell_proportions);

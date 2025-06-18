@@ -34,4 +34,11 @@ auto Deconvolver::runQpmad(const Matrix& reference_matrix)
                            m_sum_lower_bound,
                            m_sum_upper_bound);
 }
+
+auto Deconvolver::evaluateObjectiveFunction(const Matrix& reference)
+    -> double {
+   Vector difference_vector{m_bulk_profile.transpose() -
+                            (reference * m_cell_proportions)};
+   return difference_vector.norm();
+}
 }  // namespace Hylord::Deconvolution

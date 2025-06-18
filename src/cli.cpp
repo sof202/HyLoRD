@@ -95,11 +95,10 @@ void setupCLI(CLI::App& app, HylordConfig& config) {
 
    app.add_option("--convergence-threshold",
                   config.convergence_threshold,
-                  "The criterion for breaking out of the main "
-                  "deconvolution loop. i.e. if the change in cell proportions "
-                  "between iterations is smaller than this threshold, the "
-                  "loop breaks. Note: This does nothing if "
-                  "additional-cell-types is not set.")
+                  "The criterion for breaking out of the main deconvolution "
+                  "loop. i.e. if the l2 norm of the objective function is "
+                  "smaller than this threshold, the loop breaks. "
+                  "Note: Does nothing if additional-cell-types is not set.")
        ->capture_default_str()
        ->group("Deconvolution hyperparameters")
        ->check(CLI::Range(0.0, std::numeric_limits<double>::max()));

@@ -88,6 +88,9 @@ auto run(CMD::HylordConfig& config) -> int {
           reference_matrix_data.numberOfCellTypes(), bulk_profile};
       if (config.additional_cell_types == 0) {
          deconvolver.runQpmad(reference_matrix);
+         std::cout << "Deconvolution resulted in an objective function of: "
+                   << deconvolver.evaluateObjectiveFunction(reference_matrix)
+                   << '\n';
          IO::writeMetrics(config, deconvolver);
          return 0;
       }
@@ -112,16 +115,17 @@ auto run(CMD::HylordConfig& config) -> int {
                          "https://github.com/sof202/HyLoRD/issues.\n";
             break;
          }
-         // On first iteration, there is no 'previous' cell proportions
-         // yet and so the distance metric will fail.
-         if (iteration > 1 && deconvolver.changeInProportions() <
-                                  config.convergence_threshold) {
+         if (deconvolver.evaluateObjectiveFunction(reference_matrix) <
+             config.convergence_threshold) {
             break;
          }
          iteration++;
       }
       std::cout << "Deconvolution loop finished after " << iteration
                 << " iteration" << (iteration == 1 ? ".\n" : "s.\n");
+      std::cout << "Deconvolution resulted in an objective function of: "
+                << deconvolver.evaluateObjectiveFunction(reference_matrix)
+                << '\n';
 
       // ------- //
       // Outputs //
