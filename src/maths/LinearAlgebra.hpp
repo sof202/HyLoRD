@@ -44,9 +44,6 @@ auto pseudoInverse(const Eigen::MatrixBase<Derived>& vec)
    return vec.transpose() / squared_norm;
 }
 
-/// Computes the squared Euclidean distance between two vectors.
-auto squaredDistance(const Vector& vec1, const Vector& vec2) -> double;
-
 /**
  * @brief Update process for unknown reference profiles (see @ref
  * reference-matrix-updating for more info).

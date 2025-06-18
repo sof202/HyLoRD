@@ -10,7 +10,6 @@
 
 #include <utility>
 
-#include "maths/LinearAlgebra.hpp"
 #include "qpmad/solver.h"
 #include "types.hpp"
 
@@ -38,10 +37,6 @@ class Deconvolver {
       return m_cell_proportions;
    }
    auto evaluateObjectiveFunction(const Matrix& reference) -> double;
-   auto changeInProportions() -> double {
-      return LinearAlgebra::squaredDistance(m_cell_proportions,
-                                            m_prev_cell_proportions);
-   }
 
   private:
    /// Initialises standard inputs for qpmad solver (see docs for more details)
@@ -55,7 +50,6 @@ class Deconvolver {
 
    int m_num_cell_types;
    Vector m_cell_proportions;         // x
-   Vector m_prev_cell_proportions;    // x_prev
    Vector m_proportions_lower_bound;  // lb
    Vector m_proportions_upper_bound;  // ub
    Vector m_sum_lower_bound;          // Alb

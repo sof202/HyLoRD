@@ -42,17 +42,6 @@ auto generateCoefficientVector(const Matrix& reference_matrix,
 }
 
 /**
- * Calculates the squared L2 norm of the difference between two vectors.
- * Vectors must have matching dimensions (checked via assertion).
- */
-auto squaredDistance(const Vector& vec1, const Vector& vec2) -> double {
-   assert(vec1.size() == vec2.size() &&
-          "Vectors must be of the same length to compute distance between the "
-          "two of them.");
-   return (vec1 - vec2).squaredNorm();
-}
-
-/**
  * Extends the reference matrix by solving for additional cell type profiles
  * using bulk data. Requires the reference matrix to have space allocated for
  * additional cell types. Uses pseudoinverse to solve for new profiles based on

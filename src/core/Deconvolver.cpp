@@ -7,6 +7,7 @@
 
 #include "core/Deconvolver.hpp"
 
+#include "maths/LinearAlgebra.hpp"
 #include "qpmad/solver.h"
 #include "types.hpp"
 
@@ -24,7 +25,6 @@ auto Deconvolver::runQpmad(const Matrix& reference_matrix)
        reference_matrix, m_bulk_profile)};
 
    qpmad::Solver qpp_solver;
-   m_prev_cell_proportions.noalias() = m_cell_proportions;
    return qpp_solver.solve(m_cell_proportions,
                            hessian,
                            linear_terms,
